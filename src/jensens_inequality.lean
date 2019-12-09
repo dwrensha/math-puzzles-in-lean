@@ -18,9 +18,22 @@ def sum_seq { n : ℕ } (f: fin n → ℝ) : ℝ :=
   let f' := λ m : ℕ, if h: m < n then f ⟨m, h⟩ else 0 in
   sum_first_n f' n
 
-
 def is_weight {n : ℕ} (a : fin n → ℝ) : Prop :=
-  (sum_seq a = 1) ∧ ∀ i : fin n, a i > 0
+  (sum_seq a = 1) ∧ ∀ i : fin n, a i ≥ 0
+
+lemma empty_sum_is_zero (f : fin 0 → ℝ) : sum_seq f = 0 :=
+begin
+  unfold sum_seq,
+  simp,
+  unfold sum_first_n,
+end
+
+lemma no_empty_weight (a : fin 0 → ℝ) (h : is_weight a) : false :=
+begin
+  cases h with h_sum1 h_nonneg,
+  rw empty_sum_is_zero a at h_sum1,
+  linarith,
+end
 
 theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_weight a) (hf : is_convex f):
   ∀ x : fin n → ℝ,
@@ -29,8 +42,13 @@ theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_
 :=
 begin
   revert a,
-  induction n with pn ih,
+  cases n,
      intro a,
-     sorry,
+     intro hw,
+     exfalso,
+     exact no_empty_weight a hw,
+  induction n with pn ih,
+    intros a hw x,
+    sorry,
   sorry,
 end
