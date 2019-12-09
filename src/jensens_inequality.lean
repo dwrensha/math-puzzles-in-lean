@@ -19,4 +19,8 @@ def sum_seq { n : ℕ } (f: fin n → ℝ) : ℝ :=
   sum_first_n f' n
 
 
---def jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → 
+def is_weight {n : ℕ} (a : fin n → ℝ) : Prop :=
+  (sum_seq a = 1) ∧ ∀ i : fin n, a i > 0
+
+--def jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_weight a) (hf : is_convex f):
+--  sum_seq (λ i : fin n, 
