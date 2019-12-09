@@ -28,6 +28,9 @@ theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_
     (sum_seq (λ i : fin n, (a i) * f (x i)))
 :=
 begin
-  intro hn,
-  sorry
+  revert a,
+  induction n with pn ih,
+     intro a,
+     sorry,
+  sorry,
 end
