@@ -35,6 +35,17 @@ begin
   linarith,
 end
 
+lemma singleton_weight_is_trivial (a : fin 1 → ℝ) (h : is_weight a) : a 0 = 1 :=
+begin
+  unfold is_weight at h,
+  cases h with h1 hp,
+  unfold sum_seq at h1,
+  simp at h1,
+  unfold sum_first_n at h1,
+  simp at h1,
+  exact h1,
+end
+
 theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_weight a) (hf : is_convex f):
   ∀ x : fin n → ℝ,
     (f (sum_seq (λ i : fin n, (a i) * (x i)))) ≤
@@ -49,6 +60,17 @@ begin
      exact no_empty_weight a hw,
   induction n with pn ih,
     intros a hw x,
-    sorry,
+    have hs := singleton_weight_is_trivial a hw,
+    unfold sum_seq,
+    simp,
+    unfold sum_first_n,
+    simp,
+    have hz: 0 < 1,
+      linarith,
+    have haz: a 0 = a ⟨0, hz⟩,
+      refl,
+    rw haz at hs,
+    rw hs,
+    simp,
   sorry,
 end
