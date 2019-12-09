@@ -72,5 +72,7 @@ begin
     rw hs,
     simp,
   intros a hw x,
+  by_cases hp: (nat.succ pn) = 1,
+    sorry,
   sorry,
 end
