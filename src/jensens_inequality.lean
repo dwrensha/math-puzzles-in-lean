@@ -54,8 +54,7 @@ theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_
 begin
   revert a,
   cases n,
-     intro a,
-     intro hw,
+     intros a hw,
      exfalso,
      exact no_empty_weight a hw,
   induction n with pn ih,
@@ -72,5 +71,6 @@ begin
     rw haz at hs,
     rw hs,
     simp,
+  intros a hw x,
   sorry,
 end
