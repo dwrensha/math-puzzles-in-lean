@@ -46,6 +46,15 @@ begin
   exact h1,
 end
 
+lemma full_weight_in_last {p : ℕ} (a : fin (nat.succ p) → ℝ)
+  (hw : is_weight a) (hp: a p = 1) : (∀ i : fin (nat.succ p), i < p → (a i = 0)) :=
+begin
+  unfold is_weight at hw,
+  cases hw with hs hg,
+  intros j hj,
+  sorry
+end
+
 theorem jensen_inequality {n: ℕ} (f: ℝ → ℝ) (a: fin n → ℝ) (ha : is_weight a) (hf : is_convex f):
   ∀ x : fin n → ℝ,
     (f (sum_seq (λ i : fin n, (a i) * (x i)))) ≤
@@ -72,7 +81,7 @@ begin
     rw hs,
     simp,
   intros a hw x,
-  by_cases hp: (nat.succ pn) = 1,
-    sorry,
-  sorry,
+  by_cases hp: (a (nat.succ pn)) = 1,
+  {sorry},
+  {sorry},
 end
