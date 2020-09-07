@@ -1,4 +1,5 @@
 import data.finset.basic
+import data.fintype.basic
 import data.set.intervals.basic
 import data.real.basic data.nat.basic
 
@@ -30,8 +31,10 @@ theorem intervals_and_distances
           d.val = b - a
           ∧ (∃i ∈ interval_indexes, in_subinterval a (all_intervals i))
           ∧ (∃j ∈ interval_indexes, in_subinterval b (all_intervals j))))
-  : (1 : ℝ) / 1 ≤ (∑ i in interval_indexes, subinterval_length (all_intervals i)) :=
+  : (1 : ℝ) / interval_indexes.card  ≤ (∑ i in interval_indexes, subinterval_length (all_intervals i)) :=
 begin
   sorry
 end
+
+
 
