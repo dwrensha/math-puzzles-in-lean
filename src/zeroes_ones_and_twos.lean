@@ -8,7 +8,7 @@ def all_zero_or_one : list ℕ → Prop
 | (1 :: ds) := all_zero_or_one ds
 | _ := false
 
-theorem part_one (n : ℕ) : ∃ k : ℕ, all_zero_or_one (digits 10 (n * k)) :=
+theorem part_one (n : ℕ) : ∃ k : ℕ, all_zero_or_one (digits 10 (n * (k + 1))) :=
 begin
   sorry
 end
