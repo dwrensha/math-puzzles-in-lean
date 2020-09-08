@@ -5,12 +5,25 @@ import data.nat.digits
 import data.nat.gcd
 import data.zmod.basic
 
+lemma foo
+  (base factor c d : ℕ)
+  (h_coprime : nat.gcd base factor = 1)
+  (h_equal : base * c ≡ base * d [ZMOD factor])
+  : c ≡ d [ZMOD factor] :=
+begin
+  unfold int.modeq,
+  unfold has_mod.mod,
+--  int.mod,
+  sorry,
+end
+
+
 -- let a, b, c, be natural numbers, with c < b, a and b coprime.
 -- prove that there exists k > 0 such that c a^k = c mod b.
-lemma foo
-  (a b c : ℕ)
-  (h_coprime: nat.gcd a b = 1)
-  : ∃k:ℕ+, (a^k.val) * c ≡ c [ZMOD b] :=
+lemma periodic
+  (base factor c : ℕ)
+  (h_coprime: nat.gcd base factor = 1)
+  : ∃k : ℕ+, (base^k.val) * c ≡ c [ZMOD factor] :=
 begin
   sorry,
 end
