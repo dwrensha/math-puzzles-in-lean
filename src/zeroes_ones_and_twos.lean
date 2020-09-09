@@ -7,7 +7,7 @@ import data.zmod.basic
 
 lemma foo
   (base factor c d : ℕ)
-  (h_coprime : nat.gcd base factor = 1)
+  (h_coprime : nat.coprime factor base)
   (h_equal : base * c ≡ base * d [ZMOD factor])
   : c ≡ d [ZMOD factor] :=
 begin
@@ -17,6 +17,8 @@ begin
     exact (mul_sub ↑base ↑d ↑c).symm
   },
   rw hs at hd,
+  apply int.modeq.modeq_iff_dvd.mpr,
+  -- refine nat.coprime.dvd_of_dvd_mul_left h_coprime _,
   sorry,
 end
 
