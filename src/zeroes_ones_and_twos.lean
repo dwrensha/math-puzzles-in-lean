@@ -11,7 +11,12 @@ lemma foo
   (h_equal : base * c ≡ base * d [ZMOD factor])
   : c ≡ d [ZMOD factor] :=
 begin
-  have hd: (factor: ℤ) ∣ (((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ))) := int.modeq.modeq_iff_dvd.mp h_equal,
+  have hd: (factor: ℤ) ∣ ((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ)) := int.modeq.modeq_iff_dvd.mp h_equal,
+  have hs: ((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ)) = ((base: ℤ) * ( (d: ℤ) - (c: ℤ))),
+  {
+    exact (mul_sub ↑base ↑d ↑c).symm
+  },
+  rw hs at hd,
   sorry,
 end
 
