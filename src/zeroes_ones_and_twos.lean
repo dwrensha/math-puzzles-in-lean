@@ -15,11 +15,7 @@ lemma foo_aux
 begin
   have hm : (base * c) ≤ (base * d) := nat.mul_le_mul_left base hord,
   have hd: (factor ∣ (base * d) - (base * c)) := (nat.modeq.modeq_iff_dvd' hm).mp h_equal,
-  have hs: (base * d) - (base * c) = (base * (d - c)),
-  {
-    exact (nat.mul_sub_left_distrib base d c).symm
-  },
-  rw hs at hd,
+  rw [←nat.mul_sub_left_distrib base d c] at hd,
   apply (nat.modeq.modeq_iff_dvd' hord).mpr,
   exact nat.coprime.dvd_of_dvd_mul_left h_coprime hd,
 end
