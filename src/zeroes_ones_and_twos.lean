@@ -11,9 +11,7 @@ lemma foo
   (h_equal : base * c ≡ base * d [ZMOD factor])
   : c ≡ d [ZMOD factor] :=
 begin
-  unfold int.modeq,
-  unfold has_mod.mod,
---  int.mod,
+  have hd: (factor: ℤ) ∣ (((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ))) := int.modeq.modeq_iff_dvd.mp h_equal,
   sorry,
 end
 
