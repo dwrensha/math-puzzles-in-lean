@@ -1,27 +1,44 @@
 import data.int.modeq
 import data.nat.basic
+import data.nat.modeq
 import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd
 import data.zmod.basic
 
+lemma foo_aux
+  (base factor c d : ℕ)
+  (hord : c ≤ d)
+  (h_coprime : nat.coprime factor base)
+  (h_equal : base * c ≡ base * d [MOD factor])
+  : c ≡ d [MOD factor] :=
+begin
+  have hm : (base * c) ≤ (base * d) := nat.mul_le_mul_left base hord,
+  have hd: (factor ∣ (base * d) - (base * c)) := (nat.modeq.modeq_iff_dvd' hm).mp h_equal,
+  have hs: (base * d) - (base * c) = (base * (d - c)),
+  {
+    exact (nat.mul_sub_left_distrib base d c).symm
+  },
+  rw hs at hd,
+  apply (nat.modeq.modeq_iff_dvd' hord).mpr,
+  exact nat.coprime.dvd_of_dvd_mul_left h_coprime hd,
+end
+
 lemma foo
   (base factor c d : ℕ)
   (h_coprime : nat.coprime factor base)
-  (h_equal : base * c ≡ base * d [ZMOD factor])
-  : c ≡ d [ZMOD factor] :=
+  (h_equal : base * c ≡ base * d [MOD factor])
+  : c ≡ d [MOD factor] :=
 begin
-  have hd: (factor: ℤ) ∣ ((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ)) := int.modeq.modeq_iff_dvd.mp h_equal,
-  have hs: ((base: ℤ) * (d: ℤ)) - ((base: ℤ) * (c: ℤ)) = ((base: ℤ) * ( (d: ℤ) - (c: ℤ))),
+  have hord: c ≤ d ∨ d ≤ c := nat.le_total,
+  cases hord with hcd hdc,
   {
-    exact (mul_sub ↑base ↑d ↑c).symm
+    exact foo_aux base factor c d hcd h_coprime h_equal,
   },
-  rw hs at hd,
-  apply int.modeq.modeq_iff_dvd.mpr,
-  -- refine nat.coprime.dvd_of_dvd_mul_left h_coprime _,
-  sorry,
+  {
+   exact (foo_aux base factor d c hdc h_coprime h_equal.symm).symm,
+  }
 end
-
 
 -- let a, b, c, be natural numbers, with c < b, a and b coprime.
 -- prove that there exists k > 0 such that c a^k = c mod b.
