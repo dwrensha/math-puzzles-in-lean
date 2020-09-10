@@ -56,7 +56,7 @@ begin
   exact not_not.mp
 end
 
-lemma pidgeonhole :
+lemma pigeonhole :
   ∀ s: finset ℕ, ∀ f : ℕ → {x : ℕ // x ∈ s}, ∃ a b : ℕ, (a ≠ b ∧ f a = f b) :=
 begin
   apply @finset.induction ℕ (λ s: finset ℕ, ∀ f : ℕ → {x : ℕ // x ∈ s}, ∃ a b : ℕ, (a ≠ b ∧ f a = f b)),
@@ -106,6 +106,8 @@ begin
     split,
     {
       cases hnn1,
+      intro hne,
+      rw hne at hnn1_left,
       linarith,
     },
     have : (f m0).val = (f m1).val := by rw [hfm0, hfm1],
