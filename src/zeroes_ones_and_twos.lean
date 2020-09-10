@@ -45,18 +45,6 @@ begin
   exact nat.coprime.pow_right k h_coprime
 end
 
-lemma prop_fiddling (a b : Prop) : (¬ (a → b)) → (a ∧ ¬ b) :=
-begin
-  intro h,
-  exact not_imp.mp h,
-end
-
-lemma not_not_lemma (a : Prop) : ¬ ¬ a → a :=
-begin
-  exact not_not.mp
-end
-
-
 lemma pigeonhole (s : finset ℕ) (f : ℕ → (↑s : set ℕ)) :
   ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
 begin
