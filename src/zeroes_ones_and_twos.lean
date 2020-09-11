@@ -58,10 +58,32 @@ begin
   apply not_injective_infinite_fintype f hinj,
 end
 
+lemma pigeonhole_fin (n : ℕ) (f : ℕ → fin n) :
+  ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
+begin
+  classical,
+  by_contra hc,
+  push_neg at hc,
+  have hinj : function.injective f,
+  { intros a b,
+    contrapose,
+    exact hc a b, },
+  apply not_injective_infinite_fintype f hinj,
+end
+
+
+def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
+λn, ⟨(base^ n) % factor, nat.mod_lt _ _ ⟩
+
+
 lemma bar
   (base factor : ℕ)
+  (hf: factor > 0)
   : ∃ m n : ℕ, (m ≠ n ∧ base^m ≡ base^n [MOD factor]) :=
 begin
+  let f := iterate_pow base factor hf,
+  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole_fin factor f,
+  obtain ⟨a, b, hab⟩ := he,
   sorry,
 end
 
