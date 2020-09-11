@@ -6,7 +6,7 @@ import data.nat.digits
 import data.nat.gcd
 import data.zmod.basic
 
-lemma foo_aux
+lemma mul_left_coprime_aux
   (base factor c d : ℕ)
   (hord : c ≤ d)
   (h_coprime : nat.coprime factor base)
@@ -20,7 +20,7 @@ begin
   exact nat.coprime.dvd_of_dvd_mul_left h_coprime hd,
 end
 
-lemma foo
+lemma mul_left_coprime
   (base factor c d : ℕ)
   (h_coprime : nat.coprime factor base)
   (h_equal : base * c ≡ base * d [MOD factor])
@@ -29,10 +29,10 @@ begin
   have hord: c ≤ d ∨ d ≤ c := nat.le_total,
   cases hord with hcd hdc,
   {
-    exact foo_aux base factor c d hcd h_coprime h_equal,
+    exact mul_left_coprime_aux base factor c d hcd h_coprime h_equal,
   },
   {
-   exact (foo_aux base factor d c hdc h_coprime h_equal.symm).symm,
+   exact (mul_left_coprime_aux base factor d c hdc h_coprime h_equal.symm).symm,
   }
 end
 
@@ -122,7 +122,7 @@ lemma bar (a b : ℕ) (h: a ≤ b) : ∃k : ℕ, a + k = b := nat.le.dest h
 lemma periodic
   (base factor : ℕ)
   (hf: 0 < factor)
-  (h_coprime: nat.gcd base factor = 1)
+  (h_coprime: nat.coprime base factor)
   : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD factor] :=
 begin
   obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base factor hf,
@@ -132,8 +132,24 @@ begin
   { linarith },
   dsimp,
   rw ← hk at hab,
-  
-  sorry,
+  clear haneb hk b,
+  have hp: base ^ (a + 1 + k) = (base ^ a) * (base ^ (1 + k)),
+  begin
+      calc base ^ (a + 1 + k)
+          = base ^ (a + (1 + k)) : by rw [add_assoc a 1 k]
+      ... = base ^ a * base ^ (1 + k) : nat.pow_add base _ _,
+  end,
+  rw hp at hab,
+  clear hp,
+  have hp_coprime : nat.coprime (base^a) factor := nat.coprime.pow_left _ h_coprime,
+  conv at hab begin
+    congr,
+    skip,
+    rw ← (mul_one (base ^ a)),
+    skip,
+  end,
+  have := (mul_left_coprime (base ^ a) factor 1 (base ^ (1 + k)) hp_coprime.symm hab).symm,
+  rwa ←(add_comm 1 k),
 end
 
 
@@ -142,6 +158,29 @@ def all_zero_or_one : list ℕ → Prop
 | (0 :: ds) := all_zero_or_one ds
 | (1 :: ds) := all_zero_or_one ds
 | _ := false
+
+
+lemma digits_lemma
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (n: ℕ)
+  (hn: 0 < n)
+  : (digits base (base * n)) = 0 :: (digits base n) :=
+begin
+  have := digits_add base h2 0 n _ (or.inr hn),
+  finish,
+  linarith,
+end
+
+lemma times_base_still_all_zero_or_one
+  (base: ℕ)
+  (n: ℕ)
+  (hazoo : all_zero_or_one (digits base n))
+  : all_zero_or_one (digits base (n * base)) :=
+begin
+  
+  sorry,
+end
 
 theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (digits 10 (n * k)) :=
 begin
