@@ -73,7 +73,7 @@ end
 
 
 def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
-λn, ⟨(base^ n) % factor, nat.mod_lt _ _ ⟩
+λn, ⟨(base ^ n) % factor, nat.mod_lt _ _ ⟩
 
 
 lemma bar
@@ -84,7 +84,29 @@ begin
   let f := iterate_pow base factor hf,
   have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole_fin factor f,
   obtain ⟨a, b, hab⟩ := he,
-  sorry,
+  cases hab,
+  use a,
+  use b,
+  use hab_left,
+  have : base ^ a % factor = base ^ b % factor,
+  {
+     have hval :(f a).val = (f b).val := congr_arg subtype.val hab_right,
+
+     have haval: (f a).val = (iterate_pow base factor hf a).val := rfl,
+     have haval2: (iterate_pow base factor hf a).val = (base ^ a) % factor := rfl,
+     rw ← haval2,
+     rw ← haval,
+
+     have havalb: (f b).val = (iterate_pow base factor hf b).val := rfl,
+     have havalb2: (iterate_pow base factor hf b).val = (base ^ b) % factor := rfl,
+
+     rw ← havalb2,
+     rw ← havalb,
+
+     assumption,
+  },
+  unfold nat.modeq,
+  assumption,
 end
 
 -- let a, b, c, be natural numbers, with c < b, a and b coprime.
