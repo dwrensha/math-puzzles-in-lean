@@ -60,8 +60,7 @@ end
 
 
 def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
-λn, ⟨(base ^ n) % factor, nat.mod_lt _ _ ⟩
-
+λn, ⟨(base ^ n) % factor, nat.mod_lt (base ^ n) hfactor ⟩
 
 lemma bar
   (base factor : ℕ)
