@@ -62,9 +62,9 @@ end
 def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
 λn, ⟨(base ^ n) % factor, nat.mod_lt (base ^ n) hfactor ⟩
 
-lemma bar
+lemma exists_distinct_exponents
   (base factor : ℕ)
-  (hf: factor > 0)
+  (hf: 0 < factor)
   : ∃ m n : ℕ, (m ≠ n ∧ base^m ≡ base^n [MOD factor]) :=
 begin
   let f := iterate_pow base factor hf,
@@ -90,13 +90,38 @@ begin
   assumption,
 end
 
+lemma exists_distinct_exponents_ordered
+  (base factor : ℕ)
+  (hf: 0 < factor)
+  : ∃ m n : ℕ, (m < n ∧ base^m ≡ base^n [MOD factor]) :=
+begin
+  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents base factor hf,
+  have ht := nat.lt_trichotomy a b,
+  cases ht,
+  {
+    use a,
+    use b,
+    finish,
+  },
+  cases ht,
+  {
+    finish,
+  },
+  use b,
+  use a,
+  use ht,
+  exact hab.symm,
+end
+
 -- let a, b, c, be natural numbers, with c < b, a and b coprime.
 -- prove that there exists k > 0 such that c a^k = c mod b.
 lemma periodic
   (base factor : ℕ)
+  (hf: 0 < factor)
   (h_coprime: nat.gcd base factor = 1)
   : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD factor] :=
 begin
+  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base factor hf,
   sorry,
 end
 
