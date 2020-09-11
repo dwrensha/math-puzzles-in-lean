@@ -152,7 +152,7 @@ begin
   rwa ←(add_comm 1 k),
 end
 
-
+@[simp]
 def all_zero_or_one : list ℕ → Prop
 | [] := true
 | (0 :: ds) := all_zero_or_one ds
@@ -186,8 +186,18 @@ begin
   },
 
   rw (digits_lemma base h2 n hp),
+  simpa,
+end
 
-  sorry,
+lemma times_base_plus_one_still_all_zero_or_one
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (n: ℕ)
+  (hazoo : all_zero_or_one (digits base n))
+  : all_zero_or_one (digits base (1 + base * n)) :=
+begin
+  rw (digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
+  simpa,
 end
 
 theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (digits 10 (n * k)) :=
