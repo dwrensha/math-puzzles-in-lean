@@ -92,15 +92,10 @@ begin
   {
      have hval :(f a).val = (f b).val := congr_arg subtype.val hab_right,
 
-     have haval: (f a).val = (iterate_pow base factor hf a).val := rfl,
-     have haval2: (iterate_pow base factor hf a).val = (base ^ a) % factor := rfl,
-     rw ← haval2,
+     have haval: (f a).val = (base ^ a) % factor := rfl,
      rw ← haval,
 
-     have havalb: (f b).val = (iterate_pow base factor hf b).val := rfl,
-     have havalb2: (iterate_pow base factor hf b).val = (base ^ b) % factor := rfl,
-
-     rw ← havalb2,
+     have havalb: (f b).val = (base ^ b) % factor := rfl,
      rw ← havalb,
 
      assumption,
