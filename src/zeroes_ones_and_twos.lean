@@ -174,11 +174,19 @@ end
 
 lemma times_base_still_all_zero_or_one
   (base: ℕ)
+  (h2: 2 ≤ base)
   (n: ℕ)
   (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base (n * base)) :=
+  : all_zero_or_one (digits base (base * n)) :=
 begin
-  
+  cases (nat.eq_zero_or_pos n) with hz hp,
+  {
+    rw hz,
+    simp only [mul_zero, digits_zero]
+  },
+
+  rw (digits_lemma base h2 n hp),
+
   sorry,
 end
 
