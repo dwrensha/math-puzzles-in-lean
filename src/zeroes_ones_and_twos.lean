@@ -45,20 +45,7 @@ begin
   exact nat.coprime.pow_right k h_coprime
 end
 
-lemma pigeonhole (s : finset ℕ) (f : ℕ → (↑s : set ℕ)) :
-  ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
-begin
-  classical,
-  by_contra hc,
-  push_neg at hc,
-  have hinj : function.injective f,
-  { intros a b,
-    contrapose,
-    exact hc a b, },
-  apply not_injective_infinite_fintype f hinj,
-end
-
-lemma pigeonhole_fin (n : ℕ) (f : ℕ → fin n) :
+lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
   ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
 begin
   classical,
@@ -82,7 +69,7 @@ lemma bar
   : ∃ m n : ℕ, (m ≠ n ∧ base^m ≡ base^n [MOD factor]) :=
 begin
   let f := iterate_pow base factor hf,
-  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole_fin factor f,
+  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole factor f,
   obtain ⟨a, b, hab⟩ := he,
   cases hab,
   use a,
@@ -92,8 +79,8 @@ begin
   {
      have hval :(f a).val = (f b).val := congr_arg subtype.val hab_right,
 
-     have haval: (f a).val = (base ^ a) % factor := rfl,
-     rw ← haval,
+     have havala: (f a).val = (base ^ a) % factor := rfl,
+     rw ← havala,
 
      have havalb: (f b).val = (base ^ b) % factor := rfl,
      rw ← havalb,
