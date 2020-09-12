@@ -242,7 +242,7 @@ lemma exists_positive_mod
   (hf: 0 < factor)
   (h_coprime: nat.coprime base factor)
   (n: ℕ)
-  : (∃k:ℕ, k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (digits base k)) :=
+  : (∃k:ℕ, 0 < k ∧ k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (digits base k)) :=
 begin
   induction n with np hnp,
   {
@@ -260,14 +260,30 @@ begin
   use (base ^ (per0 + 1) * kp + 1),
   split,
   {
+    exact (base ^ (per0 + 1) * kp).succ_pos,
+  },
+  split,
+  {
     rw hper01 at hkper,
     refine nat.modeq.modeq_add _ rfl,
-    have hme := nat.modeq.modeq_mul hkper hkp.1,
+    have hme := nat.modeq.modeq_mul hkper hkp.2.1,
     simp only [one_mul] at hme,
     assumption,
   },
-  have hr := base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2,
+  have hr := base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2,
   exact hr,
+end
+
+lemma nonzero_lemma (a b c : ℕ) (h: a = b * c) (ha: 0 < a) (hb: 0 < b) : 0 < c :=
+begin
+  have hc: c = 0 ∨ 0 < c := nat.eq_zero_or_pos c,
+  cases hc,
+  {
+    rw hc at h,
+    simp at h,
+    finish,
+  },
+  assumption,
 end
 
 lemma zeroes_and_ones_coprime
@@ -282,9 +298,18 @@ begin
   have hpm := exists_positive_mod base factor h2 hf h_coprime factor_prev,
   obtain ⟨n, hn⟩ := hpm,
   cases hn,
-  rw ← h_factor_prev at hn_left,
-  
-  sorry,
+  cases hn_right,
+  rw ← h_factor_prev at hn_right_left,
+  have hff : factor ≡ (factor % factor) [MOD factor] := (nat.modeq.mod_modeq factor factor).symm,
+  simp only [nat.mod_self] at hff,
+  have hn0 : n ≡ 0 [MOD factor] := nat.modeq.trans hn_right_left hff,
+  have hdvd : factor ∣ n := nat.modeq.modeq_zero_iff.mp hn0,
+  obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd hdvd,
+  -- hm... need k > 0.
+  have hkp : 0 < k := nonzero_lemma n factor k hk hn_left hf,
+  use ⟨ k, hkp ⟩,
+  simp,
+  rwa ← hk,
 end
 
 
