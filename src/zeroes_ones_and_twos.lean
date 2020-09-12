@@ -215,10 +215,16 @@ lemma base_pow_then_inc_still_all_zero_or_one
   (hazoo : all_zero_or_one (digits base n))
   : all_zero_or_one (digits base ((base ^ (k + 1)) * n + 1)) :=
 begin
-  have := base_pow_still_all_zero_or_one base h2 k n hazoo,
-  sorry,
+  have hs := base_pow_still_all_zero_or_one base h2 k n hazoo,
+  have hss := times_base_plus_one_still_all_zero_or_one base h2 _ hs,
+  have hrw : 1 + base * (base ^ k * n) = base ^ (k + 1) * n + 1,
+  {
+    ring,
+    have : base ^ k * base  = base ^ (k + 1) := (nat.pow_succ base k).symm,
+    finish,
+  },
+  rwa ← hrw,
 end
-
 
 lemma foobar
   (base factor : ℕ)
@@ -239,7 +245,29 @@ begin
   },
   obtain ⟨kp, hkp⟩ := hnp,
   obtain ⟨kper, hkper⟩ := (periodic base factor hf h_coprime),
-  sorry,
+  have hper0: ∃ km: ℕ, kper.val = km + 1,
+  {
+    -- there's gotta be a simpler way to do this
+    have hkperz : 0 < kper.val := kper.2,
+    cases kper.val with j,
+    {
+      exfalso,
+      exact nat.lt_asymm hkperz hkperz,
+    },
+    use j,
+  },
+  obtain ⟨per0, hper01⟩ := hper0,
+  use (base ^ (per0 + 1) * kp + 1),
+  split,
+  {
+    rw hper01 at hkper,
+    refine nat.modeq.modeq_add _ rfl,
+    have hme := nat.modeq.modeq_mul hkper hkp.1,
+    simp only [one_mul] at hme,
+    assumption,
+  },
+  have hr := base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2,
+  exact hr,
 end
 
 
