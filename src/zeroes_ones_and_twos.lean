@@ -202,6 +202,19 @@ begin
   rwa [←(nat.add_one pk), nat.pow_succ base pk, mul_comm (base^pk) base, mul_assoc],
 end
 
+lemma base_pow_then_inc_still_all_zero_or_one
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (k : ℕ)
+  (n : ℕ)
+  (hazoo : all_zero_or_one (digits base n))
+  : all_zero_or_one (digits base ((base ^ (k + 1)) * n + 1)) :=
+begin
+  have := base_pow_still_all_zero_or_one base h2 k n hazoo,
+  sorry,
+end
+
+
 lemma times_base_plus_one_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
