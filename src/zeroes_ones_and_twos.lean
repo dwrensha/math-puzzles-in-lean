@@ -202,6 +202,17 @@ begin
   rwa [←(nat.add_one pk), nat.pow_succ base pk, mul_comm (base^pk) base, mul_assoc],
 end
 
+lemma times_base_plus_one_still_all_zero_or_one
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (n: ℕ)
+  (hazoo : all_zero_or_one (digits base n))
+  : all_zero_or_one (digits base (1 + base * n)) :=
+begin
+  rw (digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
+  simpa,
+end
+
 lemma base_pow_then_inc_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
@@ -215,15 +226,23 @@ begin
 end
 
 
-lemma times_base_plus_one_still_all_zero_or_one
-  (base: ℕ)
-  (h2: 2 ≤ base)
+lemma foobar
+  (base factor : ℕ)
+  (h2 : 2 ≤ base)
+  (h_coprime: nat.coprime base factor)
   (n: ℕ)
-  (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base (1 + base * n)) :=
+  : (∃k:ℕ, k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (digits base k)) :=
 begin
-  rw (digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
-  simpa,
+  induction n with np hnp,
+  {
+    use 1,
+    use nat.modeq.refl 1,
+    have hd := digits_add base h2 1 0 (nat.succ_le_iff.mp h2) (or.inl nat.one_pos),
+    simp at hd,
+    rw hd,
+    simp
+  },
+  sorry,
 end
 
 
