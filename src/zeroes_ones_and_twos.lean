@@ -305,13 +305,26 @@ begin
   have hn0 : n ≡ 0 [MOD factor] := nat.modeq.trans hn_right_left hff,
   have hdvd : factor ∣ n := nat.modeq.modeq_zero_iff.mp hn0,
   obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd hdvd,
-  -- hm... need k > 0.
   have hkp : 0 < k := nonzero_lemma n factor k hk hn_left hf,
   use ⟨ k, hkp ⟩,
   simp,
   rwa ← hk,
 end
 
+-- what if base and factor aren't coprime?
+-- then there is r and s and t such that factor * r = t * base ^ s where t and base are coprime.
+
+lemma split_into_coprime
+  (factor : ℕ)
+  (hf: 0 < factor)
+  : (∃ r s t : ℕ, 0 < r ∧ factor * r = t * 10 ^ s ∧ nat.coprime 10 t) :=
+begin
+  -- find largest power s2 of 2 that divides factor, pull it out, yielding m
+  -- find largest power s5 of 5 that divides m, pull it out, yielding t.
+  -- set r := 2^s5 * 5^s2.
+  -- s:= s5 + s2
+  sorry,
+end
 
 theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (digits 10 (n * k)) :=
 begin
