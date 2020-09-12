@@ -226,7 +226,17 @@ begin
   rwa ← hrw,
 end
 
-lemma foobar
+lemma nat_prev (n: ℕ) (hn: 0 < n) : (∃m:ℕ, n = m + 1) :=
+begin
+   cases n with j,
+   {
+      exfalso,
+      exact nat.lt_asymm hn hn,
+   },
+   use j,
+end
+
+lemma exists_positive_mod
   (base factor : ℕ)
   (h2 : 2 ≤ base)
   (hf: 0 < factor)
@@ -245,17 +255,7 @@ begin
   },
   obtain ⟨kp, hkp⟩ := hnp,
   obtain ⟨kper, hkper⟩ := (periodic base factor hf h_coprime),
-  have hper0: ∃ km: ℕ, kper.val = km + 1,
-  {
-    -- there's gotta be a simpler way to do this
-    have hkperz : 0 < kper.val := kper.2,
-    cases kper.val with j,
-    {
-      exfalso,
-      exact nat.lt_asymm hkperz hkperz,
-    },
-    use j,
-  },
+  have hper0: ∃ km: ℕ, kper.val = km + 1 := nat_prev kper.1 kper.2,
   obtain ⟨per0, hper01⟩ := hper0,
   use (base ^ (per0 + 1) * kp + 1),
   split,
@@ -268,6 +268,23 @@ begin
   },
   have hr := base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2,
   exact hr,
+end
+
+lemma zeroes_and_ones_coprime
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (factor: ℕ)
+  (hf: 0 < factor)
+  (h_coprime: nat.coprime base factor)
+  : ∃ k : ℕ+, all_zero_or_one (digits base (factor * k)) :=
+begin
+  obtain ⟨factor_prev, h_factor_prev⟩ := nat_prev factor hf,
+  have hpm := exists_positive_mod base factor h2 hf h_coprime factor_prev,
+  obtain ⟨n, hn⟩ := hpm,
+  cases hn,
+  rw ← h_factor_prev at hn_left,
+  
+  sorry,
 end
 
 
