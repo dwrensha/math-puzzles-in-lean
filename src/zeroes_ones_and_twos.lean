@@ -189,6 +189,19 @@ begin
   simpa,
 end
 
+lemma base_pow_still_all_zero_or_one
+  (base: ℕ)
+  (h2: 2 ≤ base)
+  (k n: ℕ)
+  (hazoo : all_zero_or_one (digits base n))
+  : all_zero_or_one (digits base ((base ^ k) * n)) :=
+begin
+  induction k with pk hpk,
+  { simpa },
+  have := times_base_still_all_zero_or_one base h2 _ hpk,
+  rwa [←(nat.add_one pk), nat.pow_succ base pk, mul_comm (base^pk) base, mul_assoc],
+end
+
 lemma times_base_plus_one_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
@@ -199,6 +212,7 @@ begin
   rw (digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
   simpa,
 end
+
 
 theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (digits 10 (n * k)) :=
 begin
