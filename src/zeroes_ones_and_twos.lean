@@ -113,12 +113,6 @@ begin
   exact hab.symm,
 end
 
-
-lemma bar (a b : ℕ) (h: a ≤ b) : ∃k : ℕ, a + k = b := nat.le.dest h
-
-
--- let a, b, c, be natural numbers, with c < b, a and b coprime.
--- prove that there exists k > 0 such that c a^k = c mod b.
 lemma periodic
   (base factor : ℕ)
   (hf: 0 < factor)
@@ -229,6 +223,7 @@ end
 lemma foobar
   (base factor : ℕ)
   (h2 : 2 ≤ base)
+  (hf: 0 < factor)
   (h_coprime: nat.coprime base factor)
   (n: ℕ)
   : (∃k:ℕ, k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (digits base k)) :=
@@ -242,6 +237,8 @@ begin
     rw hd,
     simp
   },
+  obtain ⟨kp, hkp⟩ := hnp,
+  obtain ⟨kper, hkper⟩ := (periodic base factor hf h_coprime),
   sorry,
 end
 
