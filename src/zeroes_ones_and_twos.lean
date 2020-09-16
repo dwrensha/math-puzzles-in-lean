@@ -4,7 +4,6 @@ import data.nat.modeq
 import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd
-import data.zmod.basic
 
 lemma mul_left_coprime_aux
   (base factor c d : ℕ)
@@ -161,9 +160,8 @@ lemma digits_lemma
   (hn: 0 < n)
   : (digits base (base * n)) = 0 :: (digits base n) :=
 begin
-  have := digits_add base h2 0 n _ (or.inr hn),
-  finish,
-  linarith,
+  have := digits_add base h2 0 n (nat.lt_of_succ_lt (nat.succ_le_iff.mp h2)) (or.inr hn),
+  rwa (zero_add (base * n)) at this,
 end
 
 lemma times_base_still_all_zero_or_one
@@ -313,6 +311,46 @@ end
 
 -- what if base and factor aren't coprime?
 -- then there is r and s and t such that factor * r = t * base ^ s where t and base are coprime.
+
+lemma power_unbounded
+  (m n: ℕ)
+  (hm: 2 ≤ m)
+  : (∃k : ℕ, m ^ k > n) :=
+begin
+--  nat.log m 
+  sorry,
+end
+
+lemma largest_pow_factor
+  (m n: ℕ)
+  (hm: 2 ≤ m)
+  : (∃k : ℕ, m ^ k ∣ (n + 2) ∧ (¬ m ^ (k + 1) ∣ (n + 2))) :=
+begin
+  revert n,
+  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → ∃ (k : ℕ), m ^ k ∣ (n1 + 2) ∧ ¬m ^ (k + 1) ∣ (n1 + 2),
+  {
+    intro n,
+    exact ht n n rfl.ge,
+  },
+  intro n,
+  induction n with hn hnp,
+  {
+    sorry,
+  },
+  intros n1 hn1,
+  -- plug in something like (n1 + 2) / m.
+  have ho2 : (n1 + 2) / m ≤ hn,
+  {
+     sorry,
+  },
+  obtain ⟨k, hk1, hk2⟩ := hnp ((n1 + 2) / m) ho2,
+  use k + 1,
+  split,
+  {
+   sorry,
+  },
+  sorry,
+end
 
 lemma split_into_coprime
   (factor : ℕ)
