@@ -360,13 +360,18 @@ begin
     exact ht n n rfl.ge,
   },
   intro n,
-  induction n with hn hnp,
+  induction n with np hnp,
   {
+    intros n1 hn1,
+    have hn10 : n1 = 0 := le_zero_iff_eq.mp hn1,
+    rw hn10,
+    simp,
+    -- depends on whether m = 2 or 2 < m...
     sorry,
   },
   intros n1 hn1,
   -- plug in something like (n1 + 2) / m.
-  have ho2 : (n1 + 2) / m ≤ hn,
+  have ho2 : (n1 + 2) / m ≤ np,
   {
      sorry,
   },
