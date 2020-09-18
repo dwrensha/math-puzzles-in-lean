@@ -312,13 +312,40 @@ end
 -- what if base and factor aren't coprime?
 -- then there is r and s and t such that factor * r = t * base ^ s where t and base are coprime.
 
-lemma power_unbounded
+lemma unbounded_power
   (m n: ℕ)
   (hm: 2 ≤ m)
-  : (∃k : ℕ, m ^ k > n) :=
+  : (∃k : ℕ, n < m ^ k) :=
 begin
---  nat.log m 
-  sorry,
+  induction n with np hnp,
+  {
+    use 0,
+    simp,
+  },
+  obtain ⟨k, hk⟩ := hnp,
+  use k + 1,
+
+  obtain ⟨m0, hm0⟩ : (∃m0, 2 + m0 = m) := nat.le.dest hm,
+  have hmm : m ^ k + 1 ≤ (m ^ k) * m :=
+  begin
+    conv begin
+      congr,
+      skip,
+      congr,
+      skip,
+      rw ← hm0,
+    end,
+    clear hm0,
+    have hol: 1 ≤ m^k := nat.one_le_of_lt hk,
+    calc m ^ k + 1 ≤ m ^ k + m ^ k : add_le_add_left hol (m ^ k)
+        ... ≤ m ^ k + m^k + m^k * m0 : nat.le.intro rfl
+        ... = m ^ k * (2 + m0) : by ring
+  end,
+
+  calc np.succ = np + 1 : rfl
+       ...     < m^k + 1 : nat.succ_lt_succ hk
+       ...     ≤ m ^ k * m : hmm
+       ...     = m ^ (k + 1) : (nat.pow_succ m k).symm,
 end
 
 lemma largest_pow_factor
