@@ -416,7 +416,7 @@ begin
     have hmm : m < m,
     {
       calc m ≤ m + m * k : nat.le.intro rfl
-        ... = m * 1 + m * k : by sorry --library_search
+        ... = m * 1 + m * k : by conv begin to_lhs, congr, rw (mul_one m).symm, skip end
         ... = m * (1 + k) : (mul_add m 1 k).symm
         ... = m * (k.succ) : by rw ((nat.one_add k).symm)
         ... < m : hm2
