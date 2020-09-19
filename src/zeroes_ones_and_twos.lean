@@ -367,6 +367,46 @@ begin
     rw hn10,
     simp,
     -- depends on whether m = 2 or 2 < m...
+    have hm2: 2 = m ∨ 2 < m := eq_or_lt_of_le hm,
+    cases hm2,
+    {
+      rw ← hm2,
+      use 1,
+      simp,
+      intro hb,
+      have h112 : 1 + 1 = 2 := rfl,
+      rw h112 at hb,
+      have h222 : 2 < 2 ^ 2 := nat.lt_two_pow 2,
+      have hdvd : (∃ k, 2 = 2 ^ 2 * k) := exists_eq_mul_right_of_dvd hb,
+      obtain ⟨k, hk⟩ := hdvd,
+      cases k,
+      {
+        finish
+      },
+      have h2222 : 2 ^ 2 ≤ 2 ^ 2 * k.succ,
+      {
+        calc 2 ^ 2 ≤ 2^2 * k +  2^2 : nat.le_add_left (2 ^ 2) (2 ^ 2 * k)
+             ... = 2 ^ 2 * k.succ: by ring,
+      },
+      have h222 : 2 < 2 ^ 2 * k.succ,
+      {
+        calc 2 < 2 + 2 : nat.lt_of_sub_eq_succ rfl
+            ... = 2 * 2 : (two_mul 2).symm
+            ... = 2 ^ 2 : (nat.pow_two 2).symm
+            ... ≤ 2 ^ 2 * k.succ : h2222
+      },
+      conv at h222 begin
+        congr,
+        rw hk,
+        skip, skip
+      end,
+      exact nat.lt_asymm h222 h222
+    },
+    use 0,
+    split,
+    { simp only [nat.pow_zero, is_unit.dvd, nat.is_unit_iff] },
+    simp only [nat.pow_one],
+    --intro h,
     sorry,
   },
   intros n1 hn1,
