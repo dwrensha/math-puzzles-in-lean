@@ -347,7 +347,6 @@ begin
        ...     = m ^ (k + 1) : (nat.pow_succ m k).symm,
 end
 
-
 def compute_largest_pow_factor (b: ℕ) (hb: 2 ≤ b) : ℕ → ℕ
 | n :=
       if h0: n = 0 then 0 else
@@ -356,6 +355,57 @@ def compute_largest_pow_factor (b: ℕ) (hb: 2 ≤ b) : ℕ → ℕ
          have n / b < n, from nat.div_lt_self (nat.pos_of_ne_zero h0) hb,
          1 + compute_largest_pow_factor (n / b)
        else 0
+
+lemma largest_pow_factor_valid
+  (m n: ℕ)
+  (hm: 2 ≤ m)
+  : (m ^ (compute_largest_pow_factor m hm (n + 1)) ∣ (n + 1) ∧
+    (¬ m ^ (compute_largest_pow_factor m hm (n + 1) + 1) ∣ (n + 1))) :=
+begin
+  revert n,
+  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → m ^ (compute_largest_pow_factor m hm (n + 1)) ∣ (n1 + 1)
+                                   ∧ ¬m ^ ((compute_largest_pow_factor m hm (n + 1)) + 1) ∣ (n1 + 1),
+  {
+    intro n,
+    exact ht n n rfl.ge,
+  },
+  intro n,
+  induction n with np hnp,
+  {
+    intros n1 hn1,
+    have hz : n1 = 0 := le_zero_iff_eq.mp hn1,
+    rw hz,
+    simp,
+    split,
+    {
+      have hclpf: compute_largest_pow_factor m hm 1 = 0,
+      {
+        refine if_neg _,
+        intro hmn,
+        --obtain ⟨m0, hm0⟩ : (∃m0, 2 + m0 = m) := nat.le.dest hm,
+        have hdvd : (∃ k, 1 = m * k) := exists_eq_mul_right_of_dvd hmn,
+        obtain ⟨k, hk⟩ := hdvd,
+        cases k,
+        {
+          linarith,
+        },
+        have h11 : 1 < 1,
+        { calc 1 < 2 : one_lt_two
+             ... ≤ m : hm
+             ... ≤ m + m * k : nat.le.intro rfl
+             ... = m * k.succ : by ring
+             ... = 1 : eq.symm hk
+        },
+        linarith,
+      },
+      rw hclpf,
+      exact nat.pow_zero m,
+    },
+    sorry,
+  },
+  sorry,
+end
+
 
 lemma largest_pow_factor
   (m n: ℕ)
