@@ -57,7 +57,6 @@ begin
   apply not_injective_infinite_fintype f hinj,
 end
 
-
 def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
 λn, ⟨(base ^ n) % factor, nat.mod_lt (base ^ n) hfactor ⟩
 
@@ -348,6 +347,16 @@ begin
        ...     = m ^ (k + 1) : (nat.pow_succ m k).symm,
 end
 
+
+def compute_largest_pow_factor (b: ℕ) (hb: 2 ≤ b) : ℕ → ℕ
+| n :=
+      if h0: n = 0 then 0 else
+      if hd : b ∣ n
+       then
+         have n / b < n, from nat.div_lt_self (nat.pos_of_ne_zero h0) hb,
+         1 + compute_largest_pow_factor (n / b)
+       else 0
+
 lemma largest_pow_factor
   (m n: ℕ)
   (hm: 2 ≤ m)
@@ -410,7 +419,7 @@ begin
     obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd h,
     cases k,
     {
-      finish,
+      linarith,
     },
     rw hk at hm2,
     have hmm : m < m,
@@ -424,17 +433,8 @@ begin
     exact nat.lt_asymm hmm hmm
   },
   intros n1 hn1,
-  -- plug in something like (n1 + 2) / m.
-  have ho2 : (n1 + 2) / m ≤ np,
-  {
-     sorry,
-  },
-  obtain ⟨k, hk1, hk2⟩ := hnp ((n1 + 2) / m) ho2,
-  use k + 1,
-  split,
-  {
-   sorry,
-  },
+  -- plug in something like ((n1 + 2) / m) - 2. ugh.
+  -- 
   sorry,
 end
 
