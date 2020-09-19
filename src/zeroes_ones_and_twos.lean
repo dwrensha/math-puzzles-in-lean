@@ -406,8 +406,22 @@ begin
     split,
     { simp only [nat.pow_zero, is_unit.dvd, nat.is_unit_iff] },
     simp only [nat.pow_one],
-    --intro h,
-    sorry,
+    intro h,
+    obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd h,
+    cases k,
+    {
+      finish,
+    },
+    rw hk at hm2,
+    have hmm : m < m,
+    {
+      calc m ≤ m + m * k : nat.le.intro rfl
+        ... = m * 1 + m * k : by sorry --library_search
+        ... = m * (1 + k) : (mul_add m 1 k).symm
+        ... = m * (k.succ) : by rw ((nat.one_add k).symm)
+        ... < m : hm2
+    },
+    exact nat.lt_asymm hmm hmm
   },
   intros n1 hn1,
   -- plug in something like (n1 + 2) / m.
