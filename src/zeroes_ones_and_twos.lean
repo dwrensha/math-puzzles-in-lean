@@ -363,8 +363,8 @@ lemma largest_pow_factor_valid
     (¬ m ^ (compute_largest_pow_factor m hm (n + 1) + 1) ∣ (n + 1))) :=
 begin
   revert n,
-  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → m ^ (compute_largest_pow_factor m hm (n + 1)) ∣ (n1 + 1)
-                                   ∧ ¬m ^ ((compute_largest_pow_factor m hm (n + 1)) + 1) ∣ (n1 + 1),
+  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → m ^ (compute_largest_pow_factor m hm (n1 + 1)) ∣ (n1 + 1)
+                                   ∧ ¬m ^ ((compute_largest_pow_factor m hm (n1 + 1)) + 1) ∣ (n1 + 1),
   {
     intro n,
     exact ht n n rfl.ge,
@@ -401,9 +401,32 @@ begin
       rw hclpf,
       exact nat.pow_zero m,
     },
+    intro hmc,
+    have hle : 1 ≤ compute_largest_pow_factor m hm 1 + 1 := nat.le_add_left 1 _,
+--    have 
+--    library_search
     sorry,
   },
-  sorry,
+  intros n1 hn1,
+  have he: m ∣ n1 + 1 ∨ ¬ m ∣ n1 + 1 := em _,
+  cases he,
+  {
+    split,
+    {
+      sorry,
+    },
+    sorry,
+  },
+  have hc: compute_largest_pow_factor m hm (n1 + 1) = 0,
+  {
+    sorry,
+  },
+  rw hc,
+  split,
+  {
+     simp only [nat.pow_zero, is_unit.dvd, nat.is_unit_iff],
+  },
+  simpa,
 end
 
 
