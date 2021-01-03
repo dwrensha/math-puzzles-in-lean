@@ -411,16 +411,20 @@ begin
   have he: m ∣ n1 + 1 ∨ ¬ m ∣ n1 + 1 := em _,
   cases he,
   {
+    -- apply hnp to (n1 + 1) / m
+    let hnpa := hnp ((n1 + 1) / m),
+    have hle : (n1 + 1) / m ≤ np,
+    {
+      sorry,
+--      calc (n1 + 1) / m 
+    },
     split,
     {
       sorry,
     },
     sorry,
   },
-  have hc: compute_largest_pow_factor m hm (n1 + 1) = 0,
-  {
-    sorry,
-  },
+  have hc: compute_largest_pow_factor m hm (n1 + 1) = 0 := if_neg he,
   rw hc,
   split,
   {
