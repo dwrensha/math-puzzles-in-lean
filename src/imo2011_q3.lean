@@ -30,7 +30,10 @@ begin
   have hab: (∀ a b, f (f a) - f (f b) ≤ (f a) * (f b) - b * f b ∧
                     f (f b) - f (f a) ≤ (f a) * (f b) - a * f a),
   {
-    sorry,
+     intros a b,
+     have h1 := hxt b (f a),
+     have h2 := hxt a (f b),
+     split; linarith,
   },
   have hab1: (∀ a b, a * f a + b * f b ≤ 2 * f a * f b),
   {
@@ -47,6 +50,8 @@ begin
   },
   have hx: (∀ x, f x ≤ 0),
   {
+    intros x,
+    --- suppose f y > 0 for some y ... contradiction.
     sorry,
   },
   have hn: (∀x < 0, f x = 0),
