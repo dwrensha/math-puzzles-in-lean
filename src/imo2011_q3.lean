@@ -46,5 +46,19 @@ begin
      simp at h,
      exact nonneg_of_mul_nonpos_right h han,
   },
+  have hx: (∀ x, f x ≤ 0),
+  {
+    sorry,
+  },
+  have hn: (∀x < 0, f x = 0),
+  {
+    intros x hxz,
+    exact le_antisymm (hx x) (ha x hxz)
+  },
+  have hz: f 0 = 0,
+  {
+    sorry,
+  },
+  intros x hx,
   sorry,
 end
