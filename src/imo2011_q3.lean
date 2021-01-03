@@ -60,5 +60,10 @@ begin
     sorry,
   },
   intros x hx,
-  sorry,
+  have hcases : x < 0 ∨ x = 0 := lt_or_eq_of_le hx,
+  cases hcases,
+  {
+    exact hn x hcases,
+  },
+  rwa hcases,
 end
