@@ -57,7 +57,11 @@ begin
   },
   have hz: f 0 = 0,
   {
-    sorry,
+    have hno := hn (-1) neg_one_lt_zero;
+    have hp := hxt (-1) (-1),
+    rw hno at hp,
+    simp at hp,
+    exact le_antisymm (hx 0) hp,
   },
   intros x hx,
   have hcases : x < 0 ∨ x = 0 := lt_or_eq_of_le hx,
