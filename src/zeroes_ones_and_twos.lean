@@ -129,7 +129,7 @@ begin
   begin
       calc base ^ (a + 1 + k)
           = base ^ (a + (1 + k)) : by rw [add_assoc a 1 k]
-      ... = base ^ a * base ^ (1 + k) : nat.pow_add base _ _,
+      ... = base ^ a * base ^ (1 + k) : pow_add base _ _,
   end,
   rw hp at hab,
   clear hp,
@@ -157,9 +157,9 @@ lemma digits_lemma
   (h2: 2 ≤ base)
   (n: ℕ)
   (hn: 0 < n)
-  : (digits base (base * n)) = 0 :: (digits base n) :=
+  : (nat.digits base (base * n)) = 0 :: (nat.digits base n) :=
 begin
-  have := digits_add base h2 0 n (nat.lt_of_succ_lt (nat.succ_le_iff.mp h2)) (or.inr hn),
+  have := nat.digits_add base h2 0 n (nat.lt_of_succ_lt (nat.succ_le_iff.mp h2)) (or.inr hn),
   rwa (zero_add (base * n)) at this,
 end
 
@@ -167,13 +167,13 @@ lemma times_base_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
   (n: ℕ)
-  (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base (base * n)) :=
+  (hazoo : all_zero_or_one (nat.digits base n))
+  : all_zero_or_one (nat.digits base (base * n)) :=
 begin
   cases (nat.eq_zero_or_pos n) with hz hp,
   {
     rw hz,
-    simp only [mul_zero, digits_zero]
+    simp only [mul_zero, nat.digits_zero]
   },
 
   rw (digits_lemma base h2 n hp),
@@ -184,23 +184,23 @@ lemma base_pow_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
   (k n: ℕ)
-  (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base ((base ^ k) * n)) :=
+  (hazoo : all_zero_or_one (nat.digits base n))
+  : all_zero_or_one (nat.digits base ((base ^ k) * n)) :=
 begin
   induction k with pk hpk,
   { simpa },
   have := times_base_still_all_zero_or_one base h2 _ hpk,
-  rwa [←(nat.add_one pk), nat.pow_succ base pk, mul_comm (base^pk) base, mul_assoc],
+  rwa [←(nat.add_one pk), pow_succ' base pk, mul_comm (base^pk) base, mul_assoc],
 end
 
 lemma times_base_plus_one_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
   (n: ℕ)
-  (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base (1 + base * n)) :=
+  (hazoo : all_zero_or_one (nat.digits base n))
+  : all_zero_or_one (nat.digits base (1 + base * n)) :=
 begin
-  rw (digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
+  rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
   simpa,
 end
 
@@ -209,15 +209,15 @@ lemma base_pow_then_inc_still_all_zero_or_one
   (h2: 2 ≤ base)
   (k : ℕ)
   (n : ℕ)
-  (hazoo : all_zero_or_one (digits base n))
-  : all_zero_or_one (digits base ((base ^ (k + 1)) * n + 1)) :=
+  (hazoo : all_zero_or_one (nat.digits base n))
+  : all_zero_or_one (nat.digits base ((base ^ (k + 1)) * n + 1)) :=
 begin
   have hs := base_pow_still_all_zero_or_one base h2 k n hazoo,
   have hss := times_base_plus_one_still_all_zero_or_one base h2 _ hs,
   have hrw : 1 + base * (base ^ k * n) = base ^ (k + 1) * n + 1,
   {
     ring,
-    have : base ^ k * base  = base ^ (k + 1) := (nat.pow_succ base k).symm,
+    have : base ^ k * base  = base ^ (k + 1) := (pow_succ' base k).symm,
     finish,
   },
   rwa ← hrw,
@@ -239,13 +239,13 @@ lemma exists_positive_mod
   (hf: 0 < factor)
   (h_coprime: nat.coprime base factor)
   (n: ℕ)
-  : (∃k:ℕ, 0 < k ∧ k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (digits base k)) :=
+  : (∃k:ℕ, 0 < k ∧ k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (nat.digits base k)) :=
 begin
   induction n with np hnp,
   {
     use 1,
     use nat.modeq.refl 1,
-    have hd := digits_add base h2 1 0 (nat.succ_le_iff.mp h2) (or.inl nat.one_pos),
+    have hd := nat.digits_add base h2 1 0 (nat.succ_le_iff.mp h2) (or.inl nat.one_pos),
     simp at hd,
     rw hd,
     simp
@@ -289,7 +289,7 @@ lemma zeroes_and_ones_coprime
   (factor: ℕ)
   (hf: 0 < factor)
   (h_coprime: nat.coprime base factor)
-  : ∃ k : ℕ+, all_zero_or_one (digits base (factor * k)) :=
+  : ∃ k : ℕ+, all_zero_or_one (nat.digits base (factor * k)) :=
 begin
   obtain ⟨factor_prev, h_factor_prev⟩ := nat_prev factor hf,
   have hpm := exists_positive_mod base factor h2 hf h_coprime factor_prev,
@@ -344,7 +344,7 @@ begin
   calc np.succ = np + 1 : rfl
        ...     < m^k + 1 : nat.succ_lt_succ hk
        ...     ≤ m ^ k * m : hmm
-       ...     = m ^ (k + 1) : (nat.pow_succ m k).symm,
+       ...     = m ^ (k + 1) : (pow_succ' m k).symm,
 end
 
 def compute_largest_pow_factor (b: ℕ) (hb: 2 ≤ b) : ℕ → ℕ
@@ -399,7 +399,7 @@ begin
         linarith,
       },
       rw hclpf,
-      exact nat.pow_zero m,
+      exact pow_zero m,
     },
     intro hmc,
     have hle : 1 ≤ compute_largest_pow_factor m hm 1 + 1 := nat.le_add_left 1 _,
@@ -428,7 +428,7 @@ begin
   rw hc,
   split,
   {
-     simp only [nat.pow_zero, is_unit.dvd, nat.is_unit_iff],
+     simp only [pow_zero, is_unit.dvd, nat.is_unit_iff],
   },
   simpa,
 end
@@ -478,7 +478,7 @@ begin
       {
         calc 2 < 2 + 2 : nat.lt_of_sub_eq_succ rfl
             ... = 2 * 2 : (two_mul 2).symm
-            ... = 2 ^ 2 : (nat.pow_two 2).symm
+            ... = 2 ^ 2 : (pow_two 2).symm
             ... ≤ 2 ^ 2 * k.succ : h2222
       },
       conv at h222 begin
@@ -490,8 +490,8 @@ begin
     },
     use 0,
     split,
-    { simp only [nat.pow_zero, is_unit.dvd, nat.is_unit_iff] },
-    simp only [nat.pow_one],
+    { simp only [pow_zero, is_unit.dvd, nat.is_unit_iff] },
+    simp only [pow_one],
     intro h,
     obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd h,
     cases k,
@@ -527,7 +527,7 @@ begin
   sorry,
 end
 
-theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (digits 10 (n * k)) :=
+theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
 begin
   sorry
 end
