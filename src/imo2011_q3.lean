@@ -6,7 +6,26 @@ theorem imo2011Q3
 begin
   have hab: (∀ x t, f t ≤ t * f x - x * f x + f (f x)),
   {
-    sorry,
+    intros x t,
+    have h := (hf x (t - x)),
+    conv at h begin
+      congr,
+      { congr,
+        simp,
+        skip,
+      },
+      ring,
+      congr,
+      {
+        skip,
+      },
+      congr,
+      { ring,
+        skip, },
+      skip,
+    end,
+    ring,
+    exact h,
   },
   sorry,
 end
