@@ -36,8 +36,7 @@ begin
   {
     intros a b,
     have h := hab a b,
-    cases h,
-    sorry,
+    linarith,
   },
   have ha: (∀ a < 0, 0 ≤ f a),
   {
