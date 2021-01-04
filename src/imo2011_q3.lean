@@ -1,5 +1,15 @@
 import data.real.basic
 
+lemma less_than_both (a b : ℝ) : (∃ c, c < a ∧ c < b) :=
+begin
+  use (min a b - 1),
+  have ha := min_le_right a b,
+  have ha := min_le_left a b,
+  split,
+  linarith,
+  linarith,
+end
+
 theorem imo2011Q3
   (f: ℝ → ℝ) (hf: ∀ x y, f (x + y) ≤ y * f x + f (f x))
   : (∀ x ≤ 0, f x = 0) :=
@@ -51,7 +61,11 @@ begin
   have hx: (∀ x, f x ≤ 0),
   {
     intros x,
-    --- suppose f y > 0 for some y ... contradiction.
+    classical,
+    by_contra,
+    have hp : 0 < f x := not_le.mp h,
+    let s := ((x * f x - f (f x)) / (f x)),
+    have h' := hxt x (min 0 s - 1),
     sorry,
   },
   have hn: (∀x < 0, f x = 0),
