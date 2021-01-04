@@ -8,11 +8,7 @@ begin
     linarith,
   },
   ring,
-  conv begin
-    congr,
-    congr,
-    rw hb,
-  end,
+  rw hb,
   exact one_mul a,
 end
 
