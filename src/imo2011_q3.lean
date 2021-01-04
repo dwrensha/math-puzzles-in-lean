@@ -24,24 +24,8 @@ begin
   {
     intros x t,
     have h := (hf x (t - x)),
-    conv at h begin
-      congr,
-      { congr,
-        simp,
-        skip,
-      },
-      ring,
-      congr,
-      {
-        skip,
-      },
-      congr,
-      { ring,
-        skip, },
-      skip,
-    end,
-    ring,
-    exact h,
+    rw (add_eq_of_eq_sub' rfl) at h,
+    linarith,
   },
   have hab: (∀ a b, f (f a) - f (f b) ≤ (f a) * (f b) - b * f b ∧
                     f (f b) - f (f a) ≤ (f a) * (f b) - a * f a),
