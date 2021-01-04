@@ -1,13 +1,19 @@
 import data.real.basic
 
-lemma less_than_both (a b : ℝ) : (∃ c, c < a ∧ c < b) :=
+lemma mul_denom (a b : ℝ) (h: 0 < b) : (a / b) * b = a :=
 begin
-  use (min a b - 1),
-  have ha := min_le_right a b,
-  have ha := min_le_left a b,
-  split,
-  linarith,
-  linarith,
+  have hb : b * b⁻¹ = (1 : ℝ),
+  {
+    refine mul_inv_cancel _,
+    linarith,
+  },
+  ring,
+  conv begin
+    congr,
+    congr,
+    rw hb,
+  end,
+  exact one_mul a,
 end
 
 theorem imo2011Q3
@@ -66,7 +72,40 @@ begin
     have hp : 0 < f x := not_le.mp h,
     let s := ((x * f x - f (f x)) / (f x)),
     have h' := hxt x (min 0 s - 1),
-    sorry,
+    have hm : min 0 s - 1 < s,
+    {
+      have := min_le_right 0 s,
+      linarith,
+    },
+    have hml : min 0 s - 1 < 0,
+    {
+      have := min_le_left 0 s,
+      linarith,
+    },
+
+    have hm1 : (min 0 s - 1) * f x < s * f x := (mul_lt_mul_right hp).mpr hm,
+    have hm2 : (min 0 s - 1) * f x - x * f x + f (f x) < s * f x - x * f x + f (f x),
+    {
+      linarith,
+    },
+    have hzzz : s * f x = x * f x - f (f x),
+    {
+      exact mul_denom (x * f x - f (f x)) (f x) hp,
+    },
+    have hzz : s * f x - x * f x + f (f x) = 0,
+    {
+      rw hzzz,
+      linarith,
+    },
+    have hmz: f (min 0 s - 1) < 0,
+    {
+      calc f (min 0 s - 1)
+           ≤ (min 0 s - 1) * f x - x * f x + f (f x) : h'
+      ...  < s * f x - x * f x + f (f x) : hm2
+      ...  = 0 : hzz,
+    },
+    have hmp : 0 ≤ f (min 0 s - 1) := ha (min 0 s - 1) hml,
+    linarith,
   },
   have hn: (∀x < 0, f x = 0),
   {
