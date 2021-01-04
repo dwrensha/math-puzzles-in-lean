@@ -68,21 +68,13 @@ begin
     },
 
     have hm1 : (min 0 s - 1) * f x < s * f x := (mul_lt_mul_right hp).mpr hm,
-    have hm2 : (min 0 s - 1) * f x - x * f x + f (f x) < s * f x - x * f x + f (f x),
-    {
-      linarith,
-    },
-    have hzz : s * f x - x * f x + f (f x) = 0,
-    {
-      rw (mul_denom (x * f x - f (f x)) (f x) hp),
-      linarith,
-    },
+
     have hmz: f (min 0 s - 1) < 0,
     {
       calc f (min 0 s - 1)
            ≤ (min 0 s - 1) * f x - x * f x + f (f x) : h'
-      ...  < s * f x - x * f x + f (f x) : hm2
-      ...  = 0 : hzz,
+      ...  < s * f x - x * f x + f (f x) : by linarith
+      ...  = 0 : by rw (mul_denom (x * f x - f (f x)) (f x) hp); linarith,
     },
     have hmp : 0 ≤ f (min 0 s - 1) := ha (min 0 s - 1) hml,
     linarith,
