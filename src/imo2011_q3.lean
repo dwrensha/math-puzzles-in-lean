@@ -88,13 +88,9 @@ begin
     {
       linarith,
     },
-    have hzzz : s * f x = x * f x - f (f x),
-    {
-      exact mul_denom (x * f x - f (f x)) (f x) hp,
-    },
     have hzz : s * f x - x * f x + f (f x) = 0,
     {
-      rw hzzz,
+      rw (mul_denom (x * f x - f (f x)) (f x) hp),
       linarith,
     },
     have hmz: f (min 0 s - 1) < 0,
