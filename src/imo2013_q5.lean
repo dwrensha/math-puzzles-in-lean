@@ -1,7 +1,9 @@
 import data.rat.basic
 import data.rat.order
 
-import tactic.linarith
+/-
+Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
+-/
 
 theorem imo2013Q4
   (f: ℚ → ℚ)
