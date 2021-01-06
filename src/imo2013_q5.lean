@@ -1,12 +1,13 @@
 import data.rat.basic
 import data.rat.order
+import data.real.basic
 
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
 
 theorem imo2013Q4
-  (f: ℚ → ℚ)
+  (f: ℚ → ℝ)
   (f_positive: ∀ x, 0 < f x)
   (f_i: ∀ x y, (0 < x ∧ 0 < y) → f (x * y) ≤ f x * f y)
   (f_ii: ∀ x y, (0 < x ∧ 0 < y) → f x + f y ≤ f (x + y))
@@ -26,8 +27,8 @@ begin
     induction n with pn hpn,
     { simp only [one_mul, nat.cast_zero, zero_add], },
     rw nat.cast_succ,
-    calc (↑pn + 1 + 1) * f x = ((pn : ℚ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
-        ... = (↑pn + 1) * f x + f x : by rw one_mul
+    calc (↑pn + 1 + 1) * f x = ((pn : ℚ) + 1) * f x + 1 * f x : sorry --add_mul (↑pn + 1) 1 (f x)
+        ... = (↑pn + 1) * f x + f x : sorry -- rw one_mul
         ... ≤ f ((↑pn + 1) * x) + f x : add_le_add_right hpn (f x)
         ... ≤ f ((↑pn + 1) * x + x) : f_ii ((↑pn + 1) * x) x ⟨mul_pos (nat.cast_add_one_pos pn) hx, hx⟩
         ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
