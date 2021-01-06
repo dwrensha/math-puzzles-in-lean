@@ -22,11 +22,16 @@ begin
     induction n with pn hpn,
     { simp only [one_mul, nat.cast_zero, zero_add], },
     rw nat.cast_succ,
+    have hpp : 0 < (↑pn + 1) * x,
+    {
+       sorry,
+    },
     calc (↑pn + 1 + 1) * f x = ((pn : ℚ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
         ... = (↑pn + 1) * f x + f x : by rw one_mul
-        ... ≤ f ((↑pn + 1) * x) + f x : sorry
-        ... ≤ f ((↑pn + 1) * x + x) : sorry
-        ... = f ((↑pn + 1 + 1) * x) : sorry,
+        ... ≤ f ((↑pn + 1) * x) + f x : add_le_add_right hpn (f x)
+        ... ≤ f ((↑pn + 1) * x + x) : f_ii ((↑pn + 1) * x) x ⟨hpp, hx⟩
+        ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
+        ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
   },
   sorry,
 end
