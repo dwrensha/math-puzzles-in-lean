@@ -9,15 +9,15 @@ Direct translation of solution found in https://www.imo-official.org/problems/IM
 theorem imo2013Q4
   (f: ℚ → ℝ)
   (f_positive: ∀ x, 0 < f x)
-  (f_i: ∀ x y, (0 < x ∧ 0 < y) → f (x * y) ≤ f x * f y)
-  (f_ii: ∀ x y, (0 < x ∧ 0 < y) → f x + f y ≤ f (x + y))
+  (f_i: ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
+  (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
   (f_iii: ∃ a, 1 < a ∧ f a = a)
   : ∀ x, 0 < x → f x = x :=
 begin
   obtain ⟨a, ha1, hae⟩ := f_iii,
   have hf1: 1 ≤ f 1,
   {
-    have := (f_i a 1) ⟨lt_trans zero_lt_one ha1, zero_lt_one⟩,
+    have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
     rw mul_one at this,
     exact (le_mul_iff_one_le_right (f_positive a)).mp this
   },
@@ -30,9 +30,19 @@ begin
     calc (↑pn + 1 + 1) * f x = ((pn : ℝ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
         ... = (↑pn + 1) * f x + f x : by rw one_mul
         ... ≤ f ((↑pn + 1) * x) + f x : add_le_add_right hpn (f x)
-        ... ≤ f ((↑pn + 1) * x + x) : f_ii ((↑pn + 1) * x) x ⟨mul_pos (nat.cast_add_one_pos pn) hx, hx⟩
+        ... ≤ f ((↑pn + 1) * x + x) : f_ii ((↑pn + 1) * x) x (mul_pos (nat.cast_add_one_pos pn) hx) hx
         ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
         ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
+  },
+  have : ∀ q: ℚ, 0 < q → 0 < f q,
+  {
+    intros q hq,
+    have : f q.num ≤ f q * f q.denom,
+    {
+      have := f_i q q.denom hq,
+      sorry,
+    },
+    sorry,
   },
   sorry,
 end
