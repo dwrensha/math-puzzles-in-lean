@@ -16,17 +16,17 @@ begin
     rw mul_one at this,
     exact (le_mul_iff_one_le_right (f_positive a)).mp this
   },
-  have hfn: ∀x: ℚ, (0 < x → ∀ n: ℕ, ((n: ℚ) + 1) * f x ≤ f ((n + 1) * x)),
+  have hfn: ∀x: ℚ, (0 < x → ∀ n: ℕ, (↑n + 1) * f x ≤ f ((n + 1) * x)),
   {
     intros x hx n,
     induction n with pn hpn,
     { simp only [one_mul, nat.cast_zero, zero_add], },
     rw nat.cast_succ,
-    calc ((pn : ℚ) + 1 + 1) * f x = ((pn : ℚ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
+    calc (↑pn + 1 + 1) * f x = ((pn : ℚ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
         ... = (↑pn + 1) * f x + f x : by rw one_mul
-        ... ≤ f (((pn : ℚ) + 1) * x) + f x : by begin sorry, end
-        ... ≤ f (((pn : ℚ) + 1) * x + x) : sorry
-        ... = f (((pn : ℚ) + 1 + 1) * x) : sorry,
+        ... ≤ f ((↑pn + 1) * x) + f x : sorry
+        ... ≤ f ((↑pn + 1) * x + x) : sorry
+        ... = f ((↑pn + 1 + 1) * x) : sorry,
   },
   sorry,
 end
