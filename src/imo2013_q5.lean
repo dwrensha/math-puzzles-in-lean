@@ -14,7 +14,11 @@ theorem imo2013Q4
   : ∀ x, 0 < x → f x = x :=
 begin
   obtain ⟨a, ha1, hae⟩ := f_iii,
-  have ha1r : 1 < (a:ℝ) := sorry, -- something with rat.cast_lt ?
+  have ha1r : 1 < (a:ℝ),
+  {
+    rw ←rat.cast_one,
+    exact rat.cast_lt.mpr ha1,
+  },
   have hf1: 1 ≤ f 1,
   {
     have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
