@@ -9,7 +9,7 @@ Direct translation of solution found in https://www.imo-official.org/problems/IM
 theorem imo2013Q4
   (f: ℚ → ℝ)
   (f_positive: ∀ x, 0 < f x)
-  (f_i: ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
+  (f_i:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
   (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
   (f_iii: ∃ a, 1 < a ∧ f a = a)
   : ∀ x, 0 < x → f x = x :=
@@ -37,9 +37,10 @@ begin
   have : ∀ q: ℚ, 0 < q → 0 < f q,
   {
     intros q hq,
+    have hqn : (q.num: ℚ) = q * (q.denom : ℚ) := rat.mul_denom_eq_num.symm,
     have : f q.num ≤ f q * f q.denom,
     {
-      have := f_i q q.denom hq,
+      have := f_i q q.denom hq (nat.cast_pos.mpr q.pos),
       sorry,
     },
     sorry,
