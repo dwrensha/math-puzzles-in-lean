@@ -8,18 +8,24 @@ Direct translation of solution found in https://www.imo-official.org/problems/IM
 
 theorem imo2013Q4
   (f: ℚ → ℝ)
-  (f_positive: ∀ x, 0 < f x)
   (f_i:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
   (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
   (f_iii: ∃ a, 1 < a ∧ f a = a)
   : ∀ x, 0 < x → f x = x :=
 begin
   obtain ⟨a, ha1, hae⟩ := f_iii,
+  have ha1r : 1 < (a:ℝ) := sorry, -- something with rat.cast_lt ?
   have hf1: 1 ≤ f 1,
   {
     have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
-    rw mul_one at this,
-    exact (le_mul_iff_one_le_right (f_positive a)).mp this
+    rw [mul_one, hae] at this,
+    have haz : 0 < (a:ℝ),
+    {
+      calc 0 < 1 : zero_lt_one
+          ... < (a:ℝ) : ha1r
+    },
+    have h11 : ↑a * 1 ≤ ↑a * f 1 := by simpa only [mul_one],
+    exact (mul_le_mul_left haz).mp h11,
   },
   have hfn: ∀x: ℚ, (0 < x → ∀ n: ℕ, (↑n + 1) * f x ≤ f ((n + 1) * x)),
   {
@@ -41,7 +47,7 @@ begin
     have : f q.num ≤ f q * f q.denom,
     {
       have := f_i q q.denom hq (nat.cast_pos.mpr q.pos),
-      sorry,
+      rwa hqn,
     },
     sorry,
   },
