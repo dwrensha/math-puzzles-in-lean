@@ -47,7 +47,8 @@ begin
   have hn: (∀ n : ℕ, ((n + 1): ℝ) ≤ f (n + 1)),
   {
     intro n,
-    calc ((n + 1): ℝ) ≤ ((n + 1): ℝ) * f 1 : sorry
+    calc ((n + 1): ℝ) = ((n + 1): ℝ) * 1 : by simp only [mul_one]
+                  ... ≤ ((n + 1): ℝ) * f 1 : begin sorry end
                   ... ≤ f ((n + 1) * 1) : hfn 1 zero_lt_one n
                   ... = f (n + 1) : by simp only [mul_one]
   },
