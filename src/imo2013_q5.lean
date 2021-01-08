@@ -48,7 +48,7 @@ begin
   {
     intro n,
     calc ((n + 1): ℝ) = ((n + 1): ℝ) * 1 : by simp only [mul_one]
-                  ... ≤ ((n + 1): ℝ) * f 1 : begin sorry end
+                  ... ≤ ((n + 1): ℝ) * f 1 : (mul_le_mul_left (nat.cast_add_one_pos n)).mpr hf1
                   ... ≤ f ((n + 1) * 1) : hfn 1 zero_lt_one n
                   ... = f (n + 1) : by simp only [mul_one]
   },
