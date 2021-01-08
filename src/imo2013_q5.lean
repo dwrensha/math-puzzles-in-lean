@@ -69,6 +69,13 @@ begin
       have := f_i q q.denom hq (nat.cast_pos.mpr q.pos),
       rwa hqn,
     },
+    have hqd: (q.denom: ℝ) ≤ f q.denom := hn q.denom q.pos,
+    have hqnp: 0 < q.num := rat.num_pos_iff_pos.mpr hq,
+    have hqfn' : (q.num: ℝ) ≤ f q.num,
+    {
+      sorry,
+      --hn q.num hqnp,
+    },
     sorry,
   },
   sorry,
