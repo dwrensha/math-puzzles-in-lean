@@ -44,13 +44,21 @@ begin
         ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
         ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
   },
-  have hn: (∀ n : ℕ, ((n + 1): ℝ) ≤ f (n + 1)),
+  have hfn': ∀x: ℚ, (0 < x → ∀ n: ℕ, 0 < n → ↑n * f x ≤ f (n * x)),
   {
-    intro n,
-    calc ((n + 1): ℝ) = ((n + 1): ℝ) * 1 : by simp only [mul_one]
-                  ... ≤ ((n + 1): ℝ) * f 1 : (mul_le_mul_left (nat.cast_add_one_pos n)).mpr hf1
-                  ... ≤ f ((n + 1) * 1) : hfn 1 zero_lt_one n
-                  ... = f (n + 1) : by simp only [mul_one]
+    intros x hx n hn,
+    cases n,
+    { linarith }, -- hn: 0 < 0
+    have := hfn x hx n,
+    rwa [nat.cast_succ n],
+  },
+  have hn: (∀ n : ℕ, 0 < n → (n: ℝ) ≤ f n),
+  {
+    intros n hn,
+    calc (n: ℝ) = (n: ℝ) * 1 : by simp only [mul_one]
+                  ... ≤ (n: ℝ) * f 1 : (mul_le_mul_left (nat.cast_pos.mpr hn)).mpr hf1
+                  ... ≤ f (n * 1) : hfn' 1 zero_lt_one n hn
+                  ... = f n : by simp only [mul_one]
   },
   have : ∀ q: ℚ, 0 < q → 0 < f q,
   {
