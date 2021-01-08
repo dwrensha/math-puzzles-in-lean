@@ -44,11 +44,18 @@ begin
         ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
         ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
   },
+  have hn: (∀ n : ℕ, ((n + 1): ℝ) ≤ f (n + 1)),
+  {
+    intro n,
+    calc ((n + 1): ℝ) ≤ ((n + 1): ℝ) * f 1 : sorry
+                  ... ≤ f ((n + 1) * 1) : hfn 1 zero_lt_one n
+                  ... = f (n + 1) : by simp only [mul_one]
+  },
   have : ∀ q: ℚ, 0 < q → 0 < f q,
   {
     intros q hq,
     have hqn : (q.num: ℚ) = q * (q.denom : ℚ) := rat.mul_denom_eq_num.symm,
-    have : f q.num ≤ f q * f q.denom,
+    have hfqn : f q.num ≤ f q * f q.denom,
     {
       have := f_i q q.denom hq (nat.cast_pos.mpr q.pos),
       rwa hqn,
