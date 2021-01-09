@@ -69,13 +69,12 @@ begin
 
     have hm1 : (min 0 s - 1) * f x < s * f x := (mul_lt_mul_right hp).mpr hm,
 
-    have hmz: f (min 0 s - 1) < 0,
-    {
+    have hmz: f (min 0 s - 1) < 0 :=
       calc f (min 0 s - 1)
            ≤ (min 0 s - 1) * f x - x * f x + f (f x) : h'
       ...  < s * f x - x * f x + f (f x) : by linarith
       ...  = 0 : by rw (mul_denom (x * f x - f (f x)) (f x) hp); linarith,
-    },
+
     have hmp : 0 ≤ f (min 0 s - 1) := ha (min 0 s - 1) hml,
     linarith,
   },
@@ -89,7 +88,7 @@ begin
     have hno := hn (-1) neg_one_lt_zero;
     have hp := hxt (-1) (-1),
     rw hno at hp,
-    simp at hp,
+    simp only [sub_zero, zero_add, mul_zero] at hp,
     exact le_antisymm (hx 0) hp,
   },
   intros x hx,
