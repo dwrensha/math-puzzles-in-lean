@@ -18,5 +18,13 @@ begin
     use λ _, 1,
     simp only [finset.card_fin, add_zero, finset.prod_const, zero_div, pow_zero, sub_self],
   },
+  have ht: (∃t: ℕ+, n.1 = 2 * t.1 - 1) ∨ (∃t: ℕ+, n.1 = 2 * t.1),
+  { sorry },
+  cases ht,
+  {
+    obtain ⟨t, ht⟩ := ht,
+    sorry,
+  },
+  obtain ⟨t, ht⟩ := ht,
   sorry,
 end
