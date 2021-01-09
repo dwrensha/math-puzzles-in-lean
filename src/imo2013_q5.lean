@@ -86,6 +86,14 @@ begin
          ... ≤ f q.denom : hqd,
     nlinarith,
   },
+  have : (∀x:ℚ, 1 ≤ x → ((x - 1):ℝ) < f x),
+  {
+     intros x hx,
+
+     calc ((x - 1):ℝ) < x.floor : sorry -- basic property of floor()
+                  ... ≤ f x.floor : sorry -- hn
+                  ... ≤ f x : sorry -- f is strictly increasing
+  },
   sorry,
 end
 
