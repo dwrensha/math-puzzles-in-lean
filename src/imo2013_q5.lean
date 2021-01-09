@@ -23,11 +23,9 @@ begin
   {
     have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
     rw [mul_one, hae] at this,
-    have haz : 0 < (a:ℝ),
-    {
-      calc 0 < 1 : zero_lt_one
-          ... < (a:ℝ) : ha1r
-    },
+    have haz := calc 0 < 1     : zero_lt_one
+                   ... < (a:ℝ) : ha1r,
+
     have h11 : ↑a * 1 ≤ ↑a * f 1 := by simpa only [mul_one],
     exact (mul_le_mul_left haz).mp h11,
   },
