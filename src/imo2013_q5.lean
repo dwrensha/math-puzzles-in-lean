@@ -71,12 +71,27 @@ begin
     },
     have hqd: (q.denom: ℝ) ≤ f q.denom := hn q.denom q.pos,
     have hqnp: 0 < q.num := rat.num_pos_iff_pos.mpr hq,
-    have hqfn' : (q.num: ℝ) ≤ f q.num,
+    have hqna: ((int.nat_abs q.num):ℤ) = q.num := int.nat_abs_of_nonneg (le_of_lt hqnp),
+    have hqfn': (q.num: ℝ) ≤ f q.num,
     {
-      sorry,
-      --hn q.num hqnp,
+      rw ←hqna at hqnp,
+      have := hn q.num.nat_abs (int.coe_nat_pos.mp hqnp),
+      rw ←hqna,
+      rwa [int.cast_coe_nat q.num.nat_abs],
     },
-    sorry,
+    have hqnz : 0 < f q.num,
+    {
+      calc (0:ℝ) < q.num : int.cast_pos.mpr hqnp
+         ... ≤ f q.num : hqfn'
+    },
+    have hqdz : 0 < f q.denom,
+    {
+      calc (0:ℝ) < q.denom : nat.cast_pos.mpr q.pos
+         ... ≤ f q.denom : hqd
+    },
+    nlinarith,
   },
   sorry,
 end
+
+
