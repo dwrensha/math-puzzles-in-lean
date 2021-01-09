@@ -9,9 +9,9 @@ Direct translation of solution found in https://www.imo-official.org/problems/IM
 
 theorem imo2013Q1
   (n k: ℕ+) :
-  (∃s: finset ℕ, s.card = k ∧
-                 (∃m: ℕ → ℕ+, 1 + ((2^k.1 - 1): ℚ) / n =
-                              ∏ (i: ℕ) in s, (1 + 1 / ((m i) : ℚ)))) :=
+  (∃m: fin k → ℕ+, 1 + ((2^k.1 - 1): ℚ) / n =
+          ∏ (i: fin k), (1 + 1 / ((m i) : ℚ))) :=
 begin
+  induction k with kp hkp,
   sorry
 end
