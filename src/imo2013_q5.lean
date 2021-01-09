@@ -60,7 +60,7 @@ begin
                   ... ≤ f (n * 1) : hfn' 1 zero_lt_one n hn
                   ... = f n : by simp only [mul_one]
   },
-  have : ∀ q: ℚ, 0 < q → 0 < f q,
+  have hqp: ∀ q: ℚ, 0 < q → 0 < f q,
   {
     intros q hq,
     have hqn : (q.num: ℚ) = q * (q.denom : ℚ) := rat.mul_denom_eq_num.symm,
@@ -79,16 +79,11 @@ begin
       rw ←hqna,
       rwa [int.cast_coe_nat q.num.nat_abs],
     },
-    have hqnz : 0 < f q.num,
-    {
-      calc (0:ℝ) < q.num : int.cast_pos.mpr hqnp
-         ... ≤ f q.num : hqfn'
-    },
-    have hqdz : 0 < f q.denom,
-    {
+    have hqnz := calc (0:ℝ) < q.num : int.cast_pos.mpr hqnp
+                        ... ≤ f q.num : hqfn',
+    have hqdz :=
       calc (0:ℝ) < q.denom : nat.cast_pos.mpr q.pos
-         ... ≤ f q.denom : hqd
-    },
+         ... ≤ f q.denom : hqd,
     nlinarith,
   },
   sorry,
