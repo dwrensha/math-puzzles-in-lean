@@ -33,7 +33,7 @@ begin
   {
      intros a han,
      have h := hab1 a (2 * f a),
-     simp at h,
+     simp only [add_le_iff_nonpos_left] at h,
      exact nonneg_of_mul_nonpos_right h han,
   },
   have hx: (∀ x, f x ≤ 0),
