@@ -18,11 +18,13 @@ begin
     use λ _, 1,
     simp only [finset.card_fin, add_zero, finset.prod_const, zero_div, pow_zero, sub_self],
   },
+  obtain ⟨mp, hmp⟩ := hkp,
   have ht: (∃t: ℕ+, n.1 = 2 * t.1 - 1) ∨ (∃t: ℕ+, n.1 = 2 * t.1),
   { sorry },
   cases ht,
   {
     obtain ⟨t, ht⟩ := ht,
+    use (λi: fin kp.succ, if hi: i.val < kp then mp ⟨i.val, hi⟩ else ⟨2 * t.val - 1, sorry⟩),
     sorry,
   },
   obtain ⟨t, ht⟩ := ht,
