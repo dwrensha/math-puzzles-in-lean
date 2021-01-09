@@ -87,7 +87,6 @@ begin
   have : (∀x:ℚ, 1 ≤ x → ((x - 1):ℝ) < f x),
   {
      intros x hx,
-
      have hx0 := calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
                               ... ≤ f ⌊x⌋ : sorry, -- hn
 
@@ -96,12 +95,9 @@ begin
      { rwa ho at hx0 },
 
      have hxmfx : 0 < (x - ⌊x⌋) := by linarith,
-     have h0fx : 0 < (⌊x⌋:ℚ),
-     {
-       calc (0:ℚ) < 1 : zero_lt_one
-              ... = (int.has_one.one : ℚ) : by simp only [int.cast_one]
-              ... ≤ ⌊x⌋ : int.cast_le.mpr (le_floor.mpr hx),
-     },
+     have h0fx := calc (0:ℚ) < 1 : zero_lt_one
+                         ... = (int.has_one.one : ℚ) : by simp only [int.cast_one]
+                         ... ≤ ⌊x⌋ : int.cast_le.mpr (le_floor.mpr hx),
 
      calc ((x - 1):ℝ) <  f ⌊x⌋ : hx0
                   ... < f (x - ⌊x⌋) + f ⌊x⌋ : lt_add_of_pos_left (f ↑⌊x⌋) (hqp (x - ↑⌊x⌋) hxmfx)
