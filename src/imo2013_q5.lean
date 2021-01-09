@@ -90,8 +90,8 @@ begin
   {
      intros x hx,
 
-     calc ((x - 1):ℝ) < x.floor : sorry -- basic property of floor()
-                  ... ≤ f x.floor : sorry -- hn
+     calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
+                  ... ≤ f ⌊x⌋ : sorry -- hn
                   ... ≤ f x : sorry -- f is strictly increasing
   },
   sorry,
