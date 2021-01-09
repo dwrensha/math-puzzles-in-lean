@@ -1,17 +1,5 @@
 import data.real.basic
 
-lemma mul_denom (a b : ℝ) (h: 0 < b) : (a / b) * b = a :=
-begin
-  have hb : b * b⁻¹ = (1 : ℝ),
-  {
-    refine mul_inv_cancel _,
-    linarith,
-  },
-  ring,
-  rw hb,
-  exact one_mul a,
-end
-
 /-
 Direct translation of the solution found in https://www.imo-official.org/problems/IMO2011SL.pdf
 -/
@@ -73,7 +61,7 @@ begin
       calc f (min 0 s - 1)
            ≤ (min 0 s - 1) * f x - x * f x + f (f x) : h'
       ...  < s * f x - x * f x + f (f x) : by linarith
-      ...  = 0 : by rw (mul_denom (x * f x - f (f x)) (f x) hp); linarith,
+      ...  = 0 : by rw ((eq_div_iff (ne.symm (ne_of_lt hp))).mp rfl); linarith,
 
     have hmp : 0 ≤ f (min 0 s - 1) := ha (min 0 s - 1) hml,
     linarith,
