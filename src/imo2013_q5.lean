@@ -88,9 +88,20 @@ begin
   {
      intros x hx,
 
-     calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
-                  ... ≤ f ⌊x⌋ : sorry -- hn
-                  ... ≤ f x : sorry -- f is strictly increasing
+     have hx0 := calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
+                              ... ≤ f ⌊x⌋ : sorry, -- hn
+
+     have ho: (⌊x⌋:ℚ) = x ∨ (⌊x⌋:ℚ) < x := eq_or_lt_of_le (floor_le x),
+     cases ho,
+     { rwa ho at hx0 },
+
+     have hxmfx : 0 < (x - ⌊x⌋) := by linarith,
+     have h0fx : 0 < (⌊x⌋:ℚ) := sorry,
+
+     calc ((x - 1):ℝ) <  f ⌊x⌋ : hx0
+                  ... < f (x - ⌊x⌋) + f ⌊x⌋ : lt_add_of_pos_left (f ↑⌊x⌋) (hqp (x - ↑⌊x⌋) hxmfx)
+                  ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
+                  ... = f x : by simp only [sub_add_cancel]
   },
   sorry,
 end
