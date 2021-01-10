@@ -5,7 +5,7 @@ import data.real.basic
 lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
 begin
   cases a,
-  {simp,
+  {simp only [int.nat_abs_of_nat, int.nat_abs],
     have : (a:ℤ) = int.of_nat a,
     {
       exact int.coe_nat_eq a,
@@ -13,7 +13,7 @@ begin
     rw ← this at ha,
     exact int.coe_nat_pos.mp ha,
    },
-  simp,
+  simp only [nat.succ_pos', int.nat_abs],
 end
 
 /-
@@ -98,7 +98,7 @@ begin
          ... ≤ f q.denom : hqd,
     nlinarith,
   },
-  have : (∀x:ℚ, 1 ≤ x → ((x - 1):ℝ) < f x),
+  have hfx_gt_xm1 : (∀x:ℚ, 1 ≤ x → ((((x - 1): ℚ)):ℝ) < f x),
   {
      intros x hx,
      have hfe : ((⌊x⌋).nat_abs : ℤ) = ⌊x⌋,
@@ -124,7 +124,11 @@ begin
             ... < ⌊x⌋ : sub_one_lt_floor x,
        exact int.cast_pos.mp this,
      },
-     have hx0 := calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
+     have hx0 := calc (((x - 1):ℚ):ℝ) < ⌊x⌋ : begin have h := sub_one_lt_floor x,
+                                                    have h' : ((⌊x⌋ : ℚ):ℝ) = (⌊x⌋ : ℝ) := rat.cast_coe_int ⌊x⌋,
+                                                    rw ← h',
+                                                    exact rat.cast_lt.mpr h,
+                                              end
                               ... ≤ f ⌊x⌋ : begin have := hn (⌊x⌋).nat_abs hnnna,
                                                    rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
                                                    rw hfe' at this,
@@ -140,7 +144,7 @@ begin
                          ... = (int.has_one.one : ℚ) : by simp only [int.cast_one]
                          ... ≤ ⌊x⌋ : int.cast_le.mpr (le_floor.mpr hx),
 
-     calc ((x - 1):ℝ) <  f ⌊x⌋ : hx0
+     calc (((x - 1):ℚ):ℝ) <  f ⌊x⌋ : hx0
                   ... < f (x - ⌊x⌋) + f ⌊x⌋ : lt_add_of_pos_left (f ↑⌊x⌋) (hqp (x - ↑⌊x⌋) hxmfx)
                   ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
                   ... = f x : by simp only [sub_add_cancel]
