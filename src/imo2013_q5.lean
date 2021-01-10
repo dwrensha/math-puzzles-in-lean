@@ -149,7 +149,7 @@ begin
                   ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
                   ... = f x : by simp only [sub_add_cancel]
   },
-  have : (∀n:ℕ, 0 < n → ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
+  have hfxn : (∀n:ℕ, 0 < n → ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
   {
     intros n hn x hx,
     induction n with pn hpn,
@@ -168,6 +168,10 @@ begin
     calc f ((x ^ pn.succ) * x)
          ≤ f (x ^ pn.succ) * f x : f_i (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
      ... ≤ (f x) ^ pn.succ * f x : (mul_le_mul_right hfnp).mpr hpn'
+  },
+  have : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
+  {
+    sorry,
   },
   sorry,
 end
