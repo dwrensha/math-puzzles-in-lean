@@ -2,6 +2,20 @@ import data.rat.basic
 import data.rat.order
 import data.real.basic
 
+lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
+begin
+  cases a,
+  {simp,
+    have : (a:ℤ) = int.of_nat a,
+    {
+      exact int.coe_nat_eq a,
+    },
+    rw ← this at ha,
+    exact int.coe_nat_pos.mp ha,
+   },
+  simp,
+end
+
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
@@ -103,7 +117,12 @@ begin
        simp only [int.cast_coe_nat],
      },
      have hnnna : 0 < (⌊x⌋).nat_abs,
-     { sorry,
+     {
+       suffices: 0 < ⌊x⌋,
+       { exact foo ⌊x⌋ this, },
+       have := calc 0 ≤ x - 1 : by linarith
+            ... < ⌊x⌋ : sub_one_lt_floor x,
+       exact int.cast_pos.mp this,
      },
      have hx0 := calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
                               ... ≤ f ⌊x⌋ : begin have := hn (⌊x⌋).nat_abs hnnna,
