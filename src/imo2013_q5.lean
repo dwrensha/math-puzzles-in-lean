@@ -149,6 +149,13 @@ begin
                   ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
                   ... = f x : by simp only [sub_add_cancel]
   },
+  have : (∀n:ℕ, ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
+  {
+    intros n x hx,
+    induction n with pn hpn,
+    { sorry },
+    sorry,
+  },
   sorry,
 end
 
