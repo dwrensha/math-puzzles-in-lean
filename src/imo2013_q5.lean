@@ -87,7 +87,7 @@ begin
   have : (∀x:ℚ, 1 ≤ x → ((x - 1):ℝ) < f x),
   {
      intros x hx,
-     have hfe : ((⌊x⌋).nat_abs:ℚ) = ⌊x⌋,
+     have hfe : ((⌊x⌋).nat_abs : ℤ) = ⌊x⌋,
      {
        have hzx := calc 0 ≤ 1 : zero_le_one
                       ... ≤ x: hx,
@@ -96,6 +96,10 @@ begin
        conv begin
          to_rhs, rw ← this,
        end,
+     },
+     have hfe' : ((⌊x⌋).nat_abs : ℚ) = ⌊x⌋,
+     {
+       conv begin to_rhs, rw ← hfe end,
        simp only [int.cast_coe_nat],
      },
      have hnnna : 0 < (⌊x⌋).nat_abs,
@@ -104,7 +108,7 @@ begin
      have hx0 := calc ((x - 1):ℝ) < ⌊x⌋ : sorry -- basic property of floor
                               ... ≤ f ⌊x⌋ : begin have := hn (⌊x⌋).nat_abs hnnna,
                                                    rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
-                                                   rw hfe at this,
+                                                   rw hfe' at this,
                                                    rwa (rat.cast_coe_int ⌊x⌋) at this,
                                                    end,
 
