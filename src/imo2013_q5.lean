@@ -160,7 +160,14 @@ begin
     {
       simp only [pow_one],
     },
-    sorry,
+    have hpn' := hpn (nat.succ_pos pn),
+    rw [pow_succ' x (nat.succ pn), pow_succ' (f x) (nat.succ pn)],
+    have hxp := calc 0 < 1 : zero_lt_one
+                 ... < x : hx,
+    have hfnp: 0 < f x := hqp x hxp,
+    calc f ((x ^ pn.succ) * x)
+         ≤ f (x ^ pn.succ) * f x : f_i (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
+     ... ≤ (f x) ^ pn.succ * f x : (mul_le_mul_right hfnp).mpr hpn'
   },
   sorry,
 end
