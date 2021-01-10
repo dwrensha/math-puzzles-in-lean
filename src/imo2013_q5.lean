@@ -20,7 +20,7 @@ end
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
 
-theorem imo2013Q4
+theorem imo2013Q5
   (f: ℚ → ℝ)
   (f_i:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
   (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
@@ -149,11 +149,17 @@ begin
                   ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
                   ... = f x : by simp only [sub_add_cancel]
   },
-  have : (∀n:ℕ, ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
+  have : (∀n:ℕ, 0 < n → ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
   {
-    intros n x hx,
+    intros n hn x hx,
     induction n with pn hpn,
-    { sorry },
+    {
+      linarith,
+    },
+    cases pn,
+    {
+      simp only [pow_one],
+    },
     sorry,
   },
   sorry,
