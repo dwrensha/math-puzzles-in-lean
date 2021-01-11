@@ -2,6 +2,16 @@ import data.rat.basic
 import data.rat.order
 import data.real.basic
 
+lemma nth_power_gt
+      (x:ℝ)
+      (y:ℝ)
+      (hx : 1 < x)
+      (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
+      : (x ≤ y) :=
+begin
+   sorry,
+end
+
 lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
 begin
   cases a,
