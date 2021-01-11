@@ -373,7 +373,7 @@ begin
   induction n with np hnp,
   {
     intros n1 hn1,
-    have hz : n1 = 0 := le_zero_iff_eq.mp hn1,
+    have hz : n1 = 0 := nonpos_iff_eq_zero.mp hn1,
     rw hz,
     simp,
     split,
@@ -449,7 +449,7 @@ begin
   induction n with np hnp,
   {
     intros n1 hn1,
-    have hn10 : n1 = 0 := le_zero_iff_eq.mp hn1,
+    have hn10 : n1 = 0 := nonpos_iff_eq_zero.mp hn1,
     rw hn10,
     simp,
     -- depends on whether m = 2 or 2 < m...
