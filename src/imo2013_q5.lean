@@ -171,6 +171,14 @@ begin
   },
   have : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
   {
+    intros x hx,
+    have hxg1: 1 ≤ x := le_of_lt hx,
+    have hxnm1: (∀ n : ℕ, 0 < n → (((x^n - 1):ℚ):ℝ) < (f x)^n),
+    {
+      intros n hn,
+      calc (((x^n - 1):ℚ):ℝ) < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le hxg1 n)
+                         ... ≤ (f x)^n : hfxn n hn x hx
+    },
     sorry,
   },
   sorry,
