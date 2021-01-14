@@ -8,26 +8,29 @@ lemma factor_xn_min_yn
       (x:ℝ)
       (y:ℝ)
       (n: ℕ)
-      (hn: 0 < n)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
 begin
+  cases n,
+  { simp only [finset.sum_empty, finset.range_zero, mul_zero, pow_zero, sub_self], },
+
   have : (x - y) * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) =
        x * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) -
        y * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i)))
       := sub_mul x y (∑ i in finset.range n, x ^ i * y ^ (n - 1 - i)),
 
-  have hinner0: (∀i:ℕ, i ∈ finset.range n → x * (x^i * y ^(n - 1 -i)) = x^(i+1) * y ^(n - 1 -i)),
+  have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i)) = x^(i+1) * y ^(n.succ - 1 -i)),
   {
     intros i _,
-    calc x * (x^i * y ^(n - 1 -i)) = (x * x^i) * y ^(n - 1 -i) : (mul_assoc x _ _).symm
-        ... = x^(i+1) * y ^(n - 1 -i) : by rw ←(pow_succ x i),
+    calc x * (x^i * y ^(n.succ - 1 -i)) = (x * x^i) * y ^(n.succ - 1 -i) : (mul_assoc x _ _).symm
+        ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
   },
 
-  have := calc  x * (∑i in finset.range n, (x ^i * y ^(n - 1 -i))) =
-    (∑i in finset.range n, (x * (x ^i * y ^(n - 1 -i)))) : ((finset.range n).sum_hom (has_mul.mul x)).symm
-   ... = (∑i in finset.range n, (x^(i+1) * y ^(n - 1 - i))) : finset.sum_congr rfl hinner0,
---   ... = (∑i in finset.range (n-1), (x^(i+1) * y ^(n - 1 - i))) : sorry,
-  -- something with finset.sum_range_succ
+  have := calc  x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
+    (∑i in finset.range n.succ, (x * (x ^i * y ^(n.succ - 1 -i))))
+                : ((finset.range n.succ).sum_hom (has_mul.mul x)).symm
+   ... = (∑i in finset.range n.succ, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_congr rfl hinner0
+   ... = (x^(n+1) * y ^(n.succ - 1 - n))
+         + (∑i in finset.range n, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_range_succ _ _,
 
   sorry
 end
