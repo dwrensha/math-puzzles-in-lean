@@ -13,10 +13,10 @@ begin
   cases n,
   { simp only [finset.sum_empty, finset.range_zero, mul_zero, pow_zero, sub_self], },
 
-  have : (x - y) * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) =
-       x * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) -
-       y * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i)))
-      := sub_mul x y (∑ i in finset.range n, x ^ i * y ^ (n - 1 - i)),
+  have : (x - y) * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) =
+       x * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) -
+       y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
+      := sub_mul x y (∑ i in finset.range n.succ, x ^ i * y ^ (n.succ - 1 - i)),
 
   have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i)) = x^(i+1) * y ^(n.succ - 1 -i)),
   {
@@ -31,6 +31,18 @@ begin
    ... = (∑i in finset.range n.succ, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_congr rfl hinner0
    ... = (x^(n+1) * y ^(n.succ - 1 - n))
          + (∑i in finset.range n, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_range_succ _ _,
+
+  have := calc
+      y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
+       = ∑i in finset.range n.succ, y * (x ^(i) * y ^(n.succ - 1 -i))
+            : ((finset.range (nat.succ n)).sum_hom (has_mul.mul y)).symm
+    ... = ∑i in finset.range n.succ, (y * (x ^(n - i) * y ^(n.succ - 1 - (n -i))))
+            : (finset.sum_flip (λi, (y * (x ^(i) * y ^(n.succ - 1 -i))))).symm
+    ... = ∑i in finset.range n.succ, (y * (x ^(n - i) * y ^(i)))
+            : begin
+                sorry
+              end,
+
 
   sorry
 end
