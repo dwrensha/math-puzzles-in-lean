@@ -2,13 +2,53 @@ import data.rat.basic
 import data.rat.order
 import data.real.basic
 
+open_locale big_operators
+
+lemma factor_xn_min_yn
+      (x:ℝ)
+      (y:ℝ)
+      (n: ℕ)
+      (hn: 0 < n)
+      :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
+begin
+  have : (x - y) * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) =
+       x * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i))) -
+       y * (∑i in finset.range n, (x ^(i) * y ^(n - 1 -i)))
+      := sub_mul x y (∑ i in finset.range n, x ^ i * y ^ (n - 1 - i)),
+
+  have hinner0: (∀i:ℕ, i ∈ finset.range n → x * (x^i * y ^(n - 1 -i)) = x^(i+1) * y ^(n - 1 -i)),
+  {
+    intros i _,
+    calc x * (x^i * y ^(n - 1 -i)) = (x * x^i) * y ^(n - 1 -i) : (mul_assoc x _ _).symm
+        ... = x^(i+1) * y ^(n - 1 -i) : by rw ←(pow_succ x i),
+  },
+
+  have := calc  x * (∑i in finset.range n, (x ^i * y ^(n - 1 -i))) =
+    (∑i in finset.range n, (x * (x ^i * y ^(n - 1 -i)))) : ((finset.range n).sum_hom (has_mul.mul x)).symm
+   ... = (∑i in finset.range n, (x^(i+1) * y ^(n - 1 - i))) : finset.sum_congr rfl hinner0,
+--   ... = (∑i in finset.range (n-1), (x^(i+1) * y ^(n - 1 - i))) : sorry,
+  -- something with finset.sum_range_succ
+
+  sorry
+end
+
 lemma nth_power_gt
       (x:ℝ)
       (y:ℝ)
       (hx : 1 < x)
+      (hy : 1 < y)
       (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
       : (x ≤ y) :=
 begin
+   classical,
+   by_contra,
+   push_neg at h,
+
+   have : (∀ n:ℕ, 0 < n → (n:ℝ) * (x - y) < x^n - y^n),
+   {
+     intros n h,
+     sorry,
+   },
    sorry,
 end
 
