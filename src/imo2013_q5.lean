@@ -4,6 +4,13 @@ import data.real.basic
 
 open_locale big_operators
 
+lemma simp_lemma_1 {x y: ℝ} {n:ℕ} : y * (x^0 * y^(n.succ - 1 - 0)) = y ^ (n+1) :=
+begin
+  simp only [one_mul, nat.succ_sub_succ_eq_sub, nat.sub_zero, pow_zero],
+  exact (pow_succ y n).symm,
+end
+
+
 lemma factor_xn_min_yn
       (x:ℝ)
       (y:ℝ)
@@ -18,12 +25,22 @@ begin
        y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
       := sub_mul x y (∑ i in finset.range n.succ, x ^ i * y ^ (n.succ - 1 - i)),
 
-  have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i)) = x^(i+1) * y ^(n.succ - 1 -i)),
+  have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i))
+                                                = x^(i+1) * y ^(n.succ - 1 -i)),
   {
     intros i _,
     calc x * (x^i * y ^(n.succ - 1 -i)) = (x * x^i) * y ^(n.succ - 1 -i) : (mul_assoc x _ _).symm
         ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
   },
+
+  have hinner1: (∀i:ℕ, i ∈ finset.range n.succ →
+       y * (x ^(i+1) * y ^(n.succ - 1 -(i+1))) = x^(i + 1) * y^(n - i)),
+  begin
+    intros i hi,
+    norm_num,
+    sorry,
+  end,
+
 
   have := calc  x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
     (∑i in finset.range n.succ, (x * (x ^i * y ^(n.succ - 1 -i))))
@@ -36,13 +53,12 @@ begin
       y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
        = ∑i in finset.range n.succ, y * (x ^(i) * y ^(n.succ - 1 -i))
             : ((finset.range (nat.succ n)).sum_hom (has_mul.mul y)).symm
-    ... = ∑i in finset.range n.succ, (y * (x ^(n - i) * y ^(n.succ - 1 - (n -i))))
-            : (finset.sum_flip (λi, (y * (x ^(i) * y ^(n.succ - 1 -i))))).symm
-    ... = ∑i in finset.range n.succ, (y * (x ^(n - i) * y ^(i)))
-            : begin
-                sorry
-              end,
-
+    ... = (∑i in finset.range n, y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))) + y * (x^0 * y^(n.succ - 1 - 0))
+        : finset.sum_range_succ' _ n
+    ... = (∑i in finset.range n, y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))) + y^(n + 1)
+        : by rw simp_lemma_1
+    ... = (∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1)
+        : sorry,
 
   sorry
 end
