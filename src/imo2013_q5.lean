@@ -4,8 +4,6 @@ import data.real.basic
 
 open_locale big_operators
 
-lemma bar (m n:ℕ) (h: m ≤ n) : (((n - m):ℕ):ℤ) = (n:ℤ) - (m:ℤ) := int.coe_nat_sub h
-
 lemma integer_subtraction_lemma1 {n m: ℤ} : (n - (m + 1) + 1) = n - m :=
 begin
   ring
@@ -39,12 +37,16 @@ begin
         ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
   },
 
-  have := calc  x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
+  have := calc x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
     (∑i in finset.range n.succ, (x * (x ^i * y ^(n.succ - 1 -i))))
                 : ((finset.range n.succ).sum_hom (has_mul.mul x)).symm
    ... = (∑i in finset.range n.succ, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_congr rfl hinner0
    ... = (x^(n+1) * y ^(n.succ - 1 - n))
-         + (∑i in finset.range n, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_range_succ _ _,
+         + (∑i in finset.range n, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_range_succ _ _
+   ... = (x^(n+1) * y ^(n - n))
+         + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) : by rw [nat.succ_sub_one n]
+   ... = x^(n+1)
+         + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) : by simp only [mul_one, nat.sub_self, pow_zero],
 
   have hinner2: (∀i:ℕ, i ∈ finset.range n →
        y * (x ^(i+1) * y^(n.succ - 1 -(i+1))) = x^(i + 1) * y^(n - i)),
