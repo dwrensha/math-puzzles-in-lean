@@ -33,7 +33,7 @@ begin
         ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
   },
 
-  have hinner1: (∀i:ℕ, i ∈ finset.range n.succ →
+  have hinner1: (∀i:ℕ, i ∈ finset.range n →
        y * (x ^(i+1) * y ^(n.succ - 1 -(i+1))) = x^(i + 1) * y^(n - i)),
   begin
     intros i hi,
@@ -41,8 +41,8 @@ begin
         = (y * x ^(i+1)) * y ^(n.succ - 1 -(i+1)) : tactic.ring.mul_assoc_rev y _ _
     ... = (x ^(i+1) * y) * y ^(n.succ - 1 -(i+1)) : by rw mul_comm y _
     ... = x ^(i+1) * (y * y ^(n.succ - 1 -(i+1))) : mul_assoc _ y _
-    ... = x ^(i+1) * y ^(1 + n.succ - 1 -(i+1)) : sorry
-    ... = x^(i + 1) * y^(n - i) : by norm_num
+    ... = x ^(i+1) * y ^((n.succ - 1 -(i+1)) + 1) : by rw ←(pow_succ y (n.succ - 1 -(i+1)))
+    ... = x^(i + 1) * y^(n - i) : begin norm_num, sorry end,
   end,
 
 
@@ -62,7 +62,7 @@ begin
     ... = (∑i in finset.range n, y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))) + y^(n + 1)
         : by rw simp_lemma_1
     ... = (∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1)
-        : sorry,
+        : by rw (finset.sum_congr rfl hinner1),
 
   sorry
 end
