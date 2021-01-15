@@ -37,8 +37,12 @@ begin
        y * (x ^(i+1) * y ^(n.succ - 1 -(i+1))) = x^(i + 1) * y^(n - i)),
   begin
     intros i hi,
-    norm_num,
-    sorry,
+    calc y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))
+        = (y * x ^(i+1)) * y ^(n.succ - 1 -(i+1)) : tactic.ring.mul_assoc_rev y _ _
+    ... = (x ^(i+1) * y) * y ^(n.succ - 1 -(i+1)) : by rw mul_comm y _
+    ... = x ^(i+1) * (y * y ^(n.succ - 1 -(i+1))) : mul_assoc _ y _
+    ... = x ^(i+1) * y ^(1 + n.succ - 1 -(i+1)) : sorry
+    ... = x^(i + 1) * y^(n - i) : by norm_num
   end,
 
 
