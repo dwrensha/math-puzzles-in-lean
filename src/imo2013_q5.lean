@@ -15,7 +15,7 @@ begin
   exact (pow_succ y n).symm,
 end
 
-lemma factor_xn_min_yn
+lemma factor_xn_m_yn
       (x:ℝ)
       (y:ℝ)
       (n: ℕ)
@@ -23,11 +23,6 @@ lemma factor_xn_min_yn
 begin
   cases n,
   { simp only [finset.sum_empty, finset.range_zero, mul_zero, pow_zero, sub_self], },
-
-  have : (x - y) * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) =
-       x * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) -
-       y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
-      := sub_mul x y (∑ i in finset.range n.succ, x ^ i * y ^ (n.succ - 1 - i)),
 
   have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i))
                                                 = x^(i+1) * y ^(n.succ - 1 -i)),
@@ -37,7 +32,7 @@ begin
         ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
   },
 
-  have := calc x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
+  have hxterm := calc x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
     (∑i in finset.range n.succ, (x * (x ^i * y ^(n.succ - 1 -i))))
                 : ((finset.range n.succ).sum_hom (has_mul.mul x)).symm
    ... = (∑i in finset.range n.succ, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_congr rfl hinner0
@@ -72,7 +67,7 @@ begin
     ... = x^(i + 1) * y^(n - i) : by rw ←(fpow_coe_nat y _)
   end,
 
-  have := calc
+  have hyterm := calc
       y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
        = ∑i in finset.range n.succ, y * (x ^(i) * y ^(n.succ - 1 -i))
             : ((finset.range (nat.succ n)).sum_hom (has_mul.mul y)).symm
@@ -83,7 +78,16 @@ begin
     ... = (∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1)
         : by rw (finset.sum_congr rfl hinner2),
 
-  sorry
+  symmetry,
+
+  calc (x - y) * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
+      = x * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) -
+        y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
+         : sub_mul x y (∑ i in finset.range n.succ, x ^ i * y ^ (n.succ - 1 - i))
+  ... = x^(n+1) + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) -
+        ((∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1))
+      : by rw [hxterm, hyterm]
+  ... = x^(n+1) - y^(n + 1) : by ring
 end
 
 lemma nth_power_gt
@@ -101,8 +105,22 @@ begin
    have : (∀ n:ℕ, 0 < n → (n:ℝ) * (x - y) < x^n - y^n),
    {
      intros n h,
+     rw (factor_xn_m_yn x y n),
+
+     have hterm : (∀i:ℕ, i < n → 1 < x^i * y^(n - 1 - i)),
+     {
+       intros i hi,
+       sorry,
+     },
+     have : (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i))
+            < (∑ (i : ℕ) in finset.range n, 1),
+     {
+       sorry,
+     },
      sorry,
    },
+
+
    sorry,
 end
 
