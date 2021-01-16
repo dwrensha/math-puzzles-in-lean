@@ -257,6 +257,30 @@ begin
   simp only [nat.succ_pos', int.nat_abs],
 end
 
+lemma power_bound (n: ℕ) (ε:ℚ) (ha: 0 < ε) : 1 + (n:ℚ) * ε ≤ (1 + ε)^n :=
+begin
+  induction n with pn hpn,
+  {
+    simp only [add_zero, nat.cast_zero, zero_mul, pow_zero],
+  },
+
+  have hpnp : 0 ≤ (pn:ℚ) := nat.cast_nonneg pn,
+  have hpnep: 0 ≤ (pn:ℚ) * ε := (zero_le_mul_right ha).mpr hpnp,
+  have hpp := calc 1 ≤ 1 + (pn:ℚ) * ε : le_add_of_nonneg_right hpnep
+                ...  ≤ (1+ε)^pn : hpn,
+  have hppe : ε ≤ ε * (1+ ε)^pn := (le_mul_iff_one_le_right ha).mpr hpp,
+
+  calc 1 + ↑(pn.succ) * ε
+       = 1 + (↑pn * ε + 1 * ε) : by simp only [one_mul, nat.cast_succ, add_right_inj]; ring
+   ... = (1 + ↑pn * ε) + 1 * ε : (add_assoc 1 (↑pn * ε) (1 * ε)).symm
+   ... = (1 + ↑pn * ε) + ε : by rw one_mul
+   ... ≤ (1 + ε) ^ pn + ε : add_le_add_right hpn ε
+   ... ≤ (1 + ε) ^ pn + ε * (1 + ε)^pn : add_le_add_left hppe ((1 + ε) ^ pn)
+   ... = 1 * (1 + ε) ^ pn + ε * (1 + ε)^pn : by ring
+   ... = (1 + ε) * (1 + ε) ^ pn : by ring
+   ... = (1 + ε) ^ (pn.succ) : (pow_succ (1+ε) pn).symm,
+end
+
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
@@ -456,7 +480,13 @@ begin
   },
   have h_xgt1_fx_eq_x: (∀ x:ℚ, 1 < x → f x = x),
   {
+    intros x hx,
     -- choose n such that 1 + x < a^n.
+    have : (∀m:ℕ, 1 + (m:ℚ) * (a - 1) ≤ a^m),
+    {
+      intros m,
+      sorry,
+    },
     sorry,
   },
 
