@@ -150,6 +150,75 @@ begin
    sorry,
 end
 
+lemma nth_power_gt'
+      (x:ℝ)
+      (y:ℝ)
+      (hx : 1 < x)
+      (hy : 0 < y)
+      (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
+      : (x ≤ y) :=
+begin
+  have hy': 1 < y,
+  {
+    classical,
+    by_contra hy'',
+    push_neg at hy'',
+    -- hy'' :  y ≤ 1.
+
+    let y' := (x + 1) / 2,
+    have h_y'_lt_x: y' < x,
+    {
+      have hh: x + 1 < x * 2,
+      {
+        linarith
+      },
+      have hh': (x + 1)/2 < (x * 2) / 2,
+      {
+        linarith,
+      },
+      calc y' < (x * 2) / 2 : hh'
+          ... = x : by linarith
+    },
+    have h1_lt_y' : 1 < y',
+    {
+      have hh': 1 * 2 / 2 < (x + 1) / 2,
+      {
+        linarith,
+      },
+      calc 1 = 1 * 2 / 2 : by linarith
+         ... < y' : hh'
+    },
+    have h_y_lt_y' := calc y ≤ 1 : hy''
+                         ... < y': h1_lt_y',
+    have h_yn_lt_y'n : (∀n, 0<n → y^n < y'^n),
+    {
+      intros n hn,
+      cases n,
+      {linarith},
+      induction n with pn hpn,
+      {linarith},
+      calc y ^ pn.succ.succ
+              = y ^ pn.succ * y : pow_succ' y (nat.succ pn)
+          ... < y ^ pn.succ * y' : (mul_lt_mul_left (pow_pos hy (nat.succ pn))).mpr h_y_lt_y'
+          ... < y' ^ pn.succ * y' : (mul_lt_mul_right (lt_trans hy h_y_lt_y')).mpr (hpn (nat.succ_pos pn))
+          ... = y' ^ pn.succ.succ : (pow_succ' y' (nat.succ pn)).symm
+    },
+    have hh: (∀ n, 0<n → x^n - 1 < y'^n),
+    {
+      intros n hn,
+      calc x^n - 1 < y^n : h n hn
+              ...  < y'^n : h_yn_lt_y'n n hn
+    },
+  -- then there exists y' such that 0 < y ≤ 1 < y' < x.
+  -- and for all positive n , x^n - 1 < y^n < y'^n
+
+    have := nth_power_gt x y' hx h1_lt_y' hh,
+  -- so by nth_power_gt, x ≤ y'. contradiction.
+    linarith,
+  },
+  exact nth_power_gt x y hx hy' h
+end
+
 lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
 begin
   cases a,
@@ -321,15 +390,27 @@ begin
   {
     intros x hx,
     have hxg1: 1 ≤ x := le_of_lt hx,
-    have hxnm1: (∀ n : ℕ, 0 < n → (((x^n - 1):ℚ):ℝ) < (f x)^n),
+    have hxnm1: (∀ n : ℕ, 0 < n → (x:ℝ)^n - 1 < (f x)^n),
     {
       intros n hn,
-      calc (((x^n - 1):ℚ):ℝ) < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le hxg1 n)
-                         ... ≤ (f x)^n : hfxn n hn x hx
+      calc (x:ℝ)^n - 1
+           = (((x^n - 1):ℚ):ℝ) : by norm_cast
+       ... < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le hxg1 n)
+       ... ≤ (f x)^n : hfxn n hn x hx
     },
-    sorry,
+    have hx': 1 < (x:ℝ),
+    {
+      norm_cast,
+      exact hx
+    },
+    have hxp: 0 < x,
+    {
+      calc 0 < 1 : zero_lt_one
+         ... < x : hx
+    },
+
+    exact nth_power_gt' x (f x) hx' (hqp x hxp) hxnm1,
   },
   sorry,
 end
-
 
