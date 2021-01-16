@@ -39,7 +39,6 @@ begin
   have hx: (∀ x, f x ≤ 0),
   {
     intros x,
-    classical,
     by_contra,
     have hp : 0 < f x := not_le.mp h,
     let s := ((x * f x - f (f x)) / (f x)),

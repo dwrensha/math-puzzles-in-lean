@@ -117,9 +117,9 @@ lemma nth_power_gt
       (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
       : (x ≤ y) :=
 begin
-   classical,
-   by_contra,
-   push_neg at h,
+   by_contra hxy,
+   push_neg at hxy,
+   have hxmy : 0 < x - y := sub_pos.mpr hxy,
 
    have hn: (∀ n:ℕ, 0 < n →  (x - y) * (n:ℝ) ≤ x^n - y^n),
    {
@@ -136,8 +136,6 @@ begin
        simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
      },
 
-     have hxmy : 0 < x - y := sub_pos.mpr h,
-
      calc (x - y) * (n:ℝ)
              = (x - y) *  (∑ (i : ℕ) in finset.range n, (1:ℝ))
                : by simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
@@ -146,6 +144,8 @@ begin
          ... = x^n - y^n : (factor_xn_m_yn x y n).symm,
    },
 
+   have hxyrp: 0 < 1/(x - y) := one_div_pos.mpr hxmy,
+   
    -- choose n larger than 1 / (x - y)
    sorry,
 end
@@ -160,7 +160,6 @@ lemma nth_power_gt'
 begin
   have hy': 1 < y,
   {
-    classical,
     by_contra hy'',
     push_neg at hy'',
     -- hy'' :  y ≤ 1.
