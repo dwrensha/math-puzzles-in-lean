@@ -515,7 +515,10 @@ begin
       cases n,
       { simp only [one_mul, nat.cast_one] },
       have hfneq : f (n.succ.succ) = n.succ.succ,
-      {sorry, },
+      {
+        have := h_xgt1_fx_eq_x (n.succ.succ:ℚ) (nat.one_lt_cast.mpr (nat.succ_lt_succ (nat.succ_pos n))),
+        rwa (rat.cast_coe_nat n.succ.succ) at this,
+      },
       rw ← hfneq,
       exact f_i (n.succ.succ:ℚ) x (nat.cast_pos.mpr hn) hx,
     },
@@ -552,4 +555,3 @@ begin
                ... = ((((x.num:ℚ) / (x.denom:ℚ)):ℚ):ℝ) : by norm_cast
                ... = x : by rw ←hrat_expand,
 end
-
