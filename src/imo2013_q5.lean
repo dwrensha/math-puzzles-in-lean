@@ -435,7 +435,7 @@ begin
 
     exact nth_power_gt' x (f x) hx' (hqp x hxp) hxnm1,
   },
-  have : (∀n, 0 < n → f (a^n) = a^n),
+  have h_fan_eq : (∀n, 0 < n → f (a^n) = a^n),
   {
     intros n hn,
 
@@ -454,6 +454,49 @@ begin
 
     exact le_antisymm hh1 hh0
   },
-  sorry,
+  have h_xgt1_fx_eq_x: (∀ x:ℚ, 1 < x → f x = x),
+  {
+    -- choose n such that 1 + x < a^n.
+    sorry,
+  },
+
+  have hfnx_eq : (∀ n:ℕ, 0<n → ∀x:ℚ, 0 < x → f (n * x) = n * f x),
+  {
+    intros n hn x hx,
+    sorry,
+  },
+  intros x hx,
+  have: 0 < x.num := rat.num_pos_iff_pos.mpr hx,
+  have hrat_expand: x = x.num / x.denom,
+  { norm_cast, exact rat.num_denom.symm},
+
+  have hxcnez: (x.denom:ℚ) ≠ (0:ℚ) := ne_of_gt (nat.cast_pos.mpr x.pos),
+  have hxcnezr: (x.denom:ℝ) ≠ (0:ℝ) := ne_of_gt (nat.cast_pos.mpr x.pos),
+
+  have h_denom_times_fx := calc (x.denom:ℝ) * f x
+             = f (x.denom * x) : (hfnx_eq x.denom x.pos x hx).symm
+         ... = f (x.denom * (x.num / x.denom))
+             : by conv begin to_lhs, congr, congr, skip, rw hrat_expand end
+         ... = f ((x.denom * x.num) / x.denom)
+             : by rw mul_div_assoc
+         ... = f ((x.num * x.denom) / x.denom)
+             : by rw mul_comm
+         ... = f (x.num * (x.denom / x.denom))
+             : by rw ←mul_div_assoc
+         ... = f (x.num * 1)
+             : by rw (div_self hxcnez)
+         ... = f (x.num) : by rw mul_one,
+
+  have : (x.denom:ℝ) * f x / x.denom = f x.num / x.denom
+      := congr_fun (congr_arg has_div.div h_denom_times_fx) ↑(x.denom),
+
+  calc f x = f x * 1 : (mul_one (f x)).symm
+               ... = f x * (x.denom / x.denom) : by rw ←(div_self hxcnezr)
+               ... = (f x * x.denom) / x.denom : mul_div_assoc' (f x) _ _
+               ... = (x.denom * f x) / x.denom : by rw mul_comm
+               ... = f x.num / x.denom : by rw h_denom_times_fx
+               ... = x.num / x.denom : sorry -- f x.num = x.num
+               ... = ((((x.num:ℚ) / (x.denom:ℚ)):ℚ):ℝ) : by norm_cast
+               ... = x : by rw ←hrat_expand,
 end
 
