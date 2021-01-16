@@ -232,6 +232,17 @@ begin
   exact nth_power_gt x y hx hy' h
 end
 
+lemma nth_power_gt_one {a:ℚ} {n: ℕ} (hn: 0 < n) (ha: 1 < a) : 1 < a^n :=
+begin
+  cases n,
+  { linarith },
+  induction n with pn hpn,
+  {linarith},
+  have hpn' := hpn (nat.succ_pos pn),
+  rw pow_succ,
+  nlinarith,
+end
+
 lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
 begin
   cases a,
@@ -399,7 +410,7 @@ begin
          ≤ f (x ^ pn.succ) * f x : f_i (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
      ... ≤ (f x) ^ pn.succ * f x : (mul_le_mul_right hfnp).mpr hpn'
   },
-  have : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
+  have h_fx_ge_x : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
   {
     intros x hx,
     have hxg1: 1 ≤ x := le_of_lt hx,
@@ -423,6 +434,25 @@ begin
     },
 
     exact nth_power_gt' x (f x) hx' (hqp x hxp) hxnm1,
+  },
+  have : (∀n, 0 < n → f (a^n) = a^n),
+  {
+    intros n hn,
+
+    have hh0: (a:ℝ)^n ≤ f (a^n),
+    {
+      have := h_fx_ge_x (a^n) (nth_power_gt_one hn ha1),
+      norm_cast,
+      exact this,
+    },
+
+    have hh1: f (a^n) ≤ a^n,
+    {
+      rw ← hae,
+      exact hfxn n hn a ha1
+    },
+
+    exact le_antisymm hh1 hh0
   },
   sorry,
 end
