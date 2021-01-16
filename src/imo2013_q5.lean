@@ -500,7 +500,7 @@ begin
                   ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
                   ... ≤ a^N - N * (a - 1): sub_le_sub_right (hbound N) (↑N * (a - 1))
                   ... < a^N - (x / (a - 1)) * (a - 1) : sorry
-                  ... = a^N - x : sorry,
+                  ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
     },
     sorry,
   },
