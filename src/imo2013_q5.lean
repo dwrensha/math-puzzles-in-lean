@@ -482,10 +482,25 @@ begin
   {
     intros x hx,
     -- choose n such that 1 + x < a^n.
-    have : (∀m:ℕ, 1 + (m:ℚ) * (a - 1) ≤ a^m),
+    have hbound: (∀m:ℕ, 1 + (m:ℚ) * (a - 1) ≤ a^m),
     {
       intros m,
-      sorry,
+      have haa: (1 + (a - 1)) = a := by ring,
+      have := power_bound m (a - 1) (sub_pos.mpr ha1),
+      rwa haa at this,
+    },
+
+    -- choose something greater than x / (a - 1).
+    obtain ⟨N, hN⟩ := exists_nat_gt (x / (a - 1)),
+    have h_big_enough : 1 < a^N - x,
+    {
+      have hhb := hbound N,
+
+      calc (1:ℚ) = 1 + 0 : rfl
+                  ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
+                  ... ≤ a^N - N * (a - 1): sorry -- use hhb
+                  ... < a^N - (x / (a - 1)) * (a - 1) : sorry
+                  ... = a^N - x : sorry,
     },
     sorry,
   },
