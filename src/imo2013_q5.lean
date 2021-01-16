@@ -498,7 +498,7 @@ begin
 
       calc (1:ℚ) = 1 + 0 : rfl
                   ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
-                  ... ≤ a^N - N * (a - 1): sorry -- use hhb
+                  ... ≤ a^N - N * (a - 1): sub_le_sub_right (hbound N) (↑N * (a - 1))
                   ... < a^N - (x / (a - 1)) * (a - 1) : sorry
                   ... = a^N - x : sorry,
     },
