@@ -487,9 +487,6 @@ begin
              : by rw (div_self hxcnez)
          ... = f (x.num) : by rw mul_one,
 
-  have : (x.denom:ℝ) * f x / x.denom = f x.num / x.denom
-      := congr_fun (congr_arg has_div.div h_denom_times_fx) ↑(x.denom),
-
   calc f x = f x * 1 : (mul_one (f x)).symm
                ... = f x * (x.denom / x.denom) : by rw ←(div_self hxcnezr)
                ... = (f x * x.denom) / x.denom : mul_div_assoc' (f x) _ _
