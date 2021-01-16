@@ -144,10 +144,24 @@ begin
          ... = x^n - y^n : (factor_xn_m_yn x y n).symm,
    },
 
-   have hxyrp: 0 < 1/(x - y) := one_div_pos.mpr hxmy,
-   
    -- choose n larger than 1 / (x - y)
-   sorry,
+   have hxyrp: 0 < 1/(x - y) := one_div_pos.mpr hxmy,
+   obtain ⟨N, hN⟩ := exists_nat_gt (1 / (x - y)),
+   have hNpr : (0:ℝ) < N := lt_trans hxyrp hN,
+   have hNp : 0 < N,
+   {
+     -- there's gotta be a simpler way to do this...
+     rw ←nat.cast_zero at hNpr,
+     cases N,
+     { linarith, },
+     exact nat.succ_pos N
+   },
+
+   have hh := h N hNp,
+   have := calc 1 = (x - y) * (1 / (x - y)) : by field_simp [ne_of_gt hxmy]
+              ... < (x - y) * N : (mul_lt_mul_left hxmy).mpr hN
+              ... ≤ x^N - y^N : hn N hNp,
+   linarith,
 end
 
 lemma nth_power_gt'
