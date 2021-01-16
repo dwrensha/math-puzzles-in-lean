@@ -4,27 +4,22 @@ import data.real.basic
 
 open_locale big_operators
 
-lemma sum_range_lt {n:ℕ} (hn: 0 < n) {f g: ℕ → ℝ} (h: ∀i:ℕ, i < n → f i < g i )
+lemma sum_range_le {n:ℕ} {f g: ℕ → ℝ} (h: ∀i:ℕ, i < n → f i ≤ g i )
       : (∑ (i : ℕ) in finset.range n, f i)
-            < (∑ (i : ℕ) in finset.range n, g i) :=
+            ≤ (∑ (i : ℕ) in finset.range n, g i) :=
 begin
-  cases n,
-  { linarith },
   induction n with pn hpn,
-  {
-    simp,
-    exact h 0 zero_lt_one,
+  { simp only [finset.sum_empty, finset.range_zero],
   },
-  rw (finset.sum_range_succ _ pn.succ),
-  rw (finset.sum_range_succ _ pn.succ),
-
-  have hfg := h pn.succ (lt_add_one _),
-  have hr: (∀i, i < pn.succ → f i < g i),
+  rw (finset.sum_range_succ _ pn),
+  rw (finset.sum_range_succ _ pn),
+  have hfg := h pn (lt_add_one _),
+  have hr: (∀i, i < pn → f i ≤ g i),
   {
     intros i hi,
     exact h i (nat.lt.step hi)
   },
-  have hpn' := hpn (nat.succ_pos pn) hr,
+  have hpn' := hpn hr,
   linarith,
 end
 
@@ -40,7 +35,7 @@ begin
 end
 
 lemma factor_xn_m_yn
-      (x:ℝ)
+      (x : ℝ)
       (y:ℝ)
       (n: ℕ)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
@@ -126,35 +121,29 @@ begin
    by_contra,
    push_neg at h,
 
-   have hn: (∀ n:ℕ, 0 < n → (n:ℝ) * (x - y) < x^n - y^n),
+   have hn: (∀ n:ℕ, 0 < n →  (x - y) * (n:ℝ) ≤ x^n - y^n),
    {
      intros n hn,
-     rw (factor_xn_m_yn x y n),
-
-     have hterm : (∀i:ℕ, i < n → 1 < x^i * y^(n - 1 - i)),
+     have hterm : (∀i:ℕ, i < n → 1 ≤ x^i * y^(n - 1 - i)),
      {
        intros i hi,
-       have hy' := calc 0 ≤ 1 : zero_le_one
-                      ... < y : hy,
-       have := pow_le_pow_of_le_left (le_of_lt hy') (le_of_lt h) (n - 1 - i),
-
-       have hhh'': (1:ℝ) = 1^ i := (one_pow i).symm,
-       have := calc (1:ℝ) = 1 ^ i : (one_pow i).symm
-                     ...  = 1 ^ i * 1 : (mul_one (1 ^ i)).symm,
-
-       sorry,
-     },
-     have : (∑ (i : ℕ) in finset.range n, (1:ℝ))
-            < (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i)),
-     {
-       exact sum_range_lt hn hterm,
+       have hx' : 1 ≤ x ^ i := one_le_pow_of_one_le (le_of_lt hx) i,
+       have hy' : 1 ≤ y ^ (n - 1 - i) := one_le_pow_of_one_le (le_of_lt hy) (n - 1 - i),
+       nlinarith,
      },
      have : ((n:ℝ) = (∑ (i : ℕ) in finset.range n, (1:ℝ))),
      {
        simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
      },
 
-     sorry,
+     have hxmy : 0 < x - y := sub_pos.mpr h,
+
+     calc (x - y) * (n:ℝ)
+             = (x - y) *  (∑ (i : ℕ) in finset.range n, (1:ℝ))
+               : by simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
+         ... ≤ (x-y) * (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i))
+               : (mul_le_mul_left hxmy).mpr (sum_range_le hterm)
+         ... = x^n - y^n : (factor_xn_m_yn x y n).symm,
    },
 
    -- choose n larger than 1 / (x - y)
