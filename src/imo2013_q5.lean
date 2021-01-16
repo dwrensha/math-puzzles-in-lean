@@ -4,6 +4,30 @@ import data.real.basic
 
 open_locale big_operators
 
+lemma sum_range_lt {n:ℕ} (hn: 0 < n) {f g: ℕ → ℝ} (h: ∀i:ℕ, i < n → f i < g i )
+      : (∑ (i : ℕ) in finset.range n, f i)
+            < (∑ (i : ℕ) in finset.range n, g i) :=
+begin
+  cases n,
+  { linarith },
+  induction n with pn hpn,
+  {
+    simp,
+    exact h 0 zero_lt_one,
+  },
+  rw (finset.sum_range_succ _ pn.succ),
+  rw (finset.sum_range_succ _ pn.succ),
+
+  have hfg := h pn.succ (lt_add_one _),
+  have hr: (∀i, i < pn.succ → f i < g i),
+  {
+    intros i hi,
+    exact h i (nat.lt.step hi)
+  },
+  have hpn' := hpn (nat.succ_pos pn) hr,
+  linarith,
+end
+
 lemma integer_subtraction_lemma1 {n m: ℤ} : (n - (m + 1) + 1) = n - m :=
 begin
   ring
@@ -102,25 +126,38 @@ begin
    by_contra,
    push_neg at h,
 
-   have : (∀ n:ℕ, 0 < n → (n:ℝ) * (x - y) < x^n - y^n),
+   have hn: (∀ n:ℕ, 0 < n → (n:ℝ) * (x - y) < x^n - y^n),
    {
-     intros n h,
+     intros n hn,
      rw (factor_xn_m_yn x y n),
 
      have hterm : (∀i:ℕ, i < n → 1 < x^i * y^(n - 1 - i)),
      {
        intros i hi,
+       have hy' := calc 0 ≤ 1 : zero_le_one
+                      ... < y : hy,
+       have := pow_le_pow_of_le_left (le_of_lt hy') (le_of_lt h) (n - 1 - i),
+
+       have hhh'': (1:ℝ) = 1^ i := (one_pow i).symm,
+       have := calc (1:ℝ) = 1 ^ i : (one_pow i).symm
+                     ...  = 1 ^ i * 1 : (mul_one (1 ^ i)).symm,
+
        sorry,
      },
-     have : (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i))
-            < (∑ (i : ℕ) in finset.range n, 1),
+     have : (∑ (i : ℕ) in finset.range n, (1:ℝ))
+            < (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i)),
      {
-       sorry,
+       exact sum_range_lt hn hterm,
      },
+     have : ((n:ℝ) = (∑ (i : ℕ) in finset.range n, (1:ℝ))),
+     {
+       simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
+     },
+
      sorry,
    },
 
-
+   -- choose n larger than 1 / (x - y)
    sorry,
 end
 
