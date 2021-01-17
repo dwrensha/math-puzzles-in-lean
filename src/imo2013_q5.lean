@@ -243,7 +243,7 @@ begin
   nlinarith,
 end
 
-lemma foo (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
+lemma nat_abs_pos (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
 begin
   cases a,
   {simp only [int.nat_abs_of_nat, int.nat_abs],
@@ -395,7 +395,7 @@ begin
      have hnnna : 0 < (⌊x⌋).nat_abs,
      {
        suffices: 0 < ⌊x⌋,
-       { exact foo ⌊x⌋ this, },
+       { exact nat_abs_pos ⌊x⌋ this, },
        have := calc 0 ≤ x - 1 : by linarith
             ... < ⌊x⌋ : sub_one_lt_floor x,
        exact int.cast_pos.mp this,
