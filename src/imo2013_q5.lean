@@ -24,15 +24,11 @@ begin
   linarith,
 end
 
-lemma factor_xn_m_yn
-      (x : ℝ)
-      (y:ℝ)
-      (n: ℕ)
+lemma factor_xn_minus_yn (x: ℝ) (y: ℝ) (n: ℕ)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
 begin
   have := geom_sum₂_mul_add (x-y) y n,
-  rw [sub_add_cancel x y] at this,
-  rw geom_series₂_def at this,
+  rw [sub_add_cancel x y, geom_series₂_def] at this,
   nlinarith,
 end
 
@@ -68,7 +64,7 @@ begin
                : by simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
          ... ≤ (x-y) * (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i))
                : (mul_le_mul_left hxmy).mpr (sum_range_le hterm)
-         ... = x^n - y^n : (factor_xn_m_yn x y n).symm,
+         ... = x^n - y^n : (factor_xn_minus_yn x y n).symm,
    },
 
    -- choose n larger than 1 / (x - y)
