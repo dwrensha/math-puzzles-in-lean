@@ -587,7 +587,8 @@ begin
   have hx2cnez: (x2denom:ℚ) ≠ (0:ℚ) := by field_simp,
   have hx2cnezr: (x2denom:ℝ) ≠ (0:ℝ) := by field_simp,
 
-  have hrat_expand2: x = x2num / x2denom := sorry,
+  have hrat_expand2:= calc x = x.num / x.denom : hrat_expand
+                   ... = x2num / x2denom : begin field_simp, linarith, end,
 
   have h_denom_times_fx := calc (x2denom:ℝ) * f x
              = f (x2denom * x) : (hfnx_eq x2denom hx2pos x hx).symm
