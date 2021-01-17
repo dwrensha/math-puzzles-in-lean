@@ -232,17 +232,6 @@ begin
   exact nth_power_gt x y hx hy' h
 end
 
-lemma nth_power_gt_one {a:ℚ} {n: ℕ} (hn: 0 < n) (ha: 1 < a) : 1 < a^n :=
-begin
-  cases n,
-  { linarith },
-  induction n with pn hpn,
-  {linarith},
-  have hpn' := hpn (nat.succ_pos pn),
-  rw pow_succ,
-  nlinarith,
-end
-
 lemma power_bound (n: ℕ) (ε:ℚ) (ha: 0 < ε) : 1 + (n:ℚ) * ε ≤ (1 + ε)^n :=
 begin
   induction n with pn hpn,
@@ -457,7 +446,7 @@ begin
 
     have hh0: (a:ℝ)^n ≤ f (a^n),
     {
-      have := h_fx_ge_x (a^n) (nth_power_gt_one hn ha1),
+      have := h_fx_ge_x (a^n) (one_lt_pow ha1 (nat.succ_le_iff.mpr hn)),
       norm_cast,
       exact this,
     },
