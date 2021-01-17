@@ -491,7 +491,7 @@ begin
     },
 
     -- choose something greater than x / (a - 1).
-    obtain ⟨N, hN⟩ := exists_nat_gt (x / (a - 1)),
+    obtain ⟨N, hN⟩ := exists_nat_gt (max 0 (x / (a - 1))),
     have h_big_enough : 1 < a^N - x,
     {
       have hhb := hbound N,
@@ -502,6 +502,37 @@ begin
                   ... < a^N - (x / (a - 1)) * (a - 1) : sorry
                   ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
     },
+    have hfx: (x:ℝ) ≤ f x := h_fx_ge_x x hx,
+    have hfanx: (((a^N - x):ℚ):ℝ) ≤ f (a^N - x) := h_fx_ge_x _ h_big_enough,
+    have h1 := calc (x:ℝ) + (((a^N - x):ℚ):ℝ)
+                      ≤ f x + (((a^N - x):ℚ):ℝ) : add_le_add_right hfx _
+                  ... ≤ f x + f (a^N - x) : add_le_add_left hfanx _,
+
+    have haNxp := calc (0:ℚ) < 1 : zero_lt_one
+                         ... < a^N - x : h_big_enough,
+
+    have hxp := calc (0:ℚ) < 1 : zero_lt_one
+                         ... < x : hx,
+
+    have hNp : 0 < N,
+    {
+      have hh:= calc (0:ℚ) ≤ max 0 (x / (a - 1)) : le_max_left 0 _
+                     ... < N : hN,
+      have : (0:ℚ) = ((0:ℕ):ℚ) := nat.cast_zero.symm,
+      rw this at hh,
+      norm_cast at hh,
+      exact hh,
+    },
+
+    have h2 := calc f x + f (a^N - x)
+            ≤ f (x + (a^N - x)) : f_ii x (a^N - x) hxp haNxp
+        ... = f (a^N) : by ring
+        ... = a^N : h_fan_eq N hNp
+        ... = x + (a^N - x): by ring
+        ... = x + (((a^N - x):ℚ):ℝ): by norm_cast,
+
+    have heq := le_antisymm h1 h2,
+
     sorry,
   },
 
@@ -554,4 +585,12 @@ begin
                ... = x.num / x.denom : sorry -- f x.num = x.num
                ... = ((((x.num:ℚ) / (x.denom:ℚ)):ℚ):ℝ) : by norm_cast
                ... = x : by rw ←hrat_expand,
+end
+
+lemma bar (n:ℕ) (hn: (0:ℚ) < n) : (0:ℕ) < n :=
+begin
+   have : (0:ℚ) = ((0:ℕ):ℚ) := nat.cast_zero.symm,
+   rw this at hn,
+   norm_cast at hn,
+   exact hn,
 end
