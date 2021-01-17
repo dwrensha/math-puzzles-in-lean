@@ -200,15 +200,15 @@ Direct translation of solution found in https://www.imo-official.org/problems/IM
 
 theorem imo2013_q5
   (f: ℚ → ℝ)
-  (f_i:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
-  (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
-  (f_iii: ∃ a, 1 < a ∧ f a = a)
+  (H1:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
+  (H2: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))
+  (H_fixed_point: ∃ a, 1 < a ∧ f a = a)
   : ∀ x, 0 < x → f x = x :=
 begin
-  obtain ⟨a, ha1, hae⟩ := f_iii,
+  obtain ⟨a, ha1, hae⟩ := H_fixed_point,
   have hf1: 1 ≤ f 1,
   {
-    have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
+    have := (H1 a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
     rw [mul_one, hae] at this,
     have haz := calc 0 < 1     : zero_lt_one
                    ... < (a:ℝ) : by {norm_cast, exact ha1},
@@ -225,11 +225,11 @@ begin
     calc (↑pn + 1 + 1) * f x = ((pn : ℝ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
         ... = (↑pn + 1) * f x + f x : by rw one_mul
         ... ≤ f ((↑pn + 1) * x) + f x : add_le_add_right hpn (f x)
-        ... ≤ f ((↑pn + 1) * x + x) : f_ii ((↑pn + 1) * x) x (mul_pos (nat.cast_add_one_pos pn) hx) hx
+        ... ≤ f ((↑pn + 1) * x + x) : H2 ((↑pn + 1) * x) x (mul_pos (nat.cast_add_one_pos pn) hx) hx
         ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
         ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
   },
-  have hfn': ∀x: ℚ, (0 < x → ∀ n: ℕ, 0 < n → ↑n * f x ≤ f (n * x)),
+  have H3: ∀x: ℚ, (0 < x → ∀ n: ℕ, 0 < n → ↑n * f x ≤ f (n * x)),
   {
     intros x hx n hn,
     cases n,
@@ -237,12 +237,12 @@ begin
     have := hfn x hx n,
     rwa [nat.cast_succ n],
   },
-  have hn: (∀ n : ℕ, 0 < n → (n: ℝ) ≤ f n),
+  have H4: (∀ n : ℕ, 0 < n → (n: ℝ) ≤ f n),
   {
     intros n hn,
     calc (n: ℝ) = (n: ℝ) * 1 : by simp only [mul_one]
                   ... ≤ (n: ℝ) * f 1 : (mul_le_mul_left (nat.cast_pos.mpr hn)).mpr hf1
-                  ... ≤ f (n * 1) : hfn' 1 zero_lt_one n hn
+                  ... ≤ f (n * 1) : H3 1 zero_lt_one n hn
                   ... = f n : by simp only [mul_one]
   },
   have hqp: ∀ q: ℚ, 0 < q → 0 < f q,
@@ -251,16 +251,16 @@ begin
     have hqn : (q.num: ℚ) = q * (q.denom : ℚ) := rat.mul_denom_eq_num.symm,
     have hfqn : f q.num ≤ f q * f q.denom,
     {
-      have := f_i q q.denom hq (nat.cast_pos.mpr q.pos),
+      have := H1 q q.denom hq (nat.cast_pos.mpr q.pos),
       rwa hqn,
     },
-    have hqd: (q.denom: ℝ) ≤ f q.denom := hn q.denom q.pos,
+    have hqd: (q.denom: ℝ) ≤ f q.denom := H4 q.denom q.pos,
     have hqnp: 0 < q.num := rat.num_pos_iff_pos.mpr hq,
     have hqna: ((int.nat_abs q.num):ℤ) = q.num := int.nat_abs_of_nonneg (le_of_lt hqnp),
     have hqfn': (q.num: ℝ) ≤ f q.num,
     {
       rw ←hqna at hqnp,
-      have := hn q.num.nat_abs (int.coe_nat_pos.mp hqnp),
+      have := H4 q.num.nat_abs (int.coe_nat_pos.mp hqnp),
       rw ←hqna,
       rwa [int.cast_coe_nat q.num.nat_abs],
     },
@@ -302,7 +302,7 @@ begin
                                                     rw ← h',
                                                     exact rat.cast_lt.mpr h,
                                               end
-                              ... ≤ f ⌊x⌋ : begin have := hn (⌊x⌋).nat_abs hnnna,
+                              ... ≤ f ⌊x⌋ : begin have := H4 (⌊x⌋).nat_abs hnnna,
                                                    rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
                                                    rw hfe' at this,
                                                    rwa (rat.cast_coe_int ⌊x⌋) at this,
@@ -319,7 +319,7 @@ begin
 
      calc (((x - 1):ℚ):ℝ) <  f ⌊x⌋ : hx0
                   ... < f (x - ⌊x⌋) + f ⌊x⌋ : lt_add_of_pos_left (f ↑⌊x⌋) (hqp (x - ↑⌊x⌋) hxmfx)
-                  ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : f_ii (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
+                  ... ≤ f ((x - ⌊x⌋) + ⌊x⌋) : H2 (x - ⌊x⌋) ⌊x⌋ hxmfx h0fx
                   ... = f x : by simp only [sub_add_cancel]
   },
   have hfxn : (∀n:ℕ, 0 < n → ∀ x:ℚ, 1 < x → f (x^n) ≤ (f x)^n),
@@ -337,10 +337,10 @@ begin
                  ... < x : hx,
     have hfnp: 0 < f x := hqp x hxp,
     calc f ((x ^ pn.succ) * x)
-         ≤ f (x ^ pn.succ) * f x : f_i (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
+         ≤ f (x ^ pn.succ) * f x : H1 (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
      ... ≤ (f x) ^ pn.succ * f x : (mul_le_mul_right hfnp).mpr hpn'
   },
-  have h_fx_ge_x : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
+  have H5 : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
   {
     intros x hx,
     have hxg1: 1 ≤ x := le_of_lt hx,
@@ -371,7 +371,7 @@ begin
 
     have hh0: (a:ℝ)^n ≤ f (a^n),
     {
-      have := h_fx_ge_x (a^n) (one_lt_pow ha1 (nat.succ_le_iff.mpr hn)),
+      have := H5 (a^n) (one_lt_pow ha1 (nat.succ_le_iff.mpr hn)),
       norm_cast,
       exact this,
     },
@@ -384,7 +384,7 @@ begin
 
     exact le_antisymm hh1 hh0
   },
-  have h_xgt1_fx_eq_x: (∀ x:ℚ, 1 < x → f x = x),
+  have h_xgt1_fx_eq_x: (∀x:ℚ, 1 < x → f x = x),
   {
     intros x hx,
     -- choose n such that 1 + x < a^n.
@@ -413,8 +413,8 @@ begin
                   ... < a^N - (x / (a - 1)) * (a - 1) : sub_lt_sub_left hsub (a ^ N)
                   ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
     },
-    have hfx: (x:ℝ) ≤ f x := h_fx_ge_x x hx,
-    have hfanx: (((a^N - x):ℚ):ℝ) ≤ f (a^N - x) := h_fx_ge_x _ h_big_enough,
+    have hfx: (x:ℝ) ≤ f x := H5 x hx,
+    have hfanx: (((a^N - x):ℚ):ℝ) ≤ f (a^N - x) := H5 _ h_big_enough,
     have h1 := calc (x:ℝ) + (((a^N - x):ℚ):ℝ)
                       ≤ f x + (((a^N - x):ℚ):ℝ) : add_le_add_right hfx _
                   ... ≤ f x + f (a^N - x) : add_le_add_left hfanx _,
@@ -436,7 +436,7 @@ begin
     },
 
     have h2 := calc f x + f (a^N - x)
-            ≤ f (x + (a^N - x)) : f_ii x (a^N - x) hxp haNxp
+            ≤ f (x + (a^N - x)) : H2 x (a^N - x) hxp haNxp
         ... = f (a^N) : by ring
         ... = a^N : h_fan_eq N hNp
         ... = x + (a^N - x): by ring
@@ -461,9 +461,9 @@ begin
         rwa (rat.cast_coe_nat n.succ.succ) at this,
       },
       rw ← hfneq,
-      exact f_i (n.succ.succ:ℚ) x (nat.cast_pos.mpr hn) hx,
+      exact H1 (n.succ.succ:ℚ) x (nat.cast_pos.mpr hn) hx,
     },
-    exact le_antisymm h2 (hfn' x hx n hn),
+    exact le_antisymm h2 (H3 x hx n hn),
   },
   intros x hx,
   have hxnum_pos: 0 < x.num := rat.num_pos_iff_pos.mpr hx,
