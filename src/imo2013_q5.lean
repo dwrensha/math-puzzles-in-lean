@@ -93,24 +93,11 @@ begin
     },
     have h_y_lt_y' := calc y ≤ 1 : hy''
                          ... < y': h1_lt_y',
-    have h_yn_lt_y'n : (∀n, 0<n → y^n < y'^n),
-    {
-      intros n hn,
-      cases n,
-      { exfalso, exact nat.lt_asymm hn hn },
-      induction n with pn hpn,
-      { linarith },
-      calc y ^ pn.succ.succ
-              = y ^ pn.succ * y : pow_succ' y (nat.succ pn)
-          ... < y ^ pn.succ * y' : (mul_lt_mul_left (pow_pos hy (nat.succ pn))).mpr h_y_lt_y'
-          ... < y' ^ pn.succ * y' : (mul_lt_mul_right (lt_trans hy h_y_lt_y')).mpr (hpn (nat.succ_pos pn))
-          ... = y' ^ pn.succ.succ : (pow_succ' y' (nat.succ pn)).symm
-    },
     have hh: (∀ n, 0<n → x^n - 1 < y'^n),
     {
       intros n hn,
       calc x^n - 1 < y^n : h n hn
-              ...  < y'^n : h_yn_lt_y'n n hn
+              ...  ≤ y'^n : pow_le_pow_of_le_left (le_of_lt hy) (le_of_lt h_y_lt_y') n
     },
     have : x ≤ y' := le_of_all_pow_lt_succ x y' hx h1_lt_y' hh,
     linarith, -- contradiction
