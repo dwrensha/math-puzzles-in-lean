@@ -243,20 +243,6 @@ begin
   nlinarith,
 end
 
-lemma nat_abs_pos (a: ℤ) (ha: 0 < a) : 0 < a.nat_abs :=
-begin
-  cases a,
-  {simp only [int.nat_abs_of_nat, int.nat_abs],
-    have : (a:ℤ) = int.of_nat a,
-    {
-      exact int.coe_nat_eq a,
-    },
-    rw ← this at ha,
-    exact int.coe_nat_pos.mp ha,
-   },
-  simp only [nat.succ_pos', int.nat_abs],
-end
-
 lemma power_bound (n: ℕ) (ε:ℚ) (ha: 0 < ε) : 1 + (n:ℚ) * ε ≤ (1 + ε)^n :=
 begin
   induction n with pn hpn,
@@ -390,7 +376,7 @@ begin
      have hnnna : 0 < (⌊x⌋).nat_abs,
      {
        suffices: 0 < ⌊x⌋,
-       { exact nat_abs_pos ⌊x⌋ this, },
+       { exact int.nat_abs_pos_of_ne_zero (ne_of_gt this), },
        have := calc 0 ≤ x - 1 : by linarith
             ... < ⌊x⌋ : sub_one_lt_floor x,
        exact int.cast_pos.mp this,
