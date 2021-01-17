@@ -6,10 +6,6 @@ import data.real.basic data.nat.basic
 
 open_locale big_operators
 
-#print set.Icc
-
-#print finset
-
 variables {k : Type}
 
 def unit_interval: Type := @subtype ℝ (set.Icc 0 1)
