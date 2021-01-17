@@ -3,9 +3,15 @@ import data.rat.basic
 import data.rat.order
 import data.real.basic
 
+/-!
+# IMO 2013 Q5
+This is a direct translation of the solution found in
+https://www.imo-official.org/problems/IMO2013SL.pdf
+-/
+
 open_locale big_operators
 
-lemma factor_xn_minus_yn (x: ℝ) (y: ℝ) (n: ℕ)
+lemma factor_xn_minus_yn (x : ℝ) (y : ℝ) (n : ℕ)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
 begin
   have := geom_sum₂_mul_add (x-y) y n,
@@ -13,19 +19,14 @@ begin
   nlinarith,
 end
 
-lemma nth_power_gt
-      (x:ℝ)
-      (y:ℝ)
-      (hx : 1 < x)
-      (hy : 1 < y)
-      (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
+lemma le_of_all_pow_lt_succ (x y : ℝ) (hx : 1 < x) (hy : 1 < y)
+      (h : ∀n:ℕ, 0 < n → x^n - 1 < y^n)
       : (x ≤ y) :=
 begin
    by_contra hxy,
    push_neg at hxy,
    have hxmy : 0 < x - y := sub_pos.mpr hxy,
-
-   have hn: (∀ n:ℕ, 0 < n →  (x - y) * (n:ℝ) ≤ x^n - y^n),
+   have hn: (∀n:ℕ, 0 < n → (x - y) * (n:ℝ) ≤ x^n - y^n),
    {
      intros n hn,
      have hterm : (∀i:ℕ, i ∈ finset.range n → 1 ≤ x^i * y^(n - 1 - i)),
@@ -49,42 +50,34 @@ begin
    },
 
    -- choose n larger than 1 / (x - y)
-   have hxyrp: 0 < 1/(x - y) := one_div_pos.mpr hxmy,
    obtain ⟨N, hN⟩ := exists_nat_gt (1 / (x - y)),
-   have hNpr : (0:ℝ) < N := lt_trans hxyrp hN,
+   have hNpr : (0:ℝ) < N := lt_trans (one_div_pos.mpr hxmy) hN,
    have hNp : 0 < N,
    {
-     -- there's gotta be a simpler way to do this...
-     rw ←nat.cast_zero at hNpr,
-     cases N,
-     { linarith },
-     exact nat.succ_pos N
+      cases N,
+      { exfalso, exact lt_asymm hNpr hNpr },
+      exact nat.succ_pos N
    },
 
-   have hh := h N hNp,
    have := calc 1 = (x - y) * (1 / (x - y)) : by field_simp [ne_of_gt hxmy]
               ... < (x - y) * N : (mul_lt_mul_left hxmy).mpr hN
               ... ≤ x^N - y^N : hn N hNp,
-   linarith,
+   linarith [h N hNp],
 end
 
-lemma nth_power_gt'
-      (x:ℝ)
-      (y:ℝ)
-      (hx : 1 < x)
-      (hy : 0 < y)
+/--
+ Like le_of_all_pow_lt_succ, but with a weaker assumption for y.
+-/
+lemma le_of_all_pow_lt_succ' (x y: ℝ) (hx: 1 < x) (hy: 0 < y)
       (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
       : (x ≤ y) :=
 begin
   have hy': 1 < y,
   {
     by_contra hy'',
-    push_neg at hy'',
-    -- hy'' :  y ≤ 1.
+    push_neg at hy'', -- hy'' :  y ≤ 1.
 
-    -- then there exists y' such that 0 < y ≤ 1 < y' < x.
-    -- and for all positive n , x^n - 1 < y^n < y'^n
-
+    -- Then there exists y' such that 0 < y ≤ 1 < y' < x.
     let y' := (x + 1) / 2,
     have h_y'_lt_x: y' < x,
     {
@@ -119,11 +112,10 @@ begin
       calc x^n - 1 < y^n : h n hn
               ...  < y'^n : h_yn_lt_y'n n hn
     },
-    have := nth_power_gt x y' hx h1_lt_y' hh,
-    -- so by nth_power_gt, x ≤ y'. contradiction.
-    linarith,
+    have : x ≤ y' := le_of_all_pow_lt_succ x y' hx h1_lt_y' hh,
+    linarith, -- contradiction
   },
-  exact nth_power_gt x y hx hy' h
+  exact le_of_all_pow_lt_succ x y hx hy' h
 end
 
 lemma power_bound (n: ℕ) (ε:ℚ) (ha: 0 < ε) : 1 + (n:ℚ) * ε ≤ (1 + ε)^n :=
@@ -154,10 +146,6 @@ lemma twice_pos_int_gt_one (z: ℤ) (hpos: 0 < z) : (1:ℚ) < (((2 * z):ℤ):ℚ
 by { norm_cast, linarith }
 
 lemma twice_pos_nat_pos (n:ℕ) (hn: 0 < n) : 0 < 2 * n := by linarith
-
-/-
-Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
--/
 
 theorem imo2013_q5
   (f: ℚ → ℝ)
@@ -304,7 +292,7 @@ begin
     have hxp := calc 0 < 1 : zero_lt_one
                    ... < x : hx,
 
-    exact nth_power_gt' x (f x) hx' (hqp x hxp) hxnm1,
+    exact le_of_all_pow_lt_succ' x (f x) hx' (hqp x hxp) hxnm1,
   },
   have h_fan_eq : (∀n, 0 < n → f (a^n) = a^n),
   {
@@ -330,33 +318,27 @@ begin
       rwa haa at this,
     },
 
-    -- choose something greater than x / (a - 1).
+    -- Choose n greater than x / (a - 1).
     obtain ⟨N, hN⟩ := exists_nat_gt (max 0 (x / (a - 1))),
     have hN' := calc x / (a - 1) ≤ max 0 (x / (a - 1)) : le_max_right _ _
                              ... < N : hN,
-    have h_big_enough : 1 < a^N - x,
-    {
-      have ham1: 0 < a - 1 := sub_pos.mpr ha1,
-      have hsub: (x / (a - 1)) * (a - 1) < N * (a - 1) := (mul_lt_mul_right ham1).mpr hN',
-
-      calc (1:ℚ) = 1 + 0 : rfl
+    have h_big_enough := calc (1:ℚ)
+                      = 1 + 0 : rfl
                   ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
                   ... ≤ a^N - N * (a - 1): sub_le_sub_right (hbound N) (↑N * (a - 1))
-                  ... < a^N - (x / (a - 1)) * (a - 1) : sub_lt_sub_left hsub (a ^ N)
+                  ... < a^N - (x / (a - 1)) * (a - 1)
+                      : sub_lt_sub_left ((mul_lt_mul_right (sub_pos.mpr ha1)).mpr hN') (a^N)
                   ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
-    },
-    have hfx: (x:ℝ) ≤ f x := H5 x hx,
-    have hfanx: (((a^N - x):ℚ):ℝ) ≤ f (a^N - x) := H5 _ h_big_enough,
+
     have h1 := calc (x:ℝ) + (((a^N - x):ℚ):ℝ)
-                      ≤ f x + (((a^N - x):ℚ):ℝ) : add_le_add_right hfx _
-                  ... ≤ f x + f (a^N - x) : add_le_add_left hfanx _,
+                      ≤ f x + (((a^N - x):ℚ):ℝ) : add_le_add_right (H5 x hx) _
+                  ... ≤ f x + f (a^N - x) : add_le_add_left (H5 _ h_big_enough) _,
 
     have haNxp := calc (0:ℚ) < 1 : zero_lt_one
                          ... < a^N - x : h_big_enough,
 
     have hxp := calc (0:ℚ) < 1 : zero_lt_one
                          ... < x : hx,
-
     have hNp : 0 < N,
     {
       have hh:= calc (0:ℚ) ≤ max 0 (x / (a - 1)) : le_max_left 0 _
@@ -375,7 +357,7 @@ begin
         ... = x + (((a^N - x):ℚ):ℝ): by norm_cast,
 
     have heq := le_antisymm h1 h2,
-    linarith,
+    linarith [H5 x hx, H5 _ h_big_enough],
   },
 
   have hfnx_eq : (∀ n:ℕ, 0<n → ∀x:ℚ, 0 < x → f (n * x) = n * f x),
@@ -400,7 +382,7 @@ begin
   intros x hx,
   have hxnum_pos: 0 < x.num := rat.num_pos_iff_pos.mpr hx,
   have hrat_expand: x = x.num / x.denom,
-  { norm_cast, exact rat.num_denom.symm},
+  { norm_cast, exact rat.num_denom.symm },
 
   have hxcnez: (x.denom:ℚ) ≠ (0:ℚ) := ne_of_gt (nat.cast_pos.mpr x.pos),
   have hxcnezr: (x.denom:ℝ) ≠ (0:ℝ) := ne_of_gt (nat.cast_pos.mpr x.pos),
