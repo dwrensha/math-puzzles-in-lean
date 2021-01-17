@@ -281,6 +281,12 @@ begin
    ... = (1 + ε) ^ (pn.succ) : (pow_succ (1+ε) pn).symm,
 end
 
+lemma twice_pos_int_gt_one (z: ℤ) (hpos: 0 < z) : (1:ℚ) < (((2 * z):ℤ):ℚ) :=
+begin
+  norm_cast,
+  linarith
+end
+
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
@@ -560,7 +566,7 @@ begin
     exact le_antisymm h2 (hfn' x hx n hn),
   },
   intros x hx,
-  have: 0 < x.num := rat.num_pos_iff_pos.mpr hx,
+  have hxnum_pos: 0 < x.num := rat.num_pos_iff_pos.mpr hx,
   have hrat_expand: x = x.num / x.denom,
   { norm_cast, exact rat.num_denom.symm},
 
@@ -568,9 +574,9 @@ begin
   have hxcnezr: (x.denom:ℝ) ≠ (0:ℝ) := ne_of_gt (nat.cast_pos.mpr x.pos),
 
   let x2denom := 2 * x.denom,
-  let x2num := 2 * x.num,
+  let x2num:ℤ := 2 * x.num,
 
-  have hx2num_gt_one : (1:ℚ) < x2num := sorry,
+  have hx2num_gt_one : (1:ℚ) < x2num := twice_pos_int_gt_one x.num hxnum_pos,
 
   have hx2pos : 0 < x2denom := sorry,
   have hx2cnez: (x2denom:ℚ) ≠ (0:ℚ) := by field_simp,
@@ -605,9 +611,4 @@ begin
        ... = x2num / x2denom : by rw h_fx2num_fixed
        ... = ((((x2num:ℚ) / (x2denom:ℚ)):ℚ):ℝ) : by norm_cast
        ... = x : by rw ←hrat_expand2
-end
-
-lemma bar (x:ℤ) : ((x:ℚ):ℝ) = (x:ℝ) :=
-begin
-  exact rat.cast_coe_int x
 end
