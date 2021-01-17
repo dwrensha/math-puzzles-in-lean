@@ -287,6 +287,11 @@ begin
   linarith
 end
 
+lemma twice_pos_nat_pos (n:ℕ) (hn: 0 < n) : 0 < 2 * n :=
+begin
+  linarith,
+end
+
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
@@ -578,7 +583,7 @@ begin
 
   have hx2num_gt_one : (1:ℚ) < x2num := twice_pos_int_gt_one x.num hxnum_pos,
 
-  have hx2pos : 0 < x2denom := sorry,
+  have hx2pos : 0 < x2denom := twice_pos_nat_pos x.denom x.pos,
   have hx2cnez: (x2denom:ℚ) ≠ (0:ℚ) := by field_simp,
   have hx2cnezr: (x2denom:ℝ) ≠ (0:ℝ) := by field_simp,
 
