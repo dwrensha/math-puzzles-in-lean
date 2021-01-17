@@ -5,25 +5,6 @@ import data.real.basic
 
 open_locale big_operators
 
-lemma sum_range_le {n:ℕ} {f g: ℕ → ℝ} (h: ∀i:ℕ, i < n → f i ≤ g i )
-      : (∑ (i : ℕ) in finset.range n, f i)
-            ≤ (∑ (i : ℕ) in finset.range n, g i) :=
-begin
-  induction n with pn hpn,
-  { simp only [finset.sum_empty, finset.range_zero],
-  },
-  rw (finset.sum_range_succ _ pn),
-  rw (finset.sum_range_succ _ pn),
-  have hfg := h pn (lt_add_one _),
-  have hr: (∀i, i < pn → f i ≤ g i),
-  {
-    intros i hi,
-    exact h i (nat.lt.step hi)
-  },
-  have hpn' := hpn hr,
-  linarith,
-end
-
 lemma factor_xn_minus_yn (x: ℝ) (y: ℝ) (n: ℕ)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
 begin
@@ -47,7 +28,7 @@ begin
    have hn: (∀ n:ℕ, 0 < n →  (x - y) * (n:ℝ) ≤ x^n - y^n),
    {
      intros n hn,
-     have hterm : (∀i:ℕ, i < n → 1 ≤ x^i * y^(n - 1 - i)),
+     have hterm : (∀i:ℕ, i ∈ finset.range n → 1 ≤ x^i * y^(n - 1 - i)),
      {
        intros i hi,
        have hx' : 1 ≤ x ^ i := one_le_pow_of_one_le (le_of_lt hx) i,
@@ -63,7 +44,7 @@ begin
              = (x - y) *  (∑ (i : ℕ) in finset.range n, (1:ℝ))
                : by simp only [mul_one, finset.sum_const, nsmul_eq_mul, finset.card_range]
          ... ≤ (x-y) * (∑ (i : ℕ) in finset.range n, x ^ i * y ^ (n - 1 - i))
-               : (mul_le_mul_left hxmy).mpr (sum_range_le hterm)
+               : (mul_le_mul_left hxmy).mpr (finset.sum_le_sum hterm)
          ... = x^n - y^n : (factor_xn_minus_yn x y n).symm,
    },
 
