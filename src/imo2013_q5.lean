@@ -198,7 +198,7 @@ end
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
 
-theorem imo2013Q5
+theorem imo2013_q5
   (f: ℚ → ℝ)
   (f_i:  ∀ x y, 0 < x → 0 < y → f (x * y) ≤ f x * f y)
   (f_ii: ∀ x y, 0 < x → 0 < y → f x + f y ≤ f (x + y))

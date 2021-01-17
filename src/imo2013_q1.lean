@@ -7,7 +7,7 @@ open_locale big_operators
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 -/
 
-theorem imo2013Q1
+theorem imo2013_q1
   (n: ℕ+)
   (k: ℕ):
   (∃m: fin k → ℕ+, 1 + ((2^k - 1): ℚ) / n =

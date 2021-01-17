@@ -4,7 +4,7 @@ import data.real.basic
 Direct translation of the solution found in https://www.imo-official.org/problems/IMO2011SL.pdf
 -/
 
-theorem imo2011Q3
+theorem imo2011_q3
   (f: ℝ → ℝ) (hf: ∀ x y, f (x + y) ≤ y * f x + f (f x))
   : (∀ x ≤ 0, f x = 0) :=
 begin
