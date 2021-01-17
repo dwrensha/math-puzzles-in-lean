@@ -292,11 +292,7 @@ begin
             ... < ⌊x⌋ : sub_one_lt_floor x,
        exact int.cast_pos.mp this,
      },
-     have hx0 := calc (((x - 1):ℚ):ℝ) < ⌊x⌋ : begin have h := sub_one_lt_floor x,
-                                                    have h' : ((⌊x⌋ : ℚ):ℝ) = (⌊x⌋ : ℝ) := rat.cast_coe_int ⌊x⌋,
-                                                    rw ← h',
-                                                    exact rat.cast_lt.mpr h,
-                                              end
+     have hx0 := calc (((x - 1):ℚ):ℝ) < ⌊x⌋ : by norm_cast; exact sub_one_lt_floor x
                               ... ≤ f ⌊x⌋ : begin have := H4 (⌊x⌋).nat_abs hnnna,
                                                    rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
                                                    rw hfe' at this,
