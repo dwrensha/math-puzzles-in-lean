@@ -1,3 +1,4 @@
+import algebra.geom_sum
 import data.rat.basic
 import data.rat.order
 import data.real.basic
@@ -23,90 +24,16 @@ begin
   linarith,
 end
 
-lemma integer_subtraction_lemma1 {n m: ℤ} : (n - (m + 1) + 1) = n - m :=
-begin
-  ring
-end
-
-lemma simp_lemma_1 {x y: ℝ} {n:ℕ} : y * (x^0 * y^(n.succ - 1 - 0)) = y ^ (n+1) :=
-begin
-  simp only [one_mul, nat.succ_sub_succ_eq_sub, nat.sub_zero, pow_zero],
-  exact (pow_succ y n).symm,
-end
-
 lemma factor_xn_m_yn
       (x : ℝ)
       (y:ℝ)
       (n: ℕ)
       :  x^n - y^n = (x - y) * (∑ (i:ℕ) in finset.range n, (x ^(i) * y ^(n - 1 -i))) :=
 begin
-  cases n,
-  { simp only [finset.sum_empty, finset.range_zero, mul_zero, pow_zero, sub_self], },
-
-  have hinner0: (∀i:ℕ, i ∈ finset.range n.succ → x * (x^i * y ^(n.succ - 1 -i))
-                                                = x^(i+1) * y ^(n.succ - 1 -i)),
-  {
-    intros i _,
-    calc x * (x^i * y ^(n.succ - 1 -i)) = (x * x^i) * y ^(n.succ - 1 -i) : (mul_assoc x _ _).symm
-        ... = x^(i+1) * y ^(n.succ - 1 -i) : by rw ←(pow_succ x i),
-  },
-
-  have hxterm := calc x * (∑i in finset.range n.succ, (x ^i * y ^(n.succ - 1 - i))) =
-    (∑i in finset.range n.succ, (x * (x ^i * y ^(n.succ - 1 -i))))
-                : ((finset.range n.succ).sum_hom (has_mul.mul x)).symm
-   ... = (∑i in finset.range n.succ, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_congr rfl hinner0
-   ... = (x^(n+1) * y ^(n.succ - 1 - n))
-         + (∑i in finset.range n, (x^(i+1) * y ^(n.succ - 1 - i))) : finset.sum_range_succ _ _
-   ... = (x^(n+1) * y ^(n - n))
-         + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) : by rw [nat.succ_sub_one n]
-   ... = x^(n+1)
-         + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) : by simp only [mul_one, nat.sub_self, pow_zero],
-
-  have hinner2: (∀i:ℕ, i ∈ finset.range n →
-       y * (x ^(i+1) * y^(n.succ - 1 -(i+1))) = x^(i + 1) * y^(n - i)),
-  begin
-    intros i hi,
-    have hii : (i+1) ≤ n,
-    {
-      exact nat.succ_le_iff.mpr (finset.mem_range.mp hi)
-    },
-
-    calc y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))
-        = (y * x ^(i+1)) * y ^(n.succ - 1 -(i+1)) : tactic.ring.mul_assoc_rev y _ _
-    ... = (x ^(i+1) * y) * y ^(n.succ - 1 -(i+1)) : by rw mul_comm y _
-    ... = x ^(i+1) * (y * y ^(n.succ - 1 -(i+1))) : mul_assoc _ y _
-    ... = x ^(i+1) * y ^((n.succ - 1 -(i+1)) + 1) : by rw ←(pow_succ y (n.succ - 1 -(i+1)))
-    ... = x ^(i+1) * y ^((n -(i+1)) + 1) : by simp only [nat.succ_sub_succ_eq_sub, nat.sub_zero]
-    ... = x ^(i+1) * y ^((((n -(i+1)) + 1):ℕ):ℤ) : by rw (fpow_coe_nat y _)
-    ... = x ^(i+1) * y ^((((n -(i+1)):ℕ):ℤ) + (1:ℤ)) : by rw int.coe_nat_succ
-    ... = x ^(i+1) * y ^(((n:ℤ) - (((i+1):ℕ):ℤ)) + (1:ℤ)) : by rw int.coe_nat_sub hii
-    ... = x ^(i+1) * y ^(((n:ℤ) - ((i:ℤ)+(1:ℤ))) + (1:ℤ)) : by rw int.coe_nat_succ
-    ... = x ^(i+1) * y ^((n:ℤ) - (i:ℤ)) : by rw integer_subtraction_lemma1
-    ... = x ^(i+1) * y ^(((n - i):ℕ):ℤ) : by rw ←(int.coe_nat_sub (nat.le_of_succ_le hii))
-    ... = x^(i + 1) * y^(n - i) : by rw ←(fpow_coe_nat y _)
-  end,
-
-  have hyterm := calc
-      y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
-       = ∑i in finset.range n.succ, y * (x ^(i) * y ^(n.succ - 1 -i))
-            : ((finset.range (nat.succ n)).sum_hom (has_mul.mul y)).symm
-    ... = (∑i in finset.range n, y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))) + y * (x^0 * y^(n.succ - 1 - 0))
-        : finset.sum_range_succ' _ n
-    ... = (∑i in finset.range n, y * (x ^(i+1) * y ^(n.succ - 1 -(i+1)))) + y^(n + 1)
-        : by rw simp_lemma_1
-    ... = (∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1)
-        : by rw (finset.sum_congr rfl hinner2),
-
-  symmetry,
-
-  calc (x - y) * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
-      = x * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i))) -
-        y * (∑i in finset.range n.succ, (x ^(i) * y ^(n.succ - 1 -i)))
-         : sub_mul x y (∑ i in finset.range n.succ, x ^ i * y ^ (n.succ - 1 - i))
-  ... = x^(n+1) + (∑i in finset.range n, (x^(i+1) * y ^(n - i))) -
-        ((∑i in finset.range n, x^(i + 1) * y^(n - i)) + y^(n + 1))
-      : by rw [hxterm, hyterm]
-  ... = x^(n+1) - y^(n + 1) : by ring
+  have := geom_sum₂_mul_add (x-y) y n,
+  rw [sub_add_cancel x y] at this,
+  rw geom_series₂_def at this,
+  nlinarith,
 end
 
 lemma nth_power_gt
