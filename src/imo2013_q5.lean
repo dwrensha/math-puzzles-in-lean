@@ -492,14 +492,19 @@ begin
 
     -- choose something greater than x / (a - 1).
     obtain ⟨N, hN⟩ := exists_nat_gt (max 0 (x / (a - 1))),
+    have hN' := calc x / (a - 1) ≤ max 0 (x / (a - 1)) : le_max_right _ _
+                             ... < N : hN,
     have h_big_enough : 1 < a^N - x,
     {
       have hhb := hbound N,
 
+      have ham1: 0 < a - 1 := sub_pos.mpr ha1,
+      have hsub: (x / (a - 1)) * (a - 1) < N * (a - 1) := (mul_lt_mul_right ham1).mpr hN',
+
       calc (1:ℚ) = 1 + 0 : rfl
                   ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
                   ... ≤ a^N - N * (a - 1): sub_le_sub_right (hbound N) (↑N * (a - 1))
-                  ... < a^N - (x / (a - 1)) * (a - 1) : sorry
+                  ... < a^N - (x / (a - 1)) * (a - 1) : sub_lt_sub_left hsub (a ^ N)
                   ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
     },
     have hfx: (x:ℝ) ≤ f x := h_fx_ge_x x hx,
@@ -586,10 +591,3 @@ begin
                ... = x : by rw ←hrat_expand,
 end
 
-lemma bar (n:ℕ) (hn: (0:ℚ) < n) : (0:ℕ) < n :=
-begin
-   have : (0:ℚ) = ((0:ℕ):ℚ) := nat.cast_zero.symm,
-   rw this at hn,
-   norm_cast at hn,
-   exact hn,
-end
