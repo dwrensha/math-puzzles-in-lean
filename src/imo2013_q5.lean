@@ -216,26 +216,21 @@ begin
     have h11 : ↑a * 1 ≤ ↑a * f 1 := by simpa only [mul_one],
     exact (mul_le_mul_left haz).mp h11,
   },
-  have hfn: ∀x: ℚ, (0 < x → ∀ n: ℕ, (↑n + 1) * f x ≤ f ((n + 1) * x)),
-  {
-    intros x hx n,
-    induction n with pn hpn,
-    { simp only [one_mul, nat.cast_zero, zero_add], },
-    rw nat.cast_succ,
-    calc (↑pn + 1 + 1) * f x = ((pn : ℝ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
-        ... = (↑pn + 1) * f x + f x : by rw one_mul
-        ... ≤ f ((↑pn + 1) * x) + f x : add_le_add_right hpn (f x)
-        ... ≤ f ((↑pn + 1) * x + x) : H2 ((↑pn + 1) * x) x (mul_pos (nat.cast_add_one_pos pn) hx) hx
-        ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
-        ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
-  },
   have H3: ∀x: ℚ, (0 < x → ∀ n: ℕ, 0 < n → ↑n * f x ≤ f (n * x)),
   {
     intros x hx n hn,
     cases n,
     { exfalso, exact nat.lt_asymm hn hn },
-    have := hfn x hx n,
-    rwa [nat.cast_succ n],
+    induction n with pn hpn,
+    { simp only [one_mul, nat.cast_one] },
+    calc (↑pn + 1 + 1) * f x = ((pn : ℝ) + 1) * f x + 1 * f x : add_mul (↑pn + 1) 1 (f x)
+        ... = (↑pn + 1) * f x + f x : by rw one_mul
+        ... = (↑pn.succ) * f x + f x : by norm_cast
+        ... ≤ f ((↑pn.succ) * x) + f x : add_le_add_right (hpn (nat.succ_pos pn)) (f x)
+        ... ≤ f ((↑pn + 1) * x) + f x : by norm_cast
+        ... ≤ f ((↑pn + 1) * x + x) : H2 ((↑pn + 1) * x) x (mul_pos (nat.cast_add_one_pos pn) hx) hx
+        ... = f ((↑pn + 1) * x + 1 * x) : by rw one_mul
+        ... = f ((↑pn + 1 + 1) * x) : congr_arg f (add_mul (↑pn + 1) 1 x).symm
   },
   have H4: (∀ n : ℕ, 0 < n → (n: ℝ) ≤ f n),
   {
