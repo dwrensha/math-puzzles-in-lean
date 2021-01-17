@@ -273,11 +273,7 @@ begin
      {
        have hzx := calc 0 ≤ 1 : zero_le_one
                       ... ≤ x: hx,
-
-       have := int.nat_abs_of_nonneg (floor_nonneg.mpr hzx),
-       conv begin
-         to_rhs, rw ← this,
-       end,
+       exact int.nat_abs_of_nonneg (floor_nonneg.mpr hzx),
      },
      have hfe' : ((⌊x⌋).nat_abs : ℚ) = ⌊x⌋,
      {
