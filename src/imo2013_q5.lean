@@ -82,27 +82,20 @@ begin
     push_neg at hy'',
     -- hy'' :  y ≤ 1.
 
+    -- then there exists y' such that 0 < y ≤ 1 < y' < x.
+    -- and for all positive n , x^n - 1 < y^n < y'^n
+
     let y' := (x + 1) / 2,
     have h_y'_lt_x: y' < x,
     {
-      have hh: x + 1 < x * 2,
-      {
-        linarith
-      },
-      have hh': (x + 1)/2 < (x * 2) / 2,
-      {
-        linarith,
-      },
-      calc y' < (x * 2) / 2 : hh'
-          ... = x : by linarith
+      have hh: (x + 1)/2 < (x * 2) / 2 := by linarith,
+      calc y' < (x * 2) / 2 : hh
+          ... = x : by field_simp
     },
     have h1_lt_y' : 1 < y',
     {
-      have hh': 1 * 2 / 2 < (x + 1) / 2,
-      {
-        linarith,
-      },
-      calc 1 = 1 * 2 / 2 : by linarith
+      have hh': 1 * 2 / 2 < (x + 1) / 2 := by linarith,
+      calc 1 = 1 * 2 / 2 : by field_simp
          ... < y' : hh'
     },
     have h_y_lt_y' := calc y ≤ 1 : hy''
@@ -126,11 +119,8 @@ begin
       calc x^n - 1 < y^n : h n hn
               ...  < y'^n : h_yn_lt_y'n n hn
     },
-  -- then there exists y' such that 0 < y ≤ 1 < y' < x.
-  -- and for all positive n , x^n - 1 < y^n < y'^n
-
     have := nth_power_gt x y' hx h1_lt_y' hh,
-  -- so by nth_power_gt, x ≤ y'. contradiction.
+    -- so by nth_power_gt, x ≤ y'. contradiction.
     linarith,
   },
   exact nth_power_gt x y hx hy' h
@@ -161,15 +151,9 @@ begin
 end
 
 lemma twice_pos_int_gt_one (z: ℤ) (hpos: 0 < z) : (1:ℚ) < (((2 * z):ℤ):ℚ) :=
-begin
-  norm_cast,
-  linarith
-end
+by { norm_cast, linarith }
 
-lemma twice_pos_nat_pos (n:ℕ) (hn: 0 < n) : 0 < 2 * n :=
-begin
-  linarith,
-end
+lemma twice_pos_nat_pos (n:ℕ) (hn: 0 < n) : 0 < 2 * n := by linarith
 
 /-
 Direct translation of solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
@@ -316,36 +300,22 @@ begin
        ... < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le hxg1 n)
        ... ≤ (f x)^n : hfxn n hn x hx
     },
-    have hx': 1 < (x:ℝ),
-    {
-      norm_cast,
-      exact hx
-    },
-    have hxp: 0 < x,
-    {
-      calc 0 < 1 : zero_lt_one
-         ... < x : hx
-    },
+    have hx': 1 < (x:ℝ) := by { norm_cast, exact hx },
+    have hxp := calc 0 < 1 : zero_lt_one
+                   ... < x : hx,
 
     exact nth_power_gt' x (f x) hx' (hqp x hxp) hxnm1,
   },
   have h_fan_eq : (∀n, 0 < n → f (a^n) = a^n),
   {
     intros n hn,
-
     have hh0: (a:ℝ)^n ≤ f (a^n),
     {
       have := H5 (a^n) (one_lt_pow ha1 (nat.succ_le_iff.mpr hn)),
       norm_cast,
       exact this,
     },
-
-    have hh1: f (a^n) ≤ a^n,
-    {
-      rw ← hae,
-      exact hfxn n hn a ha1
-    },
-
+    have hh1: f (a^n) ≤ a^n := by { rw ← hae, exact hfxn n hn a ha1 },
     exact le_antisymm hh1 hh0
   },
   have h_xgt1_fx_eq_x: (∀x:ℚ, 1 < x → f x = x),
@@ -366,8 +336,6 @@ begin
                              ... < N : hN,
     have h_big_enough : 1 < a^N - x,
     {
-      have hhb := hbound N,
-
       have ham1: 0 < a - 1 := sub_pos.mpr ha1,
       have hsub: (x / (a - 1)) * (a - 1) < N * (a - 1) := (mul_lt_mul_right ham1).mpr hN',
 
