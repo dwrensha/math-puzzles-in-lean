@@ -567,27 +567,47 @@ begin
   have hxcnez: (x.denom:ℚ) ≠ (0:ℚ) := ne_of_gt (nat.cast_pos.mpr x.pos),
   have hxcnezr: (x.denom:ℝ) ≠ (0:ℝ) := ne_of_gt (nat.cast_pos.mpr x.pos),
 
-  have h_denom_times_fx := calc (x.denom:ℝ) * f x
-             = f (x.denom * x) : (hfnx_eq x.denom x.pos x hx).symm
-         ... = f (x.denom * (x.num / x.denom))
-             : by conv begin to_lhs, congr, congr, skip, rw hrat_expand end
-         ... = f ((x.denom * x.num) / x.denom)
+  let x2denom := 2 * x.denom,
+  let x2num := 2 * x.num,
+
+  have hx2num_gt_one : (1:ℚ) < x2num := sorry,
+
+  have hx2pos : 0 < x2denom := sorry,
+  have hx2cnez: (x2denom:ℚ) ≠ (0:ℚ) := by field_simp,
+  have hx2cnezr: (x2denom:ℝ) ≠ (0:ℝ) := by field_simp,
+
+  have hrat_expand2: x = x2num / x2denom := sorry,
+
+  have h_denom_times_fx := calc (x2denom:ℝ) * f x
+             = f (x2denom * x) : (hfnx_eq x2denom hx2pos x hx).symm
+         ... = f (x2denom * (x2num / x2denom))
+             : by conv begin to_lhs, congr, congr, skip, rw hrat_expand2 end
+         ... = f ((x2denom * x2num) / x2denom)
              : by rw mul_div_assoc
-         ... = f ((x.num * x.denom) / x.denom)
+         ... = f ((x2num * x2denom) / x2denom)
              : by rw mul_comm
-         ... = f (x.num * (x.denom / x.denom))
+         ... = f (x2num * (x2denom / x2denom))
              : by rw ←mul_div_assoc
-         ... = f (x.num * 1)
-             : by rw (div_self hxcnez)
-         ... = f (x.num) : by rw mul_one,
+         ... = f (x2num * 1)
+             : by rw (div_self hx2cnez)
+         ... = f (x2num) : by rw mul_one,
+
+  have h_fx2num_fixed : f x2num = x2num,
+  { have hh := h_xgt1_fx_eq_x x2num hx2num_gt_one,
+   rwa (rat.cast_coe_int x2num) at hh,
+  },
 
   calc f x = f x * 1 : (mul_one (f x)).symm
-               ... = f x * (x.denom / x.denom) : by rw ←(div_self hxcnezr)
-               ... = (f x * x.denom) / x.denom : mul_div_assoc' (f x) _ _
-               ... = (x.denom * f x) / x.denom : by rw mul_comm
-               ... = f x.num / x.denom : by rw h_denom_times_fx
-               ... = x.num / x.denom : sorry -- f x.num = x.num
-               ... = ((((x.num:ℚ) / (x.denom:ℚ)):ℚ):ℝ) : by norm_cast
-               ... = x : by rw ←hrat_expand,
+       ... = f x * (x2denom / x2denom) : by rw ←(div_self hx2cnezr)
+       ... = (f x * x2denom) / x2denom : mul_div_assoc' (f x) _ _
+       ... = (x2denom * f x) / x2denom : by rw mul_comm
+       ... = f x2num / x2denom : by rw h_denom_times_fx
+       ... = x2num / x2denom : by rw h_fx2num_fixed
+       ... = ((((x2num:ℚ) / (x2denom:ℚ)):ℚ):ℝ) : by norm_cast
+       ... = x : by rw ←hrat_expand2
 end
 
+lemma bar (x:ℤ) : ((x:ℚ):ℝ) = (x:ℝ) :=
+begin
+  exact rat.cast_coe_int x
+end
