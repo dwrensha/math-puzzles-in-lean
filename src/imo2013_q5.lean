@@ -80,7 +80,7 @@ begin
      -- there's gotta be a simpler way to do this...
      rw ←nat.cast_zero at hNpr,
      cases N,
-     { linarith, },
+     { linarith },
      exact nat.succ_pos N
    },
 
@@ -134,9 +134,9 @@ begin
     {
       intros n hn,
       cases n,
-      {linarith},
+      { exfalso, exact nat.lt_asymm hn hn },
       induction n with pn hpn,
-      {linarith},
+      { linarith },
       calc y ^ pn.succ.succ
               = y ^ pn.succ * y : pow_succ' y (nat.succ pn)
           ... < y ^ pn.succ * y' : (mul_lt_mul_left (pow_pos hy (nat.succ pn))).mpr h_y_lt_y'
@@ -233,7 +233,7 @@ begin
   {
     intros x hx n hn,
     cases n,
-    { linarith }, -- hn: 0 < 0
+    { exfalso, exact nat.lt_asymm hn hn },
     have := hfn x hx n,
     rwa [nat.cast_succ n],
   },
@@ -326,9 +326,7 @@ begin
   {
     intros n hn x hx,
     induction n with pn hpn,
-    {
-      linarith,
-    },
+    { exfalso, exact nat.lt_asymm hn hn },
     cases pn,
     {
       simp only [pow_one],
@@ -454,7 +452,7 @@ begin
     have h2: f (n * x) ≤ n * f x,
     {
       cases n,
-      { linarith },
+      { exfalso, exact nat.lt_asymm hn hn },
       cases n,
       { simp only [one_mul, nat.cast_one] },
       have hfneq : f (n.succ.succ) = n.succ.succ,
