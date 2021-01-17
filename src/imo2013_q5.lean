@@ -304,17 +304,12 @@ theorem imo2013Q5
   : ∀ x, 0 < x → f x = x :=
 begin
   obtain ⟨a, ha1, hae⟩ := f_iii,
-  have ha1r : 1 < (a:ℝ),
-  {
-    rw ←rat.cast_one,
-    exact rat.cast_lt.mpr ha1,
-  },
   have hf1: 1 ≤ f 1,
   {
     have := (f_i a 1) (lt_trans zero_lt_one ha1) zero_lt_one,
     rw [mul_one, hae] at this,
     have haz := calc 0 < 1     : zero_lt_one
-                   ... < (a:ℝ) : ha1r,
+                   ... < (a:ℝ) : by {norm_cast, exact ha1},
 
     have h11 : ↑a * 1 ≤ ↑a * f 1 := by simpa only [mul_one],
     exact (mul_le_mul_left haz).mp h11,
