@@ -21,7 +21,7 @@ end
 
 lemma le_of_all_pow_lt_succ (x y : ℝ) (hx : 1 < x) (hy : 1 < y)
       (h : ∀n:ℕ, 0 < n → x^n - 1 < y^n)
-      : (x ≤ y) :=
+      : x ≤ y :=
 begin
    by_contra hxy,
    push_neg at hxy,
@@ -60,8 +60,8 @@ begin
    },
 
    have := calc 1 = (x - y) * (1 / (x - y)) : by field_simp [ne_of_gt hxmy]
-              ... < (x - y) * N : (mul_lt_mul_left hxmy).mpr hN
-              ... ≤ x^N - y^N : hn N hNp,
+              ... < (x - y) * N             : (mul_lt_mul_left hxmy).mpr hN
+              ... ≤ x^N - y^N               : hn N hNp,
    linarith [h N hNp],
 end
 
@@ -70,7 +70,7 @@ end
 -/
 lemma le_of_all_pow_lt_succ' (x y: ℝ) (hx: 1 < x) (hy: 0 < y)
       (h: ∀n:ℕ, 0 < n → x^n - 1 < y^n)
-      : (x ≤ y) :=
+      : x ≤ y :=
 begin
   have hy': 1 < y,
   {
@@ -93,7 +93,7 @@ begin
     },
     have h_y_lt_y' := calc y ≤ 1 : hy''
                          ... < y': h1_lt_y',
-    have hh: (∀ n, 0<n → x^n - 1 < y'^n),
+    have hh: (∀ n, 0 < n → x^n - 1 < y'^n),
     {
       intros n hn,
       calc x^n - 1 < y^n : h n hn
@@ -108,9 +108,7 @@ end
 lemma power_bound (n: ℕ) (ε:ℚ) (ha: 0 < ε) : 1 + (n:ℚ) * ε ≤ (1 + ε)^n :=
 begin
   induction n with pn hpn,
-  {
-    simp only [add_zero, nat.cast_zero, zero_mul, pow_zero],
-  },
+  { simp only [add_zero, nat.cast_zero, zero_mul, pow_zero] },
 
   have hpnp : 0 ≤ (pn:ℚ) := nat.cast_nonneg pn,
   have hpnep: 0 ≤ (pn:ℚ) * ε := (zero_le_mul_right ha).mpr hpnp,
@@ -170,10 +168,10 @@ begin
       exact (mul_le_mul_left haz).mp h11,
     },
 
-    calc (n: ℝ) = (n: ℝ) * 1 : by simp only [mul_one]
-                  ... ≤ (n: ℝ) * f 1 : (mul_le_mul_left (nat.cast_pos.mpr hn)).mpr hf1
-                  ... ≤ f (n * 1) : H3 1 zero_lt_one n hn
-                  ... = f n : by simp only [mul_one]
+    calc (n: ℝ) = (n: ℝ) * 1   : by simp only [mul_one]
+            ... ≤ (n: ℝ) * f 1 : (mul_le_mul_left (nat.cast_pos.mpr hn)).mpr hf1
+            ... ≤ f (n * 1)    : H3 1 zero_lt_one n hn
+            ... = f n          : by rw mul_one
   },
   have hqp: ∀ q: ℚ, 0 < q → 0 < f q,
   {
@@ -215,20 +213,21 @@ begin
        conv begin to_rhs, rw ← hfe end,
        simp only [int.cast_coe_nat],
      },
-     have hnnna : 0 < (⌊x⌋).nat_abs,
+     have h_nab_abs_floor_pos : 0 < (⌊x⌋).nat_abs,
      {
        suffices: 0 < ⌊x⌋,
        { exact int.nat_abs_pos_of_ne_zero (ne_of_gt this), },
        have := calc 0 ≤ x - 1 : by linarith
-            ... < ⌊x⌋ : sub_one_lt_floor x,
+                  ... < ⌊x⌋   : sub_one_lt_floor x,
        exact int.cast_pos.mp this,
      },
-     have hx0 := calc (((x - 1):ℚ):ℝ) < ⌊x⌋ : by norm_cast; exact sub_one_lt_floor x
-                              ... ≤ f ⌊x⌋ : begin have := H4 (⌊x⌋).nat_abs hnnna,
-                                                   rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
-                                                   rw hfe' at this,
-                                                   rwa (rat.cast_coe_int ⌊x⌋) at this,
-                                                   end,
+     have hx0 := calc (((x - 1):ℚ):ℝ)
+                    < ⌊x⌋   : by norm_cast; exact sub_one_lt_floor x
+                ... ≤ f ⌊x⌋ : begin have := H4 (⌊x⌋).nat_abs h_nab_abs_floor_pos,
+                                    rw ←(rat.cast_coe_nat (⌊x⌋).nat_abs) at this,
+                                    rw hfe' at this,
+                                    rwa (rat.cast_coe_int ⌊x⌋) at this,
+                               end,
 
      have ho: (⌊x⌋:ℚ) = x ∨ (⌊x⌋:ℚ) < x := eq_or_lt_of_le (floor_le x),
      cases ho,
@@ -250,13 +249,11 @@ begin
     induction n with pn hpn,
     { exfalso, exact nat.lt_asymm hn hn },
     cases pn,
-    {
-      simp only [pow_one],
-    },
+    { simp only [pow_one] },
     have hpn' := hpn (nat.succ_pos pn),
     rw [pow_succ' x (nat.succ pn), pow_succ' (f x) (nat.succ pn)],
     have hxp := calc 0 < 1 : zero_lt_one
-                 ... < x : hx,
+                   ... < x : hx,
     have hfnp: 0 < f x := hqp x hxp,
     calc f ((x ^ pn.succ) * x)
          ≤ f (x ^ pn.succ) * f x : H1 (x ^ pn.succ) x (pow_pos hxp pn.succ) hxp
@@ -265,13 +262,12 @@ begin
   have H5 : (∀x:ℚ, 1 < x → (x:ℝ) ≤ f x),
   {
     intros x hx,
-    have hxg1: 1 ≤ x := le_of_lt hx,
     have hxnm1: (∀ n : ℕ, 0 < n → (x:ℝ)^n - 1 < (f x)^n),
     {
       intros n hn,
       calc (x:ℝ)^n - 1
            = (((x^n - 1):ℚ):ℝ) : by norm_cast
-       ... < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le hxg1 n)
+       ... < f (x^n) : hfx_gt_xm1 (x^n) (one_le_pow_of_one_le (le_of_lt hx) n)
        ... ≤ (f x)^n : hfxn n hn x hx
     },
     have hx': 1 < (x:ℝ) := by { norm_cast, exact hx },
@@ -280,7 +276,7 @@ begin
 
     exact le_of_all_pow_lt_succ' x (f x) hx' (hqp x hxp) hxnm1,
   },
-  have h_fan_eq : (∀n, 0 < n → f (a^n) = a^n),
+  have h_fixed_point_of_pos_nat_pow : (∀n, 0 < n → f (a^n) = a^n),
   {
     intros n hn,
     have hh0: (a:ℝ)^n ≤ f (a^n),
@@ -308,27 +304,28 @@ begin
     obtain ⟨N, hN⟩ := exists_nat_gt (max 0 (x / (a - 1))),
     have hN' := calc x / (a - 1) ≤ max 0 (x / (a - 1)) : le_max_right _ _
                              ... < N : hN,
-    have h_big_enough := calc (1:ℚ)
-                      = 1 + 0 : rfl
-                  ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
-                  ... ≤ a^N - N * (a - 1): sub_le_sub_right (hbound N) (↑N * (a - 1))
-                  ... < a^N - (x / (a - 1)) * (a - 1)
-                      : sub_lt_sub_left ((mul_lt_mul_right (sub_pos.mpr ha1)).mpr hN') (a^N)
-                  ... = a^N - x : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
+    have h_big_enough :=
+      calc (1:ℚ)
+          = 1 + 0                           : rfl
+      ... = (1 + N * (a - 1)) - N * (a - 1) : by ring
+      ... ≤ a^N - N * (a - 1)               : sub_le_sub_right (hbound N) (↑N * (a - 1))
+      ... < a^N - (x / (a - 1)) * (a - 1)   : sub_lt_sub_left
+                                              ((mul_lt_mul_right (sub_pos.mpr ha1)).mpr hN') (a^N)
+      ... = a^N - x                         : by field_simp [ne_of_gt (sub_pos.mpr ha1)],
 
     have h1 := calc (x:ℝ) + (((a^N - x):ℚ):ℝ)
                       ≤ f x + (((a^N - x):ℚ):ℝ) : add_le_add_right (H5 x hx) _
-                  ... ≤ f x + f (a^N - x) : add_le_add_left (H5 _ h_big_enough) _,
+                  ... ≤ f x + f (a^N - x)       : add_le_add_left (H5 _ h_big_enough) _,
 
-    have haNxp := calc (0:ℚ) < 1 : zero_lt_one
+    have haNxp := calc (0:ℚ) < 1       : zero_lt_one
                          ... < a^N - x : h_big_enough,
 
     have hxp := calc (0:ℚ) < 1 : zero_lt_one
-                         ... < x : hx,
+                       ... < x : hx,
     have hNp : 0 < N,
     {
       have hh:= calc (0:ℚ) ≤ max 0 (x / (a - 1)) : le_max_left 0 _
-                     ... < N : hN,
+                       ... < N                   : hN,
       have : (0:ℚ) = ((0:ℕ):ℚ) := nat.cast_zero.symm,
       rw this at hh,
       norm_cast at hh,
@@ -338,7 +335,7 @@ begin
     have h2 := calc f x + f (a^N - x)
             ≤ f (x + (a^N - x)) : H2 x (a^N - x) hxp haNxp
         ... = f (a^N) : by ring
-        ... = a^N : h_fan_eq N hNp
+        ... = a^N : h_fixed_point_of_pos_nat_pow N hNp
         ... = x + (a^N - x): by ring
         ... = x + (((a^N - x):ℚ):ℝ): by norm_cast,
 
@@ -346,7 +343,7 @@ begin
     linarith [H5 x hx, H5 _ h_big_enough],
   },
 
-  have h_fixed_point_of_pos_nat_mul : (∀ n:ℕ, 0<n → ∀x:ℚ, 0 < x → f (n * x) = n * f x),
+  have h_fixed_point_of_pos_nat_mul : (∀n:ℕ, 0 < n → ∀x:ℚ, 0 < x → f (n * x) = n * f x),
   {
     intros n hn x hx,
     have h2: f (n * x) ≤ n * f x,
@@ -377,7 +374,7 @@ begin
   -- to apply h_fixed_point_of_gt_1.
 
   let x2denom := 2 * x.denom,
-  let x2num:ℤ := 2 * x.num,
+  let x2num := 2 * x.num,
 
   have hx2num_gt_one : (1:ℚ) < x2num := twice_pos_int_gt_one x.num (rat.num_pos_iff_pos.mpr hx),
 
@@ -404,7 +401,7 @@ begin
 
   have h_fx2num_fixed : f x2num = x2num,
   { have hh := h_fixed_point_of_gt_1 x2num hx2num_gt_one,
-   rwa (rat.cast_coe_int x2num) at hh,
+    rwa (rat.cast_coe_int x2num) at hh,
   },
 
   calc f x = f x * 1                           : (mul_one (f x)).symm
