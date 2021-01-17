@@ -532,8 +532,7 @@ begin
         ... = x + (((a^N - x):ℚ):ℝ): by norm_cast,
 
     have heq := le_antisymm h1 h2,
-
-    sorry,
+    linarith,
   },
 
   have hfnx_eq : (∀ n:ℕ, 0<n → ∀x:ℚ, 0 < x → f (n * x) = n * f x),
