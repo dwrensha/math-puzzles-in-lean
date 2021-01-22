@@ -25,25 +25,26 @@ begin
          ... ≤ (t - x) * f x + f (f x)     : hf x (t - x)
          ... = t * f x - x * f x + f (f x) : by rw sub_mul },
 
-  have hab_combined : (∀ a b, a * f a + b * f b ≤ 2 * f a * f b),
+  have h_ab_combined : (∀ a b, a * f a + b * f b ≤ 2 * f a * f b),
   { intros a b,
     linarith [hxt b (f a), hxt a (f b)] },
 
-  have ha : (∀ a < 0, 0 ≤ f a),
+  have h_a : (∀ a < 0, 0 ≤ f a),
   { intros a han,
     suffices : a * f a ≤ 0, from nonneg_of_mul_nonpos_right this han,
-    exact add_le_iff_nonpos_left.mp (hab_combined a (2 * f a)) },
+    exact add_le_iff_nonpos_left.mp (h_ab_combined a (2 * f a)) },
 
   have h_fx_nonpos : (∀ x, f x ≤ 0),
   { intros x,
     by_contra h_suppose_not,
-    have hp : 0 < f x := not_le.mp h_suppose_not,
+    -- If we choose a small enough argument for f, then we get a contradiction.
     let s := ((x * f x - f (f x)) / (f x)),
     have hm : min 0 s - 1 < s := lt_of_lt_of_le (sub_one_lt _) (min_le_right 0 s),
     have hml : min 0 s - 1 < 0 := lt_of_lt_of_le (sub_one_lt _) (min_le_left 0 s),
 
-    suffices : f (min 0 s - 1) < 0, from not_le.mpr this (ha (min 0 s - 1) hml),
+    suffices : f (min 0 s - 1) < 0, from not_le.mpr this (h_a (min 0 s - 1) hml),
 
+    have hp : 0 < f x := not_le.mp h_suppose_not,
     calc f (min 0 s - 1)
            ≤ (min 0 s - 1) * f x - x * f x + f (f x) : hxt x (min 0 s - 1)
       ...  < s * f x - x * f x + f (f x) : by linarith [(mul_lt_mul_right hp).mpr hm]
@@ -51,7 +52,7 @@ begin
 
   have h_fx_zero_of_neg : (∀ x < 0, f x = 0),
   { intros x hxz,
-    exact le_antisymm (h_fx_nonpos x) (ha x hxz) },
+    exact le_antisymm (h_fx_nonpos x) (h_a x hxz) },
 
   have h_zero_of_zero : f 0 = 0,
   { suffices : 0 ≤ f 0, from le_antisymm (h_fx_nonpos 0) this,
