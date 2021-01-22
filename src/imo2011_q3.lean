@@ -1,6 +1,16 @@
 import data.real.basic
 
-/-
+/-!
+# IMO 2011 Q3
+
+Let f : ℝ → ℝ be a function that satisfies
+
+   f(x + y) ≤ y * f(x) + f(f(x))
+
+for all x and y. Prove that f(x) = 0 for all x ≤ 0.
+
+# Solution
+
 Direct translation of the solution found in https://www.imo-official.org/problems/IMO2011SL.pdf
 -/
 
@@ -25,9 +35,9 @@ begin
     linarith [hab a b] },
 
   have ha : (∀ a < 0, 0 ≤ f a),
-  {  intros a han,
-     suffices : a * f a ≤ 0, from nonneg_of_mul_nonpos_right this han,
-     exact add_le_iff_nonpos_left.mp (hab_combined a (2 * f a)) },
+  { intros a han,
+    suffices : a * f a ≤ 0, from nonneg_of_mul_nonpos_right this han,
+    exact add_le_iff_nonpos_left.mp (hab_combined a (2 * f a)) },
 
   have h_fx_nonpos : (∀ x, f x ≤ 0),
   { intros x,
@@ -52,7 +62,7 @@ begin
 
   have h_zero_of_zero : f 0 = 0,
   { suffices : 0 ≤ f 0, from le_antisymm (h_fx_nonpos 0) this,
-    have hno := h_fx_zero_of_neg (-1) neg_one_lt_zero,
+    have hno : f (-1) = 0 := h_fx_zero_of_neg (-1) neg_one_lt_zero,
     have hp := hxt (-1) (-1),
     rw hno at hp,
     linarith },
