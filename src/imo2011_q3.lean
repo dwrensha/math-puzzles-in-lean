@@ -41,8 +41,8 @@ begin
 
   have h_fx_nonpos : (∀ x, f x ≤ 0),
   { intros x,
-    by_contra,
-    have hp : 0 < f x := not_le.mp h,
+    by_contra h_suppose_not,
+    have hp : 0 < f x := not_le.mp h_suppose_not,
     let s := ((x * f x - f (f x)) / (f x)),
     have hm : min 0 s - 1 < s := lt_of_lt_of_le (sub_one_lt _) (min_le_right 0 s),
     have hml : min 0 s - 1 < 0 := lt_of_lt_of_le (sub_one_lt _) (min_le_left 0 s),
