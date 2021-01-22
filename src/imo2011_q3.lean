@@ -25,14 +25,11 @@ begin
          ... ≤ (t - x) * f x + f (f x)     : hf x (t - x)
          ... = t * f x - x * f x + f (f x) : by rw sub_mul },
 
-  have hab : (∀ a b, f (f a) - f (f b) ≤ (f a) * (f b) - b * f b ∧
-                     f (f b) - f (f a) ≤ (f a) * (f b) - a * f a),
-  { intros a b,
-    split; linarith [hxt b (f a), hxt a (f b)] },
-
   have hab_combined : (∀ a b, a * f a + b * f b ≤ 2 * f a * f b),
   { intros a b,
-    linarith [hab a b] },
+    have hab1 : f (f a) - f (f b) ≤ (f a) * (f b) - b * f b := by linarith [hxt b (f a)],
+    have hab2 : f (f b) - f (f a) ≤ (f a) * (f b) - a * f a := by linarith [hxt a (f b)],
+    linarith },
 
   have ha : (∀ a < 0, 0 ≤ f a),
   { intros a han,
