@@ -44,17 +44,15 @@ begin
     by_contra,
     have hp : 0 < f x := not_le.mp h,
     let s := ((x * f x - f (f x)) / (f x)),
-    have hm : min 0 s - 1 < s := by linarith [min_le_right 0 s],
-    have hml : min 0 s - 1 < 0 := by linarith [min_le_left 0 s],
+    have hm : min 0 s - 1 < s := lt_of_lt_of_le (sub_one_lt _) (min_le_right 0 s),
+    have hml : min 0 s - 1 < 0 := lt_of_lt_of_le (sub_one_lt _) (min_le_left 0 s),
 
-    have hmz : f (min 0 s - 1) < 0 :=
-      calc f (min 0 s - 1)
+    suffices : f (min 0 s - 1) < 0, from not_le.mpr this (ha (min 0 s - 1) hml),
+
+    calc f (min 0 s - 1)
            ≤ (min 0 s - 1) * f x - x * f x + f (f x) : hxt x (min 0 s - 1)
       ...  < s * f x - x * f x + f (f x) : by linarith [(mul_lt_mul_right hp).mpr hm]
-      ...  = 0 : by rw ((eq_div_iff (ne.symm (ne_of_lt hp))).mp rfl); linarith,
-
-    have hmp : 0 ≤ f (min 0 s - 1) := ha (min 0 s - 1) hml,
-    linarith },
+      ...  = 0 : by rw ((eq_div_iff (ne.symm (ne_of_lt hp))).mp rfl); linarith },
 
   have h_fx_zero_of_neg : (∀ x < 0, f x = 0),
   { intros x hxz,
