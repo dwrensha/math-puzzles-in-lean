@@ -2,6 +2,8 @@ import data.pnat.basic
 import algebra.big_operators.pi
 import tactic.ring
 import tactic.field_simp
+import tactic.linarith
+import tactic.omega
 
 open_locale big_operators
 
@@ -21,6 +23,12 @@ We prove a slightly more general version where k does not need to be strictly po
 
 -/
 
+lemma zero_lt_2n_minus_one {n: ℕ} (h: 0 < n) : 0 < 2 * n - 1 :=
+begin
+  omega
+end
+
+
 theorem imo2013_q1 (n : ℕ+) (k : ℕ)
   : (∃m: ℕ → ℕ+, (1:ℚ) + ((2^k - 1): ℚ) / n =
          (∏ i in finset.range k, (1 + 1 / ((m i) : ℚ)))) :=
@@ -38,7 +46,7 @@ begin
   cases ht,
   { obtain ⟨t, ht⟩ := ht,
     obtain ⟨pm, hpm⟩  := hpk t,
-    let m := λi, if h : i < pk.succ then pm i else ⟨2 * t.val - 1, sorry⟩,
+    let m := λi, if h : i < pk.succ then pm i else ⟨2 * t.val - 1, zero_lt_2n_minus_one t.property⟩,
     have h_mi_eq_pmi : ∀ i : ℕ, i < pk.succ → m i = pm i,
     { intros i hi,
       exact dif_pos hi },
@@ -62,10 +70,12 @@ begin
 
     have hneq0 : ((2 * t.val - 1):ℚ) ≠ (0:ℚ),
     { have : 0 < t.val := t.property,
-      sorry
+      sorry,
     },
 
     have htneq0 : (2 * t.val:ℚ) ≠ (0:ℚ):= by norm_num,
+
+    have hnc : (n:ℚ) = (n.val:ℚ) := by norm_cast,
 
     have h'' := calc (1:ℚ) + (2^pk.succ - 1) / (2 * t.val - 1)
         = (2 * t.val - 1) / (2 * t.val - 1) + (2^pk.succ - 1) / (2 * t.val - 1)
@@ -87,3 +97,4 @@ begin
   sorry,
 
 end
+
