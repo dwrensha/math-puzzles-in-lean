@@ -25,16 +25,14 @@ theorem imo2013_q1 (n : ℕ+) (k : ℕ)
   : (∃m: ℕ → ℕ+, (1:ℚ) + ((2^k - 1): ℚ) / n =
          (∏ i in finset.range k, (1 + 1 / ((m i) : ℚ)))) :=
 begin
-  cases k,
-  { use λ _, 1,
-    simp only [finset.card_empty, add_zero, finset.prod_const, zero_div, finset.range_zero, pow_zero, sub_self] },
-
   revert n,
   induction k with pk hpk,
-  { intro n, use λ _, n, norm_num },
+  { intro n,
+    use λ _, 1,
+    simp only [finset.card_empty, add_zero, finset.prod_const, zero_div, finset.range_zero, pow_zero, sub_self] },
   intro n,
 
-  have ht: (∃t: ℕ+, pk.succ.succ = 2 * t.1 - 1) ∨ (∃t: ℕ+, pk.succ.succ = 2 * t.1),
+  have ht: (∃t: ℕ+, n.val = 2 * t.val - 1) ∨ (∃t: ℕ+, n.val = 2 * t.val),
   { sorry },
 
   cases ht,
@@ -61,10 +59,6 @@ begin
     {
       exact finset.prod_congr rfl h_mi_eq_pmi',
     },
-    have h'' : (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t - 1) = ((1:ℚ) + (2^pk.succ - 1) / t) * (1 + 1 / (2 * t - 1)),
-    {
-      sorry
-    },
 
     have hneq0 : ((2 * t.val - 1):ℚ) ≠ (0:ℚ),
     { have : 0 < t.val := t.property,
@@ -73,18 +67,19 @@ begin
 
     have htneq0 : (2 * t.val:ℚ) ≠ (0:ℚ):= by norm_num,
 
-    have h''' := calc (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t.val - 1)
-        = (2 * t.val - 1) / (2 * t.val - 1) + (2^pk.succ.succ - 1) / (2 * t.val - 1)
+    have h'' := calc (1:ℚ) + (2^pk.succ - 1) / (2 * t.val - 1)
+        = (2 * t.val - 1) / (2 * t.val - 1) + (2^pk.succ - 1) / (2 * t.val - 1)
              : by { norm_num, exact (div_self hneq0).symm}
-    ... = ((2 * t.val - 1) + (2^pk.succ.succ - 1)) / (2 * t.val - 1) : div_add_div_same _ _ _
-    ... = (2 * t.val - 2 + 2^pk.succ.succ) / (2 * t.val - 1) : by ring
-    ... = (2 * t.val - 2 + 2 * 2^pk.succ) / (2 * t.val - 1) : by rw pow_succ
-    ... = 2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1) : by ring
-    ... = 1 * (2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1)) : (one_mul _).symm
-    ... = ((2 * t.val) / (2 * t.val)) * (2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1)) : by rw (div_self htneq0)
-    ... = ((2 * (t.val - 1 +  2^pk.succ)) / (2 * t.val)) * ((2 * t.val) / (2 * t.val - 1)) : by ring
-    ... = ((2 * (t.val - 1 +  2^pk.succ)) / (2 * t.val)) * (1 + 1 / (2 * t.val - 1)) : by field_simp
-    ... = ((t.val - 1 +  2^pk.succ) / t.val) * (1 + 1 / (2 * t.val - 1)) : sorry,
+    ... = ((2 * t.val - 1) + (2^pk.succ - 1)) / (2 * t.val - 1) : div_add_div_same _ _ _
+    ... = (2 * t.val - 2 + 2^pk.succ) / (2 * t.val - 1) : by ring
+    ... = (2 * t.val - 2 + 2 * 2^pk) / (2 * t.val - 1) : by rw pow_succ
+    ... = 2 * (t.val - 1 +  2^pk) / (2 * t.val - 1) : by ring
+    ... = 1 * (2 * (t.val - 1 +  2^pk) / (2 * t.val - 1)) : (one_mul _).symm
+    ... = ((2 * t.val) / (2 * t.val)) * (2 * (t.val - 1 +  2^pk) / (2 * t.val - 1)) : by rw (div_self htneq0)
+    ... = ((2 * (t.val - 1 +  2^pk)) / (2 * t.val)) * ((2 * t.val) / (2 * t.val - 1)) : by ring
+    ... = ((2 * (t.val - 1 +  2^pk)) / (2 * t.val)) * (1 + 1 / (2 * t.val - 1)) : by field_simp
+    ... = ((t.val - 1 +  2^pk) / t.val) * (1 + 1 / (2 * t.val - 1)) : sorry
+    ... = (1 + (2^pk - 1) / t.val) * (1 + 1 / (2 * t.val - 1)) : sorry,
 
     sorry,
   },
