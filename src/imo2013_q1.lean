@@ -1,5 +1,6 @@
 import data.pnat.basic
 import algebra.big_operators.pi
+import tactic.ring
 
 open_locale big_operators
 
@@ -71,7 +72,9 @@ begin
     have h''' := calc (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t - 1)
         = (2 * t - 1) / (2 * t - 1) + (2^pk.succ.succ - 1) / (2 * t - 1) : by { norm_num, exact (div_self hneq0).symm}
     ... = ((2 * t - 1) + (2^pk.succ.succ - 1)) / (2 * t - 1) : div_add_div_same _ _ _
-    ... = (2 * t - 2 + 2^pk.succ.succ) / (2 * t - 1) : begin sorry end,
+    ... = (2 * t - 2 + 2^pk.succ.succ) / (2 * t - 1) : by ring
+    ... = (2 * t - 2 + 2 * 2^pk.succ) / (2 * t - 1) : by rw pow_succ
+    ... = 2 * (t - 1 +  2^pk.succ) / (2 * t - 1) : by ring,
 
     sorry,
   },
