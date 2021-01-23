@@ -1,6 +1,7 @@
 import data.pnat.basic
 import algebra.big_operators.pi
 import tactic.ring
+import tactic.field_simp
 
 open_locale big_operators
 
@@ -65,16 +66,25 @@ begin
       sorry
     },
 
-    have hneq0 : ((2 * (t:ℕ) - 1):ℚ) ≠ (0:ℚ),
-    { sorry
+    have hneq0 : ((2 * t.val - 1):ℚ) ≠ (0:ℚ),
+    { have : 0 < t.val := t.property,
+      sorry
     },
 
-    have h''' := calc (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t - 1)
-        = (2 * t - 1) / (2 * t - 1) + (2^pk.succ.succ - 1) / (2 * t - 1) : by { norm_num, exact (div_self hneq0).symm}
-    ... = ((2 * t - 1) + (2^pk.succ.succ - 1)) / (2 * t - 1) : div_add_div_same _ _ _
-    ... = (2 * t - 2 + 2^pk.succ.succ) / (2 * t - 1) : by ring
-    ... = (2 * t - 2 + 2 * 2^pk.succ) / (2 * t - 1) : by rw pow_succ
-    ... = 2 * (t - 1 +  2^pk.succ) / (2 * t - 1) : by ring,
+    have htneq0 : (2 * t.val:ℚ) ≠ (0:ℚ):= by norm_num,
+
+    have h''' := calc (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t.val - 1)
+        = (2 * t.val - 1) / (2 * t.val - 1) + (2^pk.succ.succ - 1) / (2 * t.val - 1)
+             : by { norm_num, exact (div_self hneq0).symm}
+    ... = ((2 * t.val - 1) + (2^pk.succ.succ - 1)) / (2 * t.val - 1) : div_add_div_same _ _ _
+    ... = (2 * t.val - 2 + 2^pk.succ.succ) / (2 * t.val - 1) : by ring
+    ... = (2 * t.val - 2 + 2 * 2^pk.succ) / (2 * t.val - 1) : by rw pow_succ
+    ... = 2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1) : by ring
+    ... = 1 * (2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1)) : (one_mul _).symm
+    ... = ((2 * t.val) / (2 * t.val)) * (2 * (t.val - 1 +  2^pk.succ) / (2 * t.val - 1)) : by rw (div_self htneq0)
+    ... = ((2 * (t.val - 1 +  2^pk.succ)) / (2 * t.val)) * ((2 * t.val) / (2 * t.val - 1)) : by ring
+    ... = ((2 * (t.val - 1 +  2^pk.succ)) / (2 * t.val)) * (1 + 1 / (2 * t.val - 1)) : by field_simp
+    ... = ((t.val - 1 +  2^pk.succ) / t.val) * (1 + 1 / (2 * t.val - 1)) : sorry,
 
     sorry,
   },
