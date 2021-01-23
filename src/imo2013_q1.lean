@@ -23,20 +23,59 @@ theorem imo2013_q1 (n : ℕ+) (k : ℕ)
   : (∃m: ℕ → ℕ+, (1:ℚ) + ((2^k - 1): ℚ) / n =
          (∏ i in finset.range k, (1 + 1 / ((m i) : ℚ)))) :=
 begin
-  induction k with kp hkp,
-  {
-    use λ _, 1,
-    simp only [finset.card_empty, add_zero, finset.prod_const, zero_div, finset.range_zero, pow_zero, sub_self],
-  },
-  obtain ⟨mp, hmp⟩ := hkp,
-  have ht: (∃t: ℕ+, n.1 = 2 * t.1 - 1) ∨ (∃t: ℕ+, n.1 = 2 * t.1),
+  cases k,
+  { use λ _, 1,
+    simp only [finset.card_empty, add_zero, finset.prod_const, zero_div, finset.range_zero, pow_zero, sub_self] },
+
+  revert n,
+  induction k with pk hpk,
+  { intro n, use λ _, n, norm_num },
+  intro n,
+
+  have ht: (∃t: ℕ+, pk.succ.succ = 2 * t.1 - 1) ∨ (∃t: ℕ+, pk.succ.succ = 2 * t.1),
   { sorry },
+
   cases ht,
-  {
-    obtain ⟨t, ht⟩ := ht,
-    use (λi: ℕ, if hi: i < kp then mp i else ⟨2 * t.val - 1, sorry⟩),
+  { obtain ⟨t, ht⟩ := ht,
+    obtain ⟨pm, hpm⟩  := hpk t,
+    let m := λi, if h : i < pk.succ then pm i else ⟨2 * t.val - 1, sorry⟩,
+    have h_mi_eq_pmi : ∀ i : ℕ, i < pk.succ → m i = pm i,
+    { intros i hi,
+      exact dif_pos hi },
+
+    have h_mi_eq_pmi' : ∀ i : ℕ, i ∈ finset.range pk.succ → (1:ℚ) + 1 / m i = 1 + 1 / pm i,
+    { intros i hi,
+      rw (h_mi_eq_pmi i (finset.mem_range.mp hi)),
+    },
+
+    use m,
+    have : ∏ (i : ℕ) in finset.range pk.succ.succ, ((1:ℚ) + 1 / ↑(m i)) =
+                (1 + 1 / ↑(m pk.succ)) * ∏ (i : ℕ) in finset.range pk.succ, (1 + 1 / ↑(m i)),
+    { exact finset.prod_range_succ (λ (x : ℕ), 1 + 1 / ↑(m x)) (nat.succ pk) },
+
+
+    have h' :  ∏ (i : ℕ) in finset.range pk.succ, ((1:ℚ) + 1 / ↑(m i)) =
+                 ∏ (i : ℕ) in finset.range pk.succ, (1 + 1 / ↑(pm i)),
+    {
+      exact finset.prod_congr rfl h_mi_eq_pmi',
+    },
+    have h'' : (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t - 1) = ((1:ℚ) + (2^pk.succ - 1) / t) * (1 + 1 / (2 * t - 1)),
+    {
+      sorry
+    },
+
+    have hneq0 : ((2 * (t:ℕ) - 1):ℚ) ≠ (0:ℚ),
+    { sorry
+    },
+
+    have h''' := calc (1:ℚ) + (2^pk.succ.succ - 1) / (2 * t - 1)
+        = (2 * t - 1) / (2 * t - 1) + (2^pk.succ.succ - 1) / (2 * t - 1) : by { norm_num, exact (div_self hneq0).symm}
+    ... = ((2 * t - 1) + (2^pk.succ.succ - 1)) / (2 * t - 1) : div_add_div_same _ _ _
+    ... = (2 * t - 2 + 2^pk.succ.succ) / (2 * t - 1) : begin sorry end,
+
     sorry,
   },
   obtain ⟨t, ht⟩ := ht,
   sorry,
+
 end
