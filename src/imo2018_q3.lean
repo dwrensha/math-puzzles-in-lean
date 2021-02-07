@@ -28,12 +28,77 @@ No.
 -/
 
 
-theorem imo2018_q3 (f : ℕ → ℕ → ℕ)
-  (h_antipascal : ∀ r < 2017, ∀ c < r,
-      f r c + f r.succ c = f r.succ c.succ ∨
-      f r c + f r.succ c.succ = f r.succ c)
+structure coords := mk ::
+(row : ℕ) (col : ℕ)
+
+def left_child (c : coords) : coords :=
+⟨c.row.succ, c.col⟩
+
+def right_child (c : coords) : coords :=
+⟨c.row.succ, c.col.succ⟩
+
+/--
+antipascal triangle with n rows
+-/
+structure antipascal_triangle (n : ℕ) := mk ::
+(f : coords → ℕ)
+(antipascal : ∀ x: coords, x.row.succ < n → x.col ≤ x.row →
+  f x + f (left_child x) = f (right_child x) ∨
+  f x + f (right_child x) = f (left_child x))
+
+structure a_and_b := mk ::
+(a : coords) (b : coords)
+
+def a_and_b_seqs {n : ℕ} (t : antipascal_triangle n) : ℕ → a_and_b
+| 0 := ⟨⟨0,0⟩, ⟨0,0⟩⟩
+| (nat.succ m) :=
+  let ⟨a, b⟩ := a_and_b_seqs m
+  in if hm : m.succ < n
+     then if t.f b + t.f (left_child b) = t.f (right_child b)
+          then ⟨left_child b, right_child b⟩
+          else ⟨right_child b, left_child b⟩
+     else ⟨a, b⟩ -- outside relevant region, can choose anything
+
+
+lemma a_and_b_row_is_m {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
+    (a_and_b_seqs t m).a.row = m ∧ (a_and_b_seqs t m).b.row = m :=
+begin
+  induction m with pm hpm,
+  { unfold a_and_b_seqs,
+    simp },
+  unfold a_and_b_seqs,
+  obtain ⟨hpma, hpmb⟩ := hpm,
+  sorry,
+end
+
+lemma b_within_triangle {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (hm : m < n) :
+  (a_and_b_seqs t m).b.col ≤ (a_and_b_seqs t m).b.row :=
+begin
+  induction m with pm hpm,
+  { unfold a_and_b_seqs },
+  unfold a_and_b_seqs,
+  have h' := hpm (nat.lt_of_succ_lt hm),
+  have := t.antipascal (a_and_b_seqs t pm).b _ h',
+  sorry,
+  sorry,
+end
+
+lemma sum_of_a {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (hm : m < n) :
+  (∑(i:ℕ) in finset.range m.succ, t.f (a_and_b_seqs t i).a) = t.f (a_and_b_seqs t m).b :=
+begin
+  induction m with pm hpm,
+  { simp only [nat.nat_zero_eq_zero, finset.sum_singleton, finset.range_one],
+    unfold a_and_b_seqs,
+  },
+  rw [finset.sum_range_succ, hpm (nat.lt_of_succ_lt hm)],
+  have := b_within_triangle t pm (nat.lt_of_succ_lt hm),
+--  t.antipascal
+  sorry
+end
+
+theorem imo2018_q3 (t : antipascal_triangle 2018)
   (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
-    ∃ r < 2018, ∃ c < r, f r c = n) :
+    ∃ r < 2018, ∃ c < r, t.f ⟨r,c⟩ = n) :
   false :=
 begin
 sorry

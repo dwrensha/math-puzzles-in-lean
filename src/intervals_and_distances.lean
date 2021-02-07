@@ -1,12 +1,9 @@
 import data.finset.basic
 import data.fintype.basic
 import data.set.intervals.basic
-import data.set.lattice
 import data.real.basic data.nat.basic
 
 open_locale big_operators
-
-variables {k : Type}
 
 def unit_interval: Type := @subtype ℝ (set.Icc 0 1)
 
