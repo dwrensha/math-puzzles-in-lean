@@ -4,8 +4,6 @@ import algebra.big_operators.pi
 import tactic.ring
 import tactic.field_simp
 
-open_locale big_operators
-
 /-!
 # IMO 2013 Q1
 
@@ -19,17 +17,15 @@ m₁, m₂, ..., mₖ (not necessarily different) such that
 Adaptation of the solution found in https://www.imo-official.org/problems/IMO2013SL.pdf
 
 We prove a slightly more general version where k does not need to be strictly positive.
-
 -/
 
-lemma arith_lemma_1 (k n : ℕ) : 0 < 2 * n + 2 ^ k.succ :=
-calc 0 < 2 : zero_lt_two
-   ... = 2 ^ 1 : (pow_one 2).symm
-   ... ≤ 2 ^ k.succ : nat.pow_le_pow_of_le_right zero_lt_two (nat.le_add_left 1 k)
-   ... ≤ 2 * n + 2 ^ k.succ : nat.le_add_left _ _
+open_locale big_operators
 
-lemma arith_lemma_2 (k n : ℕ) : (2 * (n : ℚ) + 2 ^ k.succ) ≠ 0 :=
-by { norm_cast, exact (ne_of_gt $ arith_lemma_1 k n) }
+lemma arith_lemma (k n : ℕ) : 0 < 2 * n + 2^k.succ :=
+calc 0 < 2                : zero_lt_two
+   ... = 2^1              : (pow_one 2).symm
+   ... ≤ 2^k.succ         : nat.pow_le_pow_of_le_right zero_lt_two (nat.le_add_left 1 k)
+   ... ≤ 2 * n + 2^k.succ : nat.le_add_left _ _
 
 lemma prod_lemma (m : ℕ → ℕ+) (k : ℕ) (nm : ℕ+):
       ∏ (i : ℕ) in finset.range k, ((1 : ℚ) + 1 / ↑(if i < k then m i else nm)) =
@@ -51,22 +47,23 @@ begin
   intro n,
   obtain ⟨t, ht : ↑n = 2 * t⟩ | ⟨t, ht : ↑n = 2 * t + 1⟩ := (n : ℕ).even_or_odd,
   { -- even case
-    cases t,
+    cases t, -- Eliminate the zero case to simplify later calculations.
     { exfalso, rw mul_zero at ht, exact pnat.ne_zero n ht },
 
     -- Now we have ht : ↑n = 2 * (t + 1).
     let t_succ : ℕ+ := ⟨t + 1, t.succ_pos⟩,
     obtain ⟨pm, hpm⟩ := hpk t_succ,
-    let m := λi, if i < pk then pm i else ⟨2 * t + 2^pk.succ, arith_lemma_1 pk t⟩,
+    let m := λi, if i < pk then pm i else ⟨2 * t + 2^pk.succ, arith_lemma pk t⟩,
     use m,
 
     have hmpk : (m pk : ℚ) = 2 * t + 2^pk.succ,
-    { have : m pk = ⟨2 * t + 2^pk.succ, _⟩ := dif_neg (irrefl pk), simp [this] },
+    { have : m pk = ⟨2 * t + 2^pk.succ, _⟩ := if_neg (irrefl pk), simp [this] },
 
-    have denom_ne_zero : (2 * (t:ℚ) + 2^pk.succ) ≠ 0 := arith_lemma_2 pk t,
+    have denom_ne_zero : (2 * (t:ℚ) + 2^pk.succ) ≠ 0,
+    { norm_cast, exact (ne_of_gt $ arith_lemma pk t) },
 
     calc (1 : ℚ) + (2 ^ pk.succ - 1) / ↑n
-        = 1 + (2 * 2 ^ pk - 1) / ((2 * (t + 1)) : ℕ)  : by rw [coe_coe n, ht, pow_succ]
+        = 1 + (2 * 2 ^ pk - 1) / (2 * (t + 1) : ℕ)    : by rw [coe_coe n, ht, pow_succ]
     ... = (1 + 1 / (2 * t + 2 * 2^pk)) *
           (1 + (2 ^ pk - 1) / (↑t + 1))               : by { field_simp [t.cast_add_one_ne_zero],
                                                              ring }
@@ -83,12 +80,12 @@ begin
     use m,
 
     have hmpk : (m pk : ℚ) = 2 * t + 1,
-    { have : m pk = ⟨2 * t + 1, _⟩ := dif_neg (irrefl pk), simp [this] },
+    { have : m pk = ⟨2 * t + 1, _⟩ := if_neg (irrefl pk), simp [this] },
 
     have denom_ne_zero : (2 * (t : ℚ) + 1) ≠ 0 := by { norm_cast, apply (2 * t).succ_ne_zero },
 
     calc (1 : ℚ) + (2 ^ pk.succ - 1) / ↑n
-        = 1 + (2 * 2^pk - 1) / ((2 * t + 1) : ℕ)      : by rw [coe_coe n, ht, pow_succ]
+        = 1 + (2 * 2^pk - 1) / (2 * t + 1 : ℕ)        : by rw [coe_coe n, ht, pow_succ]
     ... = (1 + 1 / (2 * t + 1)) *
           (1 + (2^pk - 1) / (t + 1))                  : by { field_simp [t.cast_add_one_ne_zero],
                                                              ring }
