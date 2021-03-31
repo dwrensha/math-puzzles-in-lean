@@ -26,10 +26,6 @@ for all n ≥ m.
 
 open_locale big_operators
 
-/-
- Let a,b,c be positive integers such that N = b/c + (c-b)/a is an integer. Then:
-  (1) if gcd(a,c) = 1, then c divides b
--/
 lemma gcd_coprime (a b c : ℤ)
   (h_cp : is_coprime c a)
   (h_cab : c ∣ a * b) :
@@ -40,9 +36,6 @@ end
 
 
 lemma gcd_dvd (a b c : ℤ)
-  (ha : 0 < a)
-  (hb : 0 < b)
-  (hc : 0 < c)
   (hgcd : a.gcd c = 1)
   (h_cab : c ∣ a * b) :
   c ∣ b :=
@@ -60,7 +53,10 @@ begin
   exact gcd_coprime a b c this h_cab,
 end
 
-
+/-
+ Let a,b,c be positive integers such that N = b/c + (c-b)/a is an integer. Then:
+  (1) if gcd(a,c) = 1, then c divides b
+-/
 lemma lemma_1
   (a b c : ℤ)
   (ha : 0 < a) (hb : 0 < b) (hc : 0 < c)
@@ -80,8 +76,8 @@ begin
     have h2: (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
       = (a:ℚ) * (c:ℚ) * N := congr_arg (has_mul.mul (↑a * ↑c)) hN,
 
-    have := calc (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
-     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) : by {field_simp, ring},
+    have : (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
+     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp, ring},
 
     linarith,
   },
@@ -96,7 +92,7 @@ begin
 
   clear hz hN N,
 
-  exact gcd_dvd a b c ha hb hc hgcd h_cab,
+  exact gcd_dvd a b c hgcd h_cab,
 end
 
 /-
@@ -111,7 +107,29 @@ lemma lemma_2
   (hgcd : int.gcd a (int.gcd b c) = 1) :
   int.gcd a b = 1 :=
 begin
-  sorry,
+  have : (c:ℚ) * c - b * c = a * (c * N - b),
+  {
+    have ha0 : (a:ℚ) ≠ 0 := ne_of_gt (int.cast_pos.mpr ha),
+    have hc0 : (c:ℚ) ≠ 0 := ne_of_gt (int.cast_pos.mpr hc),
+
+    have h2: (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
+      = (a:ℚ) * (c:ℚ) * N := congr_arg (has_mul.mul (↑a * ↑c)) hN,
+
+    have : (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
+     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp, ring},
+
+    linarith,
+   },
+
+  have hz: c * c - b * c = a * (c * N - b) := by assumption_mod_cast,
+  clear this,
+  have h1 : a ∣ (c * c - b * c) := dvd.intro (c * N - b) (eq.symm hz),
+  have h2 : ((a.gcd b):ℤ) ∣ c * c,
+  {
+     sorry,
+  },
+
+  sorry
 end
 
 theorem imo2018_q5
