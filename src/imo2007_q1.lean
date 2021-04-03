@@ -24,13 +24,22 @@ such that we have equality in (1).
 
 theorem imo2007_q1
   (n : ℕ)
-  (a : fin n → ℝ)
-  (di : fin n → ℝ)
-  (hdi : ∀i: fin n, true ) -- {{ a j // 1 ≤ j ∧ j ≤ i }}
-  (d : ℝ)
-  /- TODO define constraints on d-/
-  : (∀ x: fin n → ℝ, monotone x → true )
-    ∧ (∃ x: fin n → ℝ, monotone x → true) :=
+  (a b c d: fin n → ℝ)
+  (hb : ∀i: fin n, is_greatest {x : ℝ | ∃ j : fin n, j ≤ i ∧ x = a j } (b i))
+  (hc : ∀i: fin n, is_least {x : ℝ | ∃ j : fin n, i ≤ j ∧ x = a j } (c i))
+  (hd : ∀i: fin n, d i = b i - c i )
+  (dm : ℝ)
+  (hdm : ∀i: fin n, is_greatest {x : ℝ | ∃ i : fin n, x = d i} dm)
+  : (∀ x: fin n → ℝ, monotone x → ∃ i : fin n, dm / 2 ≤ abs (x i - a i) )
+    ∧ (∃ x: fin n → ℝ, monotone x →
+         ∃ i : fin n, dm / 2 = abs (x i - a i)
+        ∧ ∀ i : fin n, abs (x i - a i) ≤ dm / 2) :=
 begin
- sorry
+ split,
+ { intros x x_mono,
+   sorry,
+ },
+ {
+   sorry
+ },
 end
