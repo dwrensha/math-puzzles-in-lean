@@ -21,7 +21,6 @@ such that we have equality in (1).
 
 -/
 
-
 theorem imo2007_q1
   (n : ℕ)
   (a b c d: fin n → ℝ)
@@ -29,17 +28,21 @@ theorem imo2007_q1
   (hc : ∀i: fin n, is_least {x : ℝ | ∃ j : fin n, i ≤ j ∧ x = a j } (c i))
   (hd : ∀i: fin n, d i = b i - c i )
   (dm : ℝ)
-  (hdm : ∀i: fin n, is_greatest {x : ℝ | ∃ i : fin n, x = d i} dm)
+  (hdm : is_greatest {x : ℝ | ∃ i : fin n, x = d i} dm)
   : (∀ x: fin n → ℝ, monotone x → ∃ i : fin n, dm / 2 ≤ abs (x i - a i) )
-    ∧ (∃ x: fin n → ℝ, monotone x →
+    ∧ (∃ x: fin n → ℝ, monotone x ∧
          ∃ i : fin n, dm / 2 = abs (x i - a i)
         ∧ ∀ i : fin n, abs (x i - a i) ≤ dm / 2) :=
 begin
- split,
- { intros x x_mono,
-   sorry,
- },
- {
-   sorry
- },
+  obtain ⟨⟨q, hq⟩, hqq⟩ := hdm,
+  obtain ⟨⟨p, hp⟩, hpp⟩ := hb q,
+  obtain ⟨⟨r, hr⟩, hrr⟩ := hc q,
+  have hdi := hd q,
+  split,
+  { intros x x_mono,
+    sorry,
+  },
+  {
+    sorry
+  },
 end
