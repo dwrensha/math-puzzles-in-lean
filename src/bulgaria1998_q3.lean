@@ -19,7 +19,7 @@ open_locale big_operators
 lemma geom_sum_bound (n:ℕ) : ∑(i : ℕ) in finset.range n, (1:ℝ) / (2^i) < 3 :=
 begin
   calc ∑(i : ℕ) in finset.range n, (1:ℝ) / 2^i
-          = ∑(i : ℕ) in finset.range n, (1 / 2)^i : by {congr; simp [div_eq_mul_inv, mul_comm, mul_left_comm]}
+          = ∑(i : ℕ) in finset.range n, (1 / 2)^i : by {congr; simp [div_eq_mul_inv]}
       ... ≤ 2 : sum_geometric_two_le n
       ... < 3 : by norm_num,
 end
@@ -68,15 +68,29 @@ begin
   },
 
   let x_seq : ℕ → ℝ := λ n : ℕ, 1 + ∑(i : ℕ) in finset.range n, (f 1) / (2^i),
+
+  have hz : x_seq 0 = 1 := by simp only [add_right_eq_self, finset.sum_empty, finset.range_zero],
+
   have f_x_seq: ∀ n:ℕ, f(x_seq n) ≤ f 1 / 2^n,
   { intro n,
     induction n with pn hpn,
-    { sorry },
+    { rw hz, simp only [div_one, pow_zero],},
     sorry,
   },
 
   have x_seq_pos : ∀ n: ℕ, 0 < x_seq n,
-  { sorry },
+  { intro n,
+    simp only [x_seq],
+
+    have sum_nonneg : 0 ≤ ∑ (i : ℕ) in finset.range n, f 1 / 2 ^ i,
+    { apply finset.sum_nonneg,
+      intros i hi,
+      have h1 := hpos 1 zero_lt_one,
+      have h2 : (0:ℝ) < 2 ^ i := pow_pos (by norm_num) i,
+      exact le_of_lt (div_pos_iff.mpr (or.inl ⟨h1, h2⟩)),
+    },
+    linarith,
+  },
 
   have h1: ∀ n: ℕ, x_seq n < 1 + 3 * f 1,
   { sorry},
