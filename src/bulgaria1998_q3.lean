@@ -78,6 +78,8 @@ begin
     sorry,
   },
 
+  have hf1 := hpos 1 zero_lt_one,
+
   have x_seq_pos : ∀ n: ℕ, 0 < x_seq n,
   { intro n,
     simp only [x_seq],
@@ -85,29 +87,37 @@ begin
     have sum_nonneg : 0 ≤ ∑ (i : ℕ) in finset.range n, f 1 / 2 ^ i,
     { apply finset.sum_nonneg,
       intros i hi,
-      have h1 := hpos 1 zero_lt_one,
       have h2 : (0:ℝ) < 2 ^ i := pow_pos (by norm_num) i,
-      exact le_of_lt (div_pos_iff.mpr (or.inl ⟨h1, h2⟩)),
+      exact le_of_lt (div_pos_iff.mpr (or.inl ⟨hf1, h2⟩)),
     },
     linarith,
   },
 
   have h1: ∀ n: ℕ, x_seq n < 1 + 3 * f 1,
-  { sorry},
+  { intro n,
+    norm_num,
+    calc ∑ (i : ℕ) in finset.range n, f 1 / 2 ^ i
+         = (∑ (i : ℕ) in finset.range n, 1 / 2 ^ i) * f 1 : by {rw [finset.sum_mul], field_simp }
+     ... < 3 * f 1 : (mul_lt_mul_right hf1).mpr (geom_sum_bound n)
+  },
 
   have h2 : ∀ n : ℕ, 0 < 1 + 3 * f 1 - x_seq n,
   { intro n, linarith [h1 n]},
 
-  have : ∀ n:ℕ, f (1 + 3 * f 1) < f 1 / 2 ^ n,
+  have h3 : ∀ n:ℕ, f (1 + 3 * f 1) < f 1 / 2 ^ n,
   { intro n,
     calc f (1 + 3 * f 1) = f (x_seq n + (1 + 3 * f 1 - x_seq n)) : by ring_nf
                      ... < f (x_seq n) : f_decr (x_seq n) _ (x_seq_pos n) (h2 n)
                      ... ≤ f 1 / 2^n : f_x_seq n,
   },
 
-  have nonpos : f ( 1 + 3 * f 1) ≤ 0,
-  { sorry, },
+  have he: ∃n:ℕ, f 1 / 2^n < f (1 + 3 * f 1),
+  {
+    sorry,
+  },
 
+  obtain ⟨N, hN⟩ := he,
+  have h4 := h3 N,
   have := hpos (1 + 3 * f 1) (by linarith [hpos 1 zero_lt_one]),
   linarith,
 end
