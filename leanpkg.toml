@@ -6,3 +6,5 @@ path = "src"
 
 [dependencies]
 mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "8e275a30511b92037c577c0ab20b2602d73abcca"}
+
+#lean-gptf = {path = "/Users/dwrensha/src/lean-gptf" }

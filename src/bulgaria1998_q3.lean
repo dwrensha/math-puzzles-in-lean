@@ -1,3 +1,4 @@
+import algebra.archimedean
 import data.real.basic
 import algebra.big_operators.pi
 import analysis.specific_limits
@@ -71,15 +72,7 @@ begin
 
   have hz : x_seq 0 = 1 := by simp only [add_right_eq_self, finset.sum_empty, finset.range_zero],
 
-  have f_x_seq: ∀ n:ℕ, f(x_seq n) ≤ f 1 / 2^n,
-  { intro n,
-    induction n with pn hpn,
-    { rw hz, simp only [div_one, pow_zero],},
-    sorry,
-  },
-
   have hf1 := hpos 1 zero_lt_one,
-
   have x_seq_pos : ∀ n: ℕ, 0 < x_seq n,
   { intro n,
     simp only [x_seq],
@@ -92,6 +85,43 @@ begin
     },
     linarith,
   },
+
+  have f_x_seq: ∀ n:ℕ, f(x_seq n) ≤ f 1 / 2^n,
+  { intro n,
+    induction n with pn hpn,
+    { rw hz, simp only [div_one, pow_zero],},
+
+    have hpp: x_seq pn.succ = x_seq pn + f 1 / 2^pn,
+    {
+      simp [x_seq],
+      have : ∑ (i : ℕ) in finset.range pn.succ, f 1 / 2 ^ i =
+              f 1 / 2 ^ pn + ∑ (i : ℕ) in finset.range pn, f 1 / 2 ^ i,
+      { exact finset.sum_range_succ (λ (x : ℕ), f 1 / 2 ^ x) pn },
+
+      rw this,
+      ring
+    },
+
+    have h1 : f (x_seq pn.succ) ≤ f (x_seq pn + f(x_seq pn)),
+    {
+     rw hpp,
+     obtain heq | hlt := eq_or_lt_of_le hpn,
+     { rwa heq },
+     {
+       have := le_of_lt (f_decr (x_seq pn + f (x_seq pn)) (f 1 / 2 ^ pn - f (x_seq pn))
+                                (add_pos (x_seq_pos pn) (hpos (x_seq pn) (x_seq_pos pn)))
+                                (sub_pos.mpr hlt)),
+       simp at this,
+       assumption,
+     }
+    },
+
+    calc f (x_seq pn.succ) ≤ f (x_seq pn + f(x_seq pn)) : h1
+                       ... ≤ f (x_seq pn) / 2 : f_half (x_seq pn) (x_seq_pos pn)
+                       ... ≤ (f 1 / 2 ^ pn) / 2 : by linarith
+                       ... = f 1 / 2 ^ pn.succ : by {field_simp[ne_of_gt hf1], ring_nf}
+  },
+
 
   have h1: ∀ n: ℕ, x_seq n < 1 + 3 * f 1,
   { intro n,
@@ -113,7 +143,23 @@ begin
 
   have he: ∃n:ℕ, f 1 / 2^n < f (1 + 3 * f 1),
   {
-    sorry,
+    obtain ⟨N, hN⟩ := exists_nat_gt (f 1 / f (1 + 3 * f 1) - 1),
+    use N,
+
+    have hc := calc f 1 / f (1 + 3 * f 1)
+             = f 1 / f (1 + 3 * f 1) - 1 + 1 : by ring
+         ... < N + 1  : add_lt_add_right hN 1
+         ... = 1 + N * (2 - 1) : by ring
+         ... ≤ 2 ^ N : one_add_mul_sub_le_pow (le_of_lt (lt_trans neg_one_lt_zero zero_lt_two)) N,
+
+    have hp : 0 < f (1 + 3 * f 1),
+    { have : 0 < 1 + 3 * f 1 := by linarith,
+      exact hpos (1 + 3 * f 1) this
+    },
+
+    clear hN f_x_seq x_seq_pos h1 h2 h3,
+    have h2N : (0:ℝ) < 2^N := pow_pos (by norm_num) N,
+    exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hc),
   },
 
   obtain ⟨N, hN⟩ := he,
