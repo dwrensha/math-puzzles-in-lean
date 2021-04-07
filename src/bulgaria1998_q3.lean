@@ -122,7 +122,6 @@ begin
                        ... = f 1 / 2 ^ pn.succ : by {field_simp[ne_of_gt hf1], ring_nf}
   },
 
-
   have h1: ∀ n: ℕ, x_seq n < 1 + 3 * f 1,
   { intro n,
     norm_num,
@@ -163,7 +162,5 @@ begin
   },
 
   obtain ⟨N, hN⟩ := he,
-  have h4 := h3 N,
-  have := hpos (1 + 3 * f 1) (by linarith [hpos 1 zero_lt_one]),
-  linarith,
+  exact lt_irrefl _ (lt_trans (h3 N) hN),
 end
