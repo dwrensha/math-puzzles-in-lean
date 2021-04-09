@@ -34,14 +34,12 @@ begin
   have f_decr : ∀ x y : ℝ, 0 < x → 0 < y → f (x + y) < f x,
   {
     intros x y hx hy,
-    have h0 := hpos x hx,
     have h1 := hf x y hx hy,
-    have h2 : 0 < f x + y := by linarith,
-    have h3 : 0 ≠ f x + y := by linarith,
+    have h2 : 0 < f x + y := add_pos (hpos x hx) hy,
     have h4 : f x < f x + y := lt_add_of_pos_right (f x) hy,
     have h5 : f x / (f x + y) < 1 := by rwa [div_lt_iff h2, one_mul],
     calc f (x + y) = f (x + y) * 1                       : (mul_one (f (x + y))).symm
-               ... = f (x + y) * ((f x + y) / (f x + y)) : by rw (div_self (ne.symm h3))
+               ... = f (x + y) * ((f x + y) / (f x + y)) : by rw (div_self (ne.symm (ne_of_lt h2)))
                ... = (f (x + y) * (f x + y)) / (f x + y) : mul_div_assoc' (f (x + y)) (f x + y) (f x + y)
                ... ≤ (f x)^2 / (f x + y)                 : (div_le_div_right h2).mpr h1
                ... = (f x) * (f x / (f x + y))           : by field_simp [pow_two]
@@ -52,7 +50,7 @@ begin
     intros x hx,
     have h0 := hpos x hx,
     have h1 := hf x (f x) hx h0,
-    have h2 : 0 < f x + f x := by linarith,
+    have h2 : 0 < f x + f x := add_pos h0 h0,
     have h3 : 0 ≠ f x + f x := by linarith,
     have h5 := ne_of_lt h0,
     have h6: 2 * f x ≠ 0 := by linarith,
@@ -83,7 +81,7 @@ begin
       have h2 : (0:ℝ) < 2 ^ i := pow_pos (by norm_num) i,
       exact le_of_lt (div_pos_iff.mpr (or.inl ⟨hf1, h2⟩)),
     },
-    linarith,
+    linarith
   },
 
   have f_x_seq: ∀ n:ℕ, f(x_seq n) ≤ f 1 / 2^n,
