@@ -154,7 +154,6 @@ begin
       exact hpos (1 + 3 * f 1) this
     },
 
-    clear hN f_x_seq x_seq_pos h1 h2 h3,
     have h2N : (0:ℝ) < 2^N := pow_pos (by norm_num) N,
     exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hc),
   },

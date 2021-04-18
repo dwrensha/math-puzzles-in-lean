@@ -216,7 +216,7 @@ begin
   have hss := times_base_plus_one_still_all_zero_or_one base h2 _ hs,
   have hrw : 1 + base * (base ^ k * n) = base ^ (k + 1) * n + 1,
   {
-    ring,
+    ring_nf,
     have : base ^ k * base  = base ^ (k + 1) := (pow_succ' base k).symm,
     finish,
   },

@@ -1,4 +1,5 @@
 import data.finset.basic
+import data.finset.lattice
 import data.nat.basic
 import data.nat.gcd
 import data.pnat.basic
@@ -41,8 +42,6 @@ begin
   sorry
 end
 
-
-
 theorem india1998_q8
   (M : ℕ)
   (hM : 0 < M)
@@ -50,6 +49,8 @@ theorem india1998_q8
   (h_ne : ({a, b}: finset ℕ) ≠ {c, d})
   : a.val * b.val ≠ c.val * d.val :=
 begin
+  let m : option ℕ := finset.min {a,b,c,d},
+  
   -- delegate to lemma_1 ...
   sorry,
 end
