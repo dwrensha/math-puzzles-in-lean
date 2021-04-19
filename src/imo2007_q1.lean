@@ -2,8 +2,6 @@ import data.nat.basic
 import data.real.basic
 import order.basic
 
-import tactic.gptf
-
 /- IMO 2007 Problem 1
 
 Given a sequence a₁, a₂, ... aₙ of real numbers. For each i (1≤i≤n) define
