@@ -94,7 +94,7 @@ begin
       simp [x_seq],
       have : ∑ (i : ℕ) in finset.range pn.succ, f 1 / 2 ^ i =
               f 1 / 2 ^ pn + ∑ (i : ℕ) in finset.range pn, f 1 / 2 ^ i,
-      { exact finset.sum_range_succ (λ (x : ℕ), f 1 / 2 ^ x) pn },
+      { exact finset.sum_range_succ_comm (λ (x : ℕ), f 1 / 2 ^ x) pn },
 
       rw this,
       ring

@@ -72,7 +72,7 @@ begin
     ... = (1 + 1 / ↑(m pk)) *
           ∏ (i : ℕ) in finset.range pk, (1 + 1 / m i) : by rw [hpm, prod_lemma, ←hmpk]
     ... = ∏ (i : ℕ) in finset.range pk.succ,
-                                        (1 + 1 / m i) : (finset.prod_range_succ _ pk).symm },
+                                        (1 + 1 / m i) : (finset.prod_range_succ_comm _ pk).symm },
   { -- odd case
     let t_succ : ℕ+ := ⟨t + 1, t.succ_pos⟩,
     obtain ⟨pm, hpm⟩ := hpk t_succ,
@@ -94,5 +94,5 @@ begin
     ... = (1 + 1 / ↑(m pk)) *
           ∏ (i : ℕ) in finset.range pk, (1 + 1 / m i) : by rw [hpm, prod_lemma, ←hmpk]
     ... = ∏ (i : ℕ) in finset.range pk.succ,
-                                        (1 + 1 / m i) : (finset.prod_range_succ _ pk).symm }
+                                        (1 + 1 / m i) : (finset.prod_range_succ_comm _ pk).symm }
 end
