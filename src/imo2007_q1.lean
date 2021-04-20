@@ -29,11 +29,37 @@ begin
   linarith,
 end
 
-noncomputable def xx_aux {n: ℕ} (d : ℝ) (a: fin n → ℝ) : ∀ i, i < n → ℝ
- | 0 h := a ⟨0, h⟩ - d/2
- | (nat.succ k) h := max (xx_aux k (nat.lt_of_succ_lt h)) (a ⟨nat.succ k, h⟩ - d / 2)
+noncomputable def xx_seq (a: ℕ → ℝ) : ℕ → ℝ
+ | 0 := a 0
+ | m@(nat.succ k) := max (xx_seq k) (a m)
 
-noncomputable def xx {n: ℕ} (d : ℝ) (a: fin n → ℝ) (i : fin n) : ℝ := xx_aux d a i.1 i.2
+lemma xx_seq_monotone (a: ℕ → ℝ) : monotone (xx_seq a) :=
+begin
+  have h: ∀ n, xx_seq a n ≤ xx_seq a (nat.succ n),
+  {
+    intro n,
+    unfold xx_seq,
+    exact le_max_left (xx_seq a n) (a (nat.succ n)),
+  },
+  exact monotone_of_monotone_nat h,
+end
+
+lemma monotone_fin_of_nat {n : ℕ} (f: ℕ → ℝ) (h : monotone f) : monotone (λ m: fin n, f m.val) :=
+begin
+  intros m1 m2 hm,
+  exact h hm,
+end
+
+noncomputable def x_seq' {n : ℕ} (d: ℝ) (a: fin n → ℝ) : ℕ → ℝ :=
+xx_seq (λm, if h: m < n then (a ⟨m, h⟩ - d/2) else 0)
+
+noncomputable def x_seq {n : ℕ} (d : ℝ) (a: fin n → ℝ) : fin n → ℝ :=
+λ m, x_seq' d a m.val
+
+lemma x_seq_monotone {n : ℕ} (d : ℝ) (a : fin n → ℝ) : monotone (x_seq d a) :=
+begin
+  exact monotone_fin_of_nat (x_seq' d a) (xx_seq_monotone _),
+end
 
 theorem imo2007_q1
   (n : ℕ)
@@ -73,9 +99,9 @@ begin
               ... ≤ abs (x r - a r) : le_abs_self _ }
   },
   {
-    use xx dm a,
+    use x_seq dm a,
     split,
-    { sorry },
+    { exact x_seq_monotone dm a, },
     { sorry },
   },
 end
