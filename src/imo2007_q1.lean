@@ -71,7 +71,7 @@ theorem imo2007_q1
   (hdm : is_greatest {x : ℝ | ∃ i : fin n, x = d i} dm)
   : (∀ x: fin n → ℝ, monotone x → ∃ i : fin n, dm / 2 ≤ abs (x i - a i) )
     ∧ (∃ x: fin n → ℝ, monotone x ∧
-         ∃ i : fin n, dm / 2 = abs (x i - a i)
+         (∃ i : fin n, dm / 2 = abs (x i - a i))
         ∧ ∀ i : fin n, abs (x i - a i) ≤ dm / 2) :=
 begin
   obtain ⟨⟨q, hq⟩, hqq⟩ := hdm,
@@ -102,6 +102,9 @@ begin
     use x_seq dm a,
     split,
     { exact x_seq_monotone dm a, },
-    { sorry },
+    { split,
+      { sorry },
+      { sorry },
+    },
   },
 end
