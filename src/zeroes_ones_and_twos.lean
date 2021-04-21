@@ -27,21 +27,8 @@ lemma mul_left_coprime
 begin
   have hord: c ≤ d ∨ d ≤ c := nat.le_total,
   cases hord with hcd hdc,
-  {
-    exact mul_left_coprime_aux base factor c d hcd h_coprime h_equal,
-  },
-  {
-   exact (mul_left_coprime_aux base factor d c hdc h_coprime h_equal.symm).symm,
-  }
-end
-
-lemma coprime_power
-  (base factor : ℕ)
-  (k : ℕ)
-  (h_coprime : nat.coprime factor base)
-  : nat.coprime factor (base^k) :=
-begin
-  exact nat.coprime.pow_right k h_coprime
+  { exact mul_left_coprime_aux base factor c d hcd h_coprime h_equal },
+  { exact (mul_left_coprime_aux base factor d c hdc h_coprime h_equal.symm).symm }
 end
 
 lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
@@ -94,21 +81,10 @@ lemma exists_distinct_exponents_ordered
   : ∃ m n : ℕ, (m < n ∧ base^m ≡ base^n [MOD factor]) :=
 begin
   obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents base factor hf,
-  have ht := nat.lt_trichotomy a b,
-  cases ht,
-  {
-    use a,
-    use b,
-    finish,
-  },
-  cases ht,
-  {
-    finish,
-  },
-  use b,
-  use a,
-  use ht,
-  exact hab.symm,
+  obtain hlt | heq | hgt := nat.lt_trichotomy a b,
+  { use a, use b, finish },
+  { finish },
+  { use b, use a, use hgt, exact hab.symm }
 end
 
 lemma periodic
@@ -118,10 +94,8 @@ lemma periodic
   : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD factor] :=
 begin
   obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base factor hf,
-  have hst :(∃ k : ℕ, a + 1 + k = b) := nat.le.dest haneb,
-  obtain ⟨k, hk⟩ := hst,
-  use k + 1,
-  { linarith },
+  obtain ⟨k, hk⟩ := nat.le.dest haneb,
+  use ⟨k + 1, nat.succ_pos k⟩,
   dsimp,
   rw ← hk at hab,
   clear haneb hk b,
@@ -131,15 +105,8 @@ begin
           = base ^ (a + (1 + k)) : by rw [add_assoc a 1 k]
       ... = base ^ a * base ^ (1 + k) : pow_add base _ _,
   end,
-  rw hp at hab,
-  clear hp,
+  rw [←mul_one (base ^ a), hp] at hab,
   have hp_coprime : nat.coprime (base^a) factor := nat.coprime.pow_left _ h_coprime,
-  conv at hab begin
-    congr,
-    skip,
-    rw ← (mul_one (base ^ a)),
-    skip,
-  end,
   have := (mul_left_coprime (base ^ a) factor 1 (base ^ (1 + k)) hp_coprime.symm hab).symm,
   rwa ←(add_comm 1 k),
 end
@@ -267,20 +234,7 @@ begin
     simp only [one_mul] at hme,
     assumption,
   },
-  have hr := base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2,
-  exact hr,
-end
-
-lemma nonzero_lemma (a b c : ℕ) (h: a = b * c) (ha: 0 < a) (hb: 0 < b) : 0 < c :=
-begin
-  have hc: c = 0 ∨ 0 < c := nat.eq_zero_or_pos c,
-  cases hc,
-  {
-    rw hc at h,
-    simp at h,
-    finish,
-  },
-  assumption,
+  exact base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2,
 end
 
 lemma zeroes_and_ones_coprime
@@ -292,20 +246,16 @@ lemma zeroes_and_ones_coprime
   : ∃ k : ℕ+, all_zero_or_one (nat.digits base (factor * k)) :=
 begin
   obtain ⟨factor_prev, h_factor_prev⟩ := nat_prev factor hf,
-  have hpm := exists_positive_mod base factor h2 hf h_coprime factor_prev,
-  obtain ⟨n, hn⟩ := hpm,
-  cases hn,
-  cases hn_right,
-  rw ← h_factor_prev at hn_right_left,
+  obtain ⟨n, hn_pos, hn_mod, hn_0_or_1⟩ := exists_positive_mod base factor h2 hf h_coprime factor_prev,
+  rw ← h_factor_prev at hn_mod,
   have hff : factor ≡ (factor % factor) [MOD factor] := (nat.modeq.mod_modeq factor factor).symm,
   simp only [nat.mod_self] at hff,
-  have hn0 : n ≡ 0 [MOD factor] := nat.modeq.trans hn_right_left hff,
+  have hn0 : n ≡ 0 [MOD factor] := nat.modeq.trans hn_mod hff,
   have hdvd : factor ∣ n := nat.modeq.modeq_zero_iff.mp hn0,
   obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd hdvd,
-  have hkp : 0 < k := nonzero_lemma n factor k hk hn_left hf,
+  have hkp : 0 < k := by finish,
   use ⟨ k, hkp ⟩,
-  simp,
-  rwa ← hk,
+  simpa [←hk],
 end
 
 -- what if base and factor aren't coprime?
