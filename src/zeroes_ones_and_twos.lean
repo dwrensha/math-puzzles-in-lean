@@ -5,30 +5,39 @@ import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd
 
+/--
+Let n be a natural number. Prove that
+
+  (a) n has a (nonzero) multiple whose representation in base 10 contains
+      only zeroes and ones; and
+  (b) 2^n has a multiple whose representation contains only ones and twos.
+
+-/
+
 lemma mul_left_coprime_aux
-  (base factor c d : ℕ)
+  (base n c d : ℕ)
   (hord : c ≤ d)
-  (h_coprime : nat.coprime factor base)
-  (h_equal : base * c ≡ base * d [MOD factor])
-  : c ≡ d [MOD factor] :=
+  (h_coprime : nat.coprime n base)
+  (h_equal : base * c ≡ base * d [MOD n])
+  : c ≡ d [MOD n] :=
 begin
   have hm : (base * c) ≤ (base * d) := nat.mul_le_mul_left base hord,
-  have hd: (factor ∣ (base * d) - (base * c)) := (nat.modeq.modeq_iff_dvd' hm).mp h_equal,
+  have hd: (n ∣ (base * d) - (base * c)) := (nat.modeq.modeq_iff_dvd' hm).mp h_equal,
   rw [←nat.mul_sub_left_distrib base d c] at hd,
   apply (nat.modeq.modeq_iff_dvd' hord).mpr,
   exact nat.coprime.dvd_of_dvd_mul_left h_coprime hd,
 end
 
 lemma mul_left_coprime
-  (base factor c d : ℕ)
-  (h_coprime : nat.coprime factor base)
-  (h_equal : base * c ≡ base * d [MOD factor])
-  : c ≡ d [MOD factor] :=
+  (base n c d : ℕ)
+  (h_coprime : nat.coprime n base)
+  (h_equal : base * c ≡ base * d [MOD n])
+  : c ≡ d [MOD n] :=
 begin
   have hord: c ≤ d ∨ d ≤ c := nat.le_total,
   cases hord with hcd hdc,
-  { exact mul_left_coprime_aux base factor c d hcd h_coprime h_equal },
-  { exact (mul_left_coprime_aux base factor d c hdc h_coprime h_equal.symm).symm }
+  { exact mul_left_coprime_aux base n c d hcd h_coprime h_equal },
+  { exact (mul_left_coprime_aux base n d c hdc h_coprime h_equal.symm).symm }
 end
 
 lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
@@ -44,43 +53,38 @@ begin
   apply not_injective_infinite_fintype f hinj,
 end
 
-def iterate_pow (base factor : ℕ) (hfactor: factor > 0) : ℕ → fin factor :=
-λn, ⟨(base ^ n) % factor, nat.mod_lt (base ^ n) hfactor ⟩
+def iterate_pow (base n : ℕ) (hn : n > 0) : ℕ → fin n
+| m := ⟨(base ^ m) % n, nat.mod_lt (base ^ m) hn ⟩
 
 lemma exists_distinct_exponents
-  (base factor : ℕ)
-  (hf: 0 < factor)
-  : ∃ m n : ℕ, (m ≠ n ∧ base^m ≡ base^n [MOD factor]) :=
+  (base n : ℕ)
+  (hn : 0 < n)
+  : ∃ m1 m2 : ℕ, (m1 ≠ m2 ∧ base^m1 ≡ base^m2 [MOD n]) :=
 begin
-  let f := iterate_pow base factor hf,
-  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole factor f,
-  obtain ⟨a, b, hab⟩ := he,
-  cases hab,
-  use a,
-  use b,
-  use hab_left,
-  have : base ^ a % factor = base ^ b % factor,
+  let f := iterate_pow base n hn,
+  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole n f,
+  obtain ⟨a, b, hne, heq⟩ := he,
+  use a, use b, use hne,
+  have : base ^ a % n = base ^ b % n,
   {
-     have hval :(f a).val = (f b).val := congr_arg subtype.val hab_right,
+     have hval :(f a).val = (f b).val := congr_arg subtype.val heq,
 
-     have havala: (f a).val = (base ^ a) % factor := rfl,
+     have havala: (f a).val = (base ^ a) % n := rfl,
      rw ← havala,
 
-     have havalb: (f b).val = (base ^ b) % factor := rfl,
-     rw ← havalb,
-
-     assumption,
+     have havalb: (f b).val = (base ^ b) % n := rfl,
+     rwa ← havalb
   },
   unfold nat.modeq,
   assumption,
 end
 
 lemma exists_distinct_exponents_ordered
-  (base factor : ℕ)
-  (hf: 0 < factor)
-  : ∃ m n : ℕ, (m < n ∧ base^m ≡ base^n [MOD factor]) :=
+  (base n : ℕ)
+  (hn : 0 < n)
+  : ∃ m1 m2 : ℕ, (m1 < m2 ∧ base^m1 ≡ base^m2 [MOD n]) :=
 begin
-  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents base factor hf,
+  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents base n hn,
   obtain hlt | heq | hgt := nat.lt_trichotomy a b,
   { use a, use b, finish },
   { finish },
@@ -88,12 +92,12 @@ begin
 end
 
 lemma periodic
-  (base factor : ℕ)
-  (hf: 0 < factor)
-  (h_coprime: nat.coprime base factor)
-  : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD factor] :=
+  (base n : ℕ)
+  (hn : 0 < n)
+  (h_coprime: nat.coprime base n)
+  : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD n] :=
 begin
-  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base factor hf,
+  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base n hn,
   obtain ⟨k, hk⟩ := nat.le.dest haneb,
   use ⟨k + 1, nat.succ_pos k⟩,
   dsimp,
@@ -106,8 +110,8 @@ begin
       ... = base ^ a * base ^ (1 + k) : pow_add base _ _,
   end,
   rw [←mul_one (base ^ a), hp] at hab,
-  have hp_coprime : nat.coprime (base^a) factor := nat.coprime.pow_left _ h_coprime,
-  have := (mul_left_coprime (base ^ a) factor 1 (base ^ (1 + k)) hp_coprime.symm hab).symm,
+  have hp_coprime : nat.coprime (base^a) n := nat.coprime.pow_left _ h_coprime,
+  have := (mul_left_coprime (base ^ a) n 1 (base ^ (1 + k)) hp_coprime.symm hab).symm,
   rwa ←(add_comm 1 k),
 end
 
@@ -134,7 +138,7 @@ lemma times_base_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
   (n: ℕ)
-  (hazoo : all_zero_or_one (nat.digits base n))
+  (hn : all_zero_or_one (nat.digits base n))
   : all_zero_or_one (nat.digits base (base * n)) :=
 begin
   cases (nat.eq_zero_or_pos n) with hz hp,
@@ -151,7 +155,7 @@ lemma base_pow_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
   (k n: ℕ)
-  (hazoo : all_zero_or_one (nat.digits base n))
+  (hn : all_zero_or_one (nat.digits base n))
   : all_zero_or_one (nat.digits base ((base ^ k) * n)) :=
 begin
   induction k with pk hpk,
@@ -174,12 +178,11 @@ end
 lemma base_pow_then_inc_still_all_zero_or_one
   (base: ℕ)
   (h2: 2 ≤ base)
-  (k : ℕ)
-  (n : ℕ)
-  (hazoo : all_zero_or_one (nat.digits base n))
+  (k n : ℕ)
+  (hn : all_zero_or_one (nat.digits base n))
   : all_zero_or_one (nat.digits base ((base ^ (k + 1)) * n + 1)) :=
 begin
-  have hs := base_pow_still_all_zero_or_one base h2 k n hazoo,
+  have hs := base_pow_still_all_zero_or_one base h2 k n hn,
   have hss := times_base_plus_one_still_all_zero_or_one base h2 _ hs,
   have hrw : 1 + base * (base ^ k * n) = base ^ (k + 1) * n + 1,
   {
@@ -201,57 +204,52 @@ begin
 end
 
 lemma exists_positive_mod
-  (base factor : ℕ)
+  (base n : ℕ)
   (h2 : 2 ≤ base)
-  (hf: 0 < factor)
-  (h_coprime: nat.coprime base factor)
-  (n: ℕ)
-  : (∃k:ℕ, 0 < k ∧ k ≡ (n + 1) [MOD factor] ∧ all_zero_or_one (nat.digits base k)) :=
+  (hn : 0 < n)
+  (h_coprime: nat.coprime base n)
+  (n_prev : ℕ)
+  : (∃ m : ℕ, 0 < m ∧ m ≡ (n_prev + 1) [MOD n] ∧ all_zero_or_one (nat.digits base m)) :=
 begin
-  induction n with np hnp,
+  induction n_prev with np hnp,
   {
     use 1,
     use nat.modeq.refl 1,
     have hd := nat.digits_add base h2 1 0 (nat.succ_le_iff.mp h2) (or.inl nat.one_pos),
     simp at hd,
-    rw hd,
-    simp
-  },
+    simp [hd]},
   obtain ⟨kp, hkp⟩ := hnp,
-  obtain ⟨kper, hkper⟩ := (periodic base factor hf h_coprime),
+  obtain ⟨kper, hkper⟩ := (periodic base n hn h_coprime),
   have hper0: ∃ km: ℕ, kper.val = km + 1 := nat_prev kper.1 kper.2,
   obtain ⟨per0, hper01⟩ := hper0,
   use (base ^ (per0 + 1) * kp + 1),
   split,
-  {
-    exact (base ^ (per0 + 1) * kp).succ_pos,
-  },
+  { exact (base ^ (per0 + 1) * kp).succ_pos },
   split,
   {
     rw hper01 at hkper,
     refine nat.modeq.modeq_add _ rfl,
     have hme := nat.modeq.modeq_mul hkper hkp.2.1,
     simp only [one_mul] at hme,
-    assumption,
-  },
-  exact base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2,
+    assumption },
+  exact base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2
 end
 
 lemma zeroes_and_ones_coprime
-  (base: ℕ)
-  (h2: 2 ≤ base)
-  (factor: ℕ)
-  (hf: 0 < factor)
-  (h_coprime: nat.coprime base factor)
-  : ∃ k : ℕ+, all_zero_or_one (nat.digits base (factor * k)) :=
+  (base : ℕ)
+  (h2 : 2 ≤ base)
+  (n : ℕ)
+  (hn : 0 < n)
+  (h_coprime : nat.coprime base n)
+  : ∃ k : ℕ+, all_zero_or_one (nat.digits base (n * k)) :=
 begin
-  obtain ⟨factor_prev, h_factor_prev⟩ := nat_prev factor hf,
-  obtain ⟨n, hn_pos, hn_mod, hn_0_or_1⟩ := exists_positive_mod base factor h2 hf h_coprime factor_prev,
-  rw ← h_factor_prev at hn_mod,
-  have hff : factor ≡ (factor % factor) [MOD factor] := (nat.modeq.mod_modeq factor factor).symm,
+  obtain ⟨n_prev, h_n_prev⟩ := nat_prev n hn,
+  obtain ⟨m, hm_pos, hn_mod, hn_0_or_1⟩ := exists_positive_mod base n h2 hn h_coprime n_prev,
+  rw ← h_n_prev at hn_mod,
+  have hff : n ≡ (n % n) [MOD n] := (nat.modeq.mod_modeq n n).symm,
   simp only [nat.mod_self] at hff,
-  have hn0 : n ≡ 0 [MOD factor] := nat.modeq.trans hn_mod hff,
-  have hdvd : factor ∣ n := nat.modeq.modeq_zero_iff.mp hn0,
+  have hn0 : m ≡ 0 [MOD n] := nat.modeq.trans hn_mod hff,
+  have hdvd : n ∣ m := nat.modeq.modeq_zero_iff.mp hn0,
   obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd hdvd,
   have hkp : 0 < k := by finish,
   use ⟨ k, hkp ⟩,
