@@ -4,8 +4,9 @@ import data.nat.modeq
 import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd
+import algebra.big_operators.pi
 
-/--
+/-!
 Let n be a natural number. Prove that
 
   (a) n has a (nonzero) multiple whose representation in base 10 contains
@@ -14,31 +15,13 @@ Let n be a natural number. Prove that
 
 -/
 
-lemma mul_left_coprime_aux
-  (base n c d : ℕ)
-  (hord : c ≤ d)
-  (h_coprime : nat.coprime n base)
-  (h_equal : base * c ≡ base * d [MOD n])
-  : c ≡ d [MOD n] :=
-begin
-  have hm : (base * c) ≤ (base * d) := nat.mul_le_mul_left base hord,
-  have hd: (n ∣ (base * d) - (base * c)) := (nat.modeq.modeq_iff_dvd' hm).mp h_equal,
-  rw [←nat.mul_sub_left_distrib base d c] at hd,
-  apply (nat.modeq.modeq_iff_dvd' hord).mpr,
-  exact nat.coprime.dvd_of_dvd_mul_left h_coprime hd,
-end
+open_locale big_operators
 
-lemma mul_left_coprime
-  (base n c d : ℕ)
-  (h_coprime : nat.coprime n base)
-  (h_equal : base * c ≡ base * d [MOD n])
-  : c ≡ d [MOD n] :=
-begin
-  have hord: c ≤ d ∨ d ≤ c := nat.le_total,
-  cases hord with hcd hdc,
-  { exact mul_left_coprime_aux base n c d hcd h_coprime h_equal },
-  { exact (mul_left_coprime_aux base n d c hdc h_coprime h_equal.symm).symm }
-end
+def ones (b : ℕ) : ℕ → ℕ
+| k := ∑(i : ℕ) in finset.range k, b^i
+
+def map_mod (n : ℕ) (hn: 0 < n) (f : ℕ → ℕ) : ℕ → fin n
+| m := ⟨f m % n, nat.mod_lt (f m) hn⟩
 
 lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
   ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
@@ -53,66 +36,13 @@ begin
   apply not_injective_infinite_fintype f hinj,
 end
 
-def iterate_pow (base n : ℕ) (hn : n > 0) : ℕ → fin n
-| m := ⟨(base ^ m) % n, nat.mod_lt (base ^ m) hn ⟩
-
-lemma exists_distinct_exponents
-  (base n : ℕ)
-  (hn : 0 < n)
-  : ∃ m1 m2 : ℕ, (m1 ≠ m2 ∧ base^m1 ≡ base^m2 [MOD n]) :=
+lemma pigeonhole' (n : ℕ) (f : ℕ → fin n) :
+  ∃ a b : ℕ, a < b ∧ f a = f b :=
 begin
-  let f := iterate_pow base n hn,
-  have he : ∃ a b : ℕ, a ≠ b ∧ f a = f b := pigeonhole n f,
-  obtain ⟨a, b, hne, heq⟩ := he,
-  use a, use b, use hne,
-  have : base ^ a % n = base ^ b % n,
-  {
-     have hval :(f a).val = (f b).val := congr_arg subtype.val heq,
-
-     have havala: (f a).val = (base ^ a) % n := rfl,
-     rw ← havala,
-
-     have havalb: (f b).val = (base ^ b) % n := rfl,
-     rwa ← havalb
-  },
-  unfold nat.modeq,
-  assumption,
-end
-
-lemma exists_distinct_exponents_ordered
-  (base n : ℕ)
-  (hn : 0 < n)
-  : ∃ m1 m2 : ℕ, (m1 < m2 ∧ base^m1 ≡ base^m2 [MOD n]) :=
-begin
-  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents base n hn,
-  obtain hlt | heq | hgt := nat.lt_trichotomy a b,
-  { use a, use b, finish },
-  { finish },
-  { use b, use a, use hgt, exact hab.symm }
-end
-
-lemma periodic
-  (base n : ℕ)
-  (hn : 0 < n)
-  (h_coprime: nat.coprime base n)
-  : ∃k : ℕ+, (base^k.val) ≡ 1 [MOD n] :=
-begin
-  obtain ⟨a, b, haneb, hab⟩ := exists_distinct_exponents_ordered base n hn,
-  obtain ⟨k, hk⟩ := nat.le.dest haneb,
-  use ⟨k + 1, nat.succ_pos k⟩,
-  dsimp,
-  rw ← hk at hab,
-  clear haneb hk b,
-  have hp: base ^ (a + 1 + k) = (base ^ a) * (base ^ (1 + k)),
-  begin
-      calc base ^ (a + 1 + k)
-          = base ^ (a + (1 + k)) : by rw [add_assoc a 1 k]
-      ... = base ^ a * base ^ (1 + k) : pow_add base _ _,
-  end,
-  rw [←mul_one (base ^ a), hp] at hab,
-  have hp_coprime : nat.coprime (base^a) n := nat.coprime.pow_left _ h_coprime,
-  have := (mul_left_coprime (base ^ a) n 1 (base ^ (1 + k)) hp_coprime.symm hab).symm,
-  rwa ←(add_comm 1 k),
+  obtain ⟨a, b, hne, hfe⟩ := pigeonhole n f,
+  obtain (ha : a < b) | (hb : b < a) := ne.lt_or_lt hne,
+  { use a, use b, exact ⟨ha, hfe⟩},
+  { use b, use a, exact ⟨hb, hfe.symm⟩},
 end
 
 @[simp]
@@ -164,318 +94,54 @@ begin
   rwa [←(nat.add_one pk), pow_succ' base pk, mul_comm (base^pk) base, mul_assoc],
 end
 
-lemma times_base_plus_one_still_all_zero_or_one
-  (base: ℕ)
-  (h2: 2 ≤ base)
-  (n: ℕ)
-  (hazoo : all_zero_or_one (nat.digits base n))
-  : all_zero_or_one (nat.digits base (1 + base * n)) :=
+lemma lemma_1 (k b m: ℕ) :
+  all_zero_or_one (b.digits (∑(i : ℕ) in finset.range k, b^(i + m))) :=
 begin
-  rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
-  simpa,
-end
-
-lemma base_pow_then_inc_still_all_zero_or_one
-  (base: ℕ)
-  (h2: 2 ≤ base)
-  (k n : ℕ)
-  (hn : all_zero_or_one (nat.digits base n))
-  : all_zero_or_one (nat.digits base ((base ^ (k + 1)) * n + 1)) :=
-begin
-  have hs := base_pow_still_all_zero_or_one base h2 k n hn,
-  have hss := times_base_plus_one_still_all_zero_or_one base h2 _ hs,
-  have hrw : 1 + base * (base ^ k * n) = base ^ (k + 1) * n + 1,
-  {
-    ring_nf,
-    have : base ^ k * base  = base ^ (k + 1) := (pow_succ' base k).symm,
-    finish,
+  induction k with pk hpk,
+  {simp},
+  { -- should be straightfoward.
+    -- factor out b^m...
+    sorry
   },
-  rwa ← hrw,
 end
 
-lemma nat_prev (n: ℕ) (hn: 0 < n) : (∃m:ℕ, n = m + 1) :=
-begin
-   cases n with j,
-   {
-      exfalso,
-      exact nat.lt_asymm hn hn,
-   },
-   use j,
-end
-
-lemma exists_positive_mod
-  (base n : ℕ)
-  (h2 : 2 ≤ base)
-  (hn : 0 < n)
-  (h_coprime: nat.coprime base n)
-  (n_prev : ℕ)
-  : (∃ m : ℕ, 0 < m ∧ m ≡ (n_prev + 1) [MOD n] ∧ all_zero_or_one (nat.digits base m)) :=
-begin
-  induction n_prev with np hnp,
-  {
-    use 1,
-    use nat.modeq.refl 1,
-    have hd := nat.digits_add base h2 1 0 (nat.succ_le_iff.mp h2) (or.inl nat.one_pos),
-    simp at hd,
-    simp [hd]},
-  obtain ⟨kp, hkp⟩ := hnp,
-  obtain ⟨kper, hkper⟩ := (periodic base n hn h_coprime),
-  have hper0: ∃ km: ℕ, kper.val = km + 1 := nat_prev kper.1 kper.2,
-  obtain ⟨per0, hper01⟩ := hper0,
-  use (base ^ (per0 + 1) * kp + 1),
-  split,
-  { exact (base ^ (per0 + 1) * kp).succ_pos },
-  split,
-  {
-    rw hper01 at hkper,
-    refine nat.modeq.modeq_add _ rfl,
-    have hme := nat.modeq.modeq_mul hkper hkp.2.1,
-    simp only [one_mul] at hme,
-    assumption },
-  exact base_pow_then_inc_still_all_zero_or_one base h2 per0 kp hkp.2.2
-end
-
-lemma zeroes_and_ones_coprime
-  (base : ℕ)
-  (h2 : 2 ≤ base)
+lemma lemma_2
   (n : ℕ)
-  (hn : 0 < n)
-  (h_coprime : nat.coprime base n)
-  : ∃ k : ℕ+, all_zero_or_one (nat.digits base (n * k)) :=
+  (hn : n > 0)
+  (a b : ℕ)
+  (hlt : a < b)
+  (hab : (finset.range a).sum (pow 10) % n = (finset.range b).sum (pow 10) % n) :
+  (∑(i : ℕ) in finset.range (b - a), b^(i + a)) % n = 0 :=
 begin
-  obtain ⟨n_prev, h_n_prev⟩ := nat_prev n hn,
-  obtain ⟨m, hm_pos, hn_mod, hn_0_or_1⟩ := exists_positive_mod base n h2 hn h_coprime n_prev,
-  rw ← h_n_prev at hn_mod,
-  have hff : n ≡ (n % n) [MOD n] := (nat.modeq.mod_modeq n n).symm,
-  simp only [nat.mod_self] at hff,
-  have hn0 : m ≡ 0 [MOD n] := nat.modeq.trans hn_mod hff,
-  have hdvd : n ∣ m := nat.modeq.modeq_zero_iff.mp hn0,
-  obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd hdvd,
-  have hkp : 0 < k := by finish,
-  use ⟨ k, hkp ⟩,
-  simpa [←hk],
-end
-
--- what if base and factor aren't coprime?
--- then there is r and s and t such that factor * r = t * base ^ s where t and base are coprime.
-
-lemma unbounded_power
-  (m n: ℕ)
-  (hm: 2 ≤ m)
-  : (∃k : ℕ, n < m ^ k) :=
-begin
-  induction n with np hnp,
-  {
-    use 0,
-    simp,
-  },
-  obtain ⟨k, hk⟩ := hnp,
-  use k + 1,
-
-  obtain ⟨m0, hm0⟩ : (∃m0, 2 + m0 = m) := nat.le.dest hm,
-  have hmm : m ^ k + 1 ≤ (m ^ k) * m :=
-  begin
-    conv begin
-      congr,
-      skip,
-      congr,
-      skip,
-      rw ← hm0,
-    end,
-    clear hm0,
-    have hol: 1 ≤ m^k := nat.one_le_of_lt hk,
-    calc m ^ k + 1 ≤ m ^ k + m ^ k : add_le_add_left hol (m ^ k)
-        ... ≤ m ^ k + m^k + m^k * m0 : nat.le.intro rfl
-        ... = m ^ k * (2 + m0) : by ring
-  end,
-
-  calc np.succ = np + 1 : rfl
-       ...     < m^k + 1 : nat.succ_lt_succ hk
-       ...     ≤ m ^ k * m : hmm
-       ...     = m ^ (k + 1) : (pow_succ' m k).symm,
-end
-
-def compute_largest_pow_factor (b: ℕ) (hb: 2 ≤ b) : ℕ → ℕ
-| n :=
-      if h0: n = 0 then 0 else
-      if hd : b ∣ n
-       then
-         have n / b < n, from nat.div_lt_self (nat.pos_of_ne_zero h0) hb,
-         1 + compute_largest_pow_factor (n / b)
-       else 0
-
-lemma largest_pow_factor_valid
-  (m n: ℕ)
-  (hm: 2 ≤ m)
-  : (m ^ (compute_largest_pow_factor m hm (n + 1)) ∣ (n + 1) ∧
-    (¬ m ^ (compute_largest_pow_factor m hm (n + 1) + 1) ∣ (n + 1))) :=
-begin
-  revert n,
-  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → m ^ (compute_largest_pow_factor m hm (n1 + 1)) ∣ (n1 + 1)
-                                   ∧ ¬m ^ ((compute_largest_pow_factor m hm (n1 + 1)) + 1) ∣ (n1 + 1),
-  {
-    intro n,
-    exact ht n n rfl.ge,
-  },
-  intro n,
-  induction n with np hnp,
-  {
-    intros n1 hn1,
-    have hz : n1 = 0 := nonpos_iff_eq_zero.mp hn1,
-    rw hz,
-    simp,
-    split,
-    {
-      have hclpf: compute_largest_pow_factor m hm 1 = 0,
-      {
-        refine if_neg _,
-        intro hmn,
-        --obtain ⟨m0, hm0⟩ : (∃m0, 2 + m0 = m) := nat.le.dest hm,
-        have hdvd : (∃ k, 1 = m * k) := exists_eq_mul_right_of_dvd hmn,
-        obtain ⟨k, hk⟩ := hdvd,
-        cases k,
-        {
-          linarith,
-        },
-        have h11 : 1 < 1,
-        { calc 1 < 2 : one_lt_two
-             ... ≤ m : hm
-             ... ≤ m + m * k : nat.le.intro rfl
-             ... = m * k.succ : by ring
-             ... = 1 : eq.symm hk
-        },
-        linarith,
-      },
-      rw hclpf,
-      exact pow_zero m,
-    },
-    intro hmc,
-    have hle : 1 ≤ compute_largest_pow_factor m hm 1 + 1 := nat.le_add_left 1 _,
---    have 
---    library_search
-    sorry,
-  },
-  intros n1 hn1,
-  have he: m ∣ n1 + 1 ∨ ¬ m ∣ n1 + 1 := em _,
-  cases he,
-  {
-    -- apply hnp to (n1 + 1) / m
-    let hnpa := hnp ((n1 + 1) / m),
-    have hle : (n1 + 1) / m ≤ np,
-    {
-      sorry,
---      calc (n1 + 1) / m 
-    },
-    split,
-    {
-      sorry,
-    },
-    sorry,
-  },
-  have hc: compute_largest_pow_factor m hm (n1 + 1) = 0 := if_neg he,
-  rw hc,
-  split,
-  {
-     simp only [pow_zero, is_unit.dvd, nat.is_unit_iff],
-  },
-  simpa,
-end
-
-
-lemma largest_pow_factor
-  (m n: ℕ)
-  (hm: 2 ≤ m)
-  : (∃k : ℕ, m ^ k ∣ (n + 2) ∧ (¬ m ^ (k + 1) ∣ (n + 2))) :=
-begin
-  revert n,
-  suffices ht : ∀ (n n1 : ℕ), n1 ≤ n → ∃ (k : ℕ), m ^ k ∣ (n1 + 2) ∧ ¬m ^ (k + 1) ∣ (n1 + 2),
-  {
-    intro n,
-    exact ht n n rfl.ge,
-  },
-  intro n,
-  induction n with np hnp,
-  {
-    intros n1 hn1,
-    have hn10 : n1 = 0 := nonpos_iff_eq_zero.mp hn1,
-    rw hn10,
-    simp,
-    -- depends on whether m = 2 or 2 < m...
-    have hm2: 2 = m ∨ 2 < m := eq_or_lt_of_le hm,
-    cases hm2,
-    {
-      rw ← hm2,
-      use 1,
-      simp,
-      intro hb,
-      have h112 : 1 + 1 = 2 := rfl,
-      rw h112 at hb,
-      have h222 : 2 < 2 ^ 2 := nat.lt_two_pow 2,
-      have hdvd : (∃ k, 2 = 2 ^ 2 * k) := exists_eq_mul_right_of_dvd hb,
-      obtain ⟨k, hk⟩ := hdvd,
-      cases k,
-      {
-        finish
-      },
-      have h2222 : 2 ^ 2 ≤ 2 ^ 2 * k.succ,
-      {
-        calc 2 ^ 2 ≤ 2^2 * k +  2^2 : nat.le_add_left (2 ^ 2) (2 ^ 2 * k)
-             ... = 2 ^ 2 * k.succ: by ring,
-      },
-      have h222 : 2 < 2 ^ 2 * k.succ,
-      {
-        calc 2 < 2 + 2 : nat.lt_of_sub_eq_succ rfl
-            ... = 2 * 2 : (two_mul 2).symm
-            ... = 2 ^ 2 : (pow_two 2).symm
-            ... ≤ 2 ^ 2 * k.succ : h2222
-      },
-      conv at h222 begin
-        congr,
-        rw hk,
-        skip, skip
-      end,
-      exact nat.lt_asymm h222 h222
-    },
-    use 0,
-    split,
-    { simp only [pow_zero, is_unit.dvd, nat.is_unit_iff] },
-    simp only [pow_one],
-    intro h,
-    obtain ⟨k, hk⟩ := exists_eq_mul_right_of_dvd h,
-    cases k,
-    {
-      linarith,
-    },
-    rw hk at hm2,
-    have hmm : m < m,
-    {
-      calc m ≤ m + m * k : nat.le.intro rfl
-        ... = m * 1 + m * k : by conv begin to_lhs, congr, rw (mul_one m).symm, skip end
-        ... = m * (1 + k) : (mul_add m 1 k).symm
-        ... = m * (k.succ) : by rw ((nat.one_add k).symm)
-        ... < m : hm2
-    },
-    exact nat.lt_asymm hmm hmm
-  },
-  intros n1 hn1,
-  -- plug in something like ((n1 + 2) / m) - 2. ugh.
-  -- 
   sorry,
 end
 
-lemma split_into_coprime
-  (factor : ℕ)
-  (hf: 0 < factor)
-  : (∃ r s t : ℕ, 0 < r ∧ factor * r = t * 10 ^ s ∧ nat.coprime 10 t) :=
+lemma lemma_3 {a n : ℕ} (hm : a % n = 0) : (∃ k : ℕ, a = n * k) :=
 begin
-  -- find largest power s2 of 2 that divides factor, pull it out, yielding m
-  -- find largest power s5 of 5 that divides m, pull it out, yielding t.
-  -- set r := 2^s5 * 5^s2.
-  -- s:= s5 + s2
+  sorry
+end
+
+theorem zeroes_and_ones (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
+begin
+  have hn : n > 0,
+  { sorry },
+  obtain ⟨a, b, hlt, hab⟩ := pigeonhole' n (λm, map_mod n hn (ones 10) m),
+  simp [map_mod, ones] at hab,
+  have h' : (∑(i : ℕ) in finset.range (b - a), b^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
+  have := lemma_3 h',
+  obtain ⟨k, hk⟩ := this,
+  use k,
+  sorry,
   sorry,
 end
 
-theorem part_one (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
+def all_one_or_two : list ℕ → Prop
+| [] := true
+| (1 :: ds) := all_one_or_two ds
+| (2 :: ds) := all_one_or_two ds
+| _ := false
+
+theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
 begin
   sorry
 end
