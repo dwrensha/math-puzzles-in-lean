@@ -112,9 +112,14 @@ begin
   { simp },
   { have hh := calc
           ∑ (i : ℕ) in finset.range pk.succ, b ^ i
-        = b ^ 0 + ∑ (i : ℕ) in finset.range pk, b ^ i.succ : sorry
+        = ∑ (i : ℕ) in finset.range pk, b ^ i.succ + b ^ 0 :
+               finset.sum_range_succ' (λ (i : ℕ), b ^ i) pk
+    ... = b ^ 0 + ∑ (i : ℕ) in finset.range pk, b ^ i.succ : add_comm _ _
     ... = 1 + ∑ (i : ℕ) in finset.range pk, b ^ i.succ : by rw pow_zero
-    ... =  1 + b * ∑ (i : ℕ) in finset.range pk, b ^ i : sorry,
+    ... = 1 + ∑ (i : ℕ) in finset.range pk, b * b ^ i :
+          by {simp, exact finset.sum_congr rfl (λx _, pow_succ _ _)}
+    ... =  1 + b * ∑ (i : ℕ) in finset.range pk, b ^ i :
+          by simp [(finset.range pk).sum_hom (has_mul.mul b)],
     have := times_base_plus_one_still_all_zero_or_one
                b h2
                (∑ (i : ℕ) in finset.range pk, b ^ i) hpk,
@@ -122,7 +127,7 @@ begin
   },
 end
 
-lemma lemma_1 (k b m: ℕ) :
+lemma lemma_1 (k b m: ℕ) (h2 : 2 ≤ b):
   all_zero_or_one (b.digits (∑(i : ℕ) in finset.range k, b^(i + m))) :=
 begin
   have h := calc
@@ -133,8 +138,6 @@ begin
              by { refine finset.sum_congr rfl _, intros x hx, exact mul_comm (b ^ x) (b ^ m) }
     ... = b^m * (∑ (i : ℕ) in finset.range k, b ^ i) :
              finset.sum_hom _ (has_mul.mul (b ^ m)),
-
-  have h2 : 2 ≤ b := sorry, -- will need this as hypothesis
 
   have := base_pow_still_all_zero_or_one b h2 m
                        (∑ (i : ℕ) in finset.range k, b ^ i)
@@ -183,15 +186,30 @@ begin
   exact lemma_2'' a b hlt (λi, 10^i),
 end
 
+lemma lemma_2_aux (n a b c: ℕ) (hc : a + b = c) (hab: a % n = c % n) : b % n = 0 :=
+begin
+  have h1: a ≡ c [MOD n] := hab,
+  have h2 : a + b ≡ c + b [MOD n] := nat.modeq.modeq_add h1 rfl,
+  rw hc at h2,
+  have h2' : c + 0 = c := self_eq_add_right.mpr rfl,
+  have h2'' : c + 0 ≡ c + b [MOD n] := by rwa h2',
+  have h3 : 0 ≡ b [MOD n] := nat.modeq.modeq_add_cancel_left rfl h2'',
+  have h4 : 0 % n = b % n := h3,
+  rw [nat.zero_mod] at h4,
+  exact eq.symm h4,
+end
+
 lemma lemma_2
   (n : ℕ)
   (hn : n > 0)
   (a b : ℕ)
   (hlt : a < b)
-  (hab : ((finset.range a).sum (pow 10)) % n = ((finset.range b).sum (pow 10)) % n) :
+  (hab : (∑(i : ℕ) in finset.range a, 10^i) % n = (∑(i : ℕ) in finset.range b, 10^i) % n) :
   (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 :=
 begin
-  sorry,
+  have h1 := lemma_2' a b hlt,
+  refine lemma_2_aux n _ (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) _ _ hab,
+  rwa add_comm,
 end
 
 lemma lemma_3 {a n : ℕ} (ha: 0 < a) (hm : a % n = 0) : (∃ k : ℕ+, a = n * k) :=
@@ -212,25 +230,33 @@ end
 lemma lemma_4 {k : ℕ} (hk : 0 < k) (f: ℕ → ℕ) (hf: ∀ i, 0 < f i) :
       0 < ∑(i : ℕ) in finset.range k, f i :=
 begin
-  sorry
+  cases k,
+  { linarith },
+
+  calc 0 < f 0 : hf 0
+     ... ≤ (∑(i : ℕ) in finset.range k, f i.succ) + f 0 :
+                  nat.le_add_left (f 0) (∑ (i : ℕ) in finset.range k, f i.succ)
+     ... = (∑(i : ℕ) in finset.range k.succ, f i) :
+                  (finset.sum_range_succ' (λ (i : ℕ), f i) k).symm
 end
 
 theorem zeroes_and_ones (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
 begin
-  have hn : n > 0,
-  { sorry },
+  obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
+  { use 1, rw hn0, simp },
   obtain ⟨a, b, hlt, hab⟩ := pigeonhole' n (λm, map_mod n hn (ones 10) m),
   simp [map_mod, ones] at hab,
   have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
   have ha: 0 < ∑(i : ℕ) in finset.range (b - a), 10^(i + a),
   { have hm : 0 < b - a := nat.sub_pos_of_lt hlt,
-    have hp : ∀ j:ℕ, 0 < 10 ^ (j+a) := sorry,
+    have ht : 0 < 10 := by norm_num,
+    have hp : ∀ j:ℕ, 0 < 10 ^ (j+a) := by { intro j, exact pow_pos ht _},
     exact lemma_4 hm (λ (i : ℕ), 10 ^ (i + a)) hp,
   },
   obtain ⟨k, hk⟩ := lemma_3 ha h',
   use k,
   rw [←hk],
-  exact lemma_1 (b - a) 10 a
+  exact lemma_1 (b - a) 10 a (by norm_num)
 end
 
 def all_one_or_two : list ℕ → Prop
