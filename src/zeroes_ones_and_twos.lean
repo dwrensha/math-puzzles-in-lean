@@ -12,7 +12,6 @@ Let n be a natural number. Prove that
   (a) n has a (nonzero) multiple whose representation in base 10 contains
       only zeroes and ones; and
   (b) 2^n has a multiple whose representation contains only ones and twos.
-
 -/
 
 open_locale big_operators
@@ -107,7 +106,6 @@ end
 lemma lemma_0 (k b : ℕ) (h2 : 2 ≤ b) :
   all_zero_or_one (b.digits (∑(i : ℕ) in finset.range k, b^i)) :=
 begin
-  -- might also need to assume that b ≥ 2.
   induction k with pk hpk,
   { simp },
   { have hh := calc
@@ -231,7 +229,7 @@ lemma lemma_4 {k : ℕ} (hk : 0 < k) (f: ℕ → ℕ) (hf: ∀ i, 0 < f i) :
       0 < ∑(i : ℕ) in finset.range k, f i :=
 begin
   cases k,
-  { linarith },
+  { exfalso, exact nat.lt_asymm hk hk },
 
   calc 0 < f 0 : hf 0
      ... ≤ (∑(i : ℕ) in finset.range k, f i.succ) + f 0 :
@@ -245,7 +243,8 @@ begin
   obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
   { use 1, rw hn0, simp },
   obtain ⟨a, b, hlt, hab⟩ := pigeonhole' n (λm, map_mod n hn (ones 10) m),
-  simp [map_mod, ones] at hab,
+  unfold map_mod at hab, unfold ones at hab,
+  rw [subtype.mk_eq_mk] at hab,
   have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
   have ha: 0 < ∑(i : ℕ) in finset.range (b - a), 10^(i + a),
   { have hm : 0 < b - a := nat.sub_pos_of_lt hlt,
