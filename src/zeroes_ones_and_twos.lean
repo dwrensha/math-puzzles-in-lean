@@ -264,7 +264,7 @@ begin
   sorry
 end
 
-theorem ones_and_twos_aux (n : ℕ) :
+lemma ones_and_twos_aux (n : ℕ) :
   ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
              all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
 begin
