@@ -70,13 +70,10 @@ lemma times_base_still_all_zero_or_one
   : all_zero_or_one (nat.digits base (base * n)) :=
 begin
   cases (nat.eq_zero_or_pos n) with hz hp,
-  {
-    rw hz,
-    simp only [mul_zero, nat.digits_zero]
-  },
-
-  rw (digits_lemma base h2 n hp),
-  simpa,
+  { rw hz,
+    simp only [mul_zero, nat.digits_zero] },
+  { rw (digits_lemma base h2 n hp),
+    simpa }
 end
 
 lemma base_pow_still_all_zero_or_one
@@ -215,23 +212,21 @@ begin
   have h2 : n ∣ a := nat.dvd_of_mod_eq_zero hm,
   obtain ⟨k', hk'⟩ := exists_eq_mul_right_of_dvd h2,
   have hkp : 0 < k',
-  {
-    cases k',
+  { cases k',
     { rw hk' at ha,
       rwa mul_zero at ha },
-    { exact nat.succ_pos k' }
-  },
+    { exact nat.succ_pos k' } },
   use ⟨k', hkp⟩,
   simpa [hkp],
 end
 
-lemma lemma_4 {k : ℕ} (hk : 0 < k) (f: ℕ → ℕ) (hf: ∀ i, 0 < f i) :
+lemma lemma_4 {k : ℕ} (hk : 0 < k) (f: ℕ → ℕ) (hf0 : 0 < f 0) :
       0 < ∑(i : ℕ) in finset.range k, f i :=
 begin
   cases k,
   { exfalso, exact nat.lt_asymm hk hk },
 
-  calc 0 < f 0 : hf 0
+  calc 0 < f 0 : hf0
      ... ≤ (∑(i : ℕ) in finset.range k, f i.succ) + f 0 :
                   nat.le_add_left (f 0) (∑ (i : ℕ) in finset.range k, f i.succ)
      ... = (∑(i : ℕ) in finset.range k.succ, f i) :
@@ -248,8 +243,7 @@ begin
   have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
   have ha: 0 < ∑(i : ℕ) in finset.range (b - a), 10^(i + a),
   { have hm : 0 < b - a := nat.sub_pos_of_lt hlt,
-    have ht : 0 < 10 := by norm_num,
-    have hp : ∀ j:ℕ, 0 < 10 ^ (j+a) := by { intro j, exact pow_pos ht _},
+    have hp : 0 < 10 ^ (0 + a) := pow_pos (by norm_num) _,
     exact lemma_4 hm (λ (i : ℕ), 10 ^ (i + a)) hp,
   },
   obtain ⟨k, hk⟩ := lemma_3 ha h',
@@ -264,7 +258,35 @@ def all_one_or_two : list ℕ → Prop
 | (2 :: ds) := all_one_or_two ds
 | _ := false
 
-theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
+lemma prepend_one (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
+    all_one_or_two (nat.digits 10 (10 ^ (list.length (nat.digits 10 n)).succ + n)) :=
 begin
   sorry
+end
+
+theorem ones_and_twos_aux (n : ℕ) :
+  ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
+             all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
+begin
+  induction n with pn hpn,
+  { use 1, simp, },
+  obtain ⟨pk, hpk1, hpk2⟩ := hpn,
+
+  /-
+    Adding a 1 or a 2 to the front of 2^pn.succ * pk increments it by 2^pn.succ * 5^pn.succ or
+    by 2^{pn.succ+1} * 5^pn.succ, in each case preserving dvisibility by 2^pn.succ. Since the
+    two choices differ by 2^pn.succ * 2^pn.succ, one of them must actually achieve
+    divisibility by 2^{pn.succ+1}.
+  -/
+
+  sorry
+end
+
+
+theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
+begin
+  cases n,
+  { use 1, simp, },
+  obtain ⟨k, hk1, hk2⟩ := ones_and_twos_aux n,
+  exact ⟨k, hk2⟩
 end
