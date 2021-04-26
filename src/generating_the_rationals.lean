@@ -36,13 +36,10 @@ begin
     obtain ⟨t, ht : m = 2 * t⟩ | ⟨t, ht : m = 2 * t + 1⟩ := m.even_or_odd,
     { -- m is even. reduces to smaller exponent
       rw ht,
-      have h2 := calc ↑(2 * t) / 2 ^ pn.succ
-                = ↑(2 * t) / (2 * 2 ^ pn) : by rw pow_succ
-            ... = ((t : ℕ) : ℚ) / 2 ^ pn : by {field_simp, ring, },
+      have h2 : ↑(2 * t) / 2 ^ pn.succ = ((t : ℕ) : ℚ) / 2 ^ pn :=
+        by {field_simp[pow_succ], ring },
       rw h2,
-      have h3 : t ≤ 2 ^ pn,
-      { rw [ht, pow_succ] at hmn,
-        linarith },
+      have h3 : t ≤ 2 ^ pn := by { rw [ht, pow_succ] at hmn, linarith },
       exact hpn t h3 },
     { -- m is odd. need to take midpoint
       -- m = 2 * t + 1 =  (t  + (t + 1))
@@ -53,13 +50,7 @@ begin
       let t1 : ℚ := t / 2^pn,
       let t2 : ℚ := ((t + 1):ℕ)/2^pn,
 
-      have h5 := calc (m:ℚ) / 2 ^ pn.succ
-              = (m:ℚ) / (2 * 2 ^ pn) : by rw pow_succ
-          ... = ((m:ℚ) / 2 ^ pn) / 2 : by {rw mul_comm, field_simp}
-          ... = ((((2 * t + 1):ℕ):ℚ) / 2 ^ pn) / 2 : by rw ht
-          ... = ((((t + t + 1):ℕ):ℚ) / 2 ^ pn) / 2 : by rw two_mul
-          ... = (t1 + t2) / 2 : by {field_simp, ring},
-
+      have h5 : (m:ℚ) / 2 ^ pn.succ = (t1 + t2) / 2 := by { field_simp[pow_succ, ht], ring },
       rw h5,
 
       have h6 : t1 ∈ S := hpn t h4,
