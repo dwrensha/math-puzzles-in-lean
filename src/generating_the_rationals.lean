@@ -110,27 +110,18 @@ begin
 
   -- Now find dyadics a b such that 0 < a < q < b < 1.
 
-  obtain ⟨na, hna⟩ := exists_nat_gt (1/q - 1),
-  have hna' := calc 1 / q
-          < 1 + na : sub_lt_iff_lt_add'.mp hna
-      ... = 1 + na * (2 - 1) : by ring
-      ... ≤ 2 ^ na : one_add_mul_sub_le_pow (le_of_lt (lt_trans neg_one_lt_zero zero_lt_two)) na,
-
+  obtain ⟨na, hna⟩ := pow_unbounded_of_one_lt (1/q) one_lt_two,
   let a : ℚ := 1 / 2^na,
   have ha0 : 0 < a := by norm_num,
-  have haq : a < q := (one_div_lt hgt0 (by norm_num)).mp hna',
+  have haq : a < q := (one_div_lt hgt0 (by norm_num)).mp hna,
 
-  obtain ⟨nb, hnb⟩ := exists_nat_gt (1/(1-q) - 1),
-  have hnb' := calc 1/(1-q)
-          < 1 + nb : sub_lt_iff_lt_add'.mp hnb
-      ... = 1 + nb * (2 - 1) : by ring
-      ... ≤ 2 ^ nb : one_add_mul_sub_le_pow (le_of_lt (lt_trans neg_one_lt_zero zero_lt_two)) nb,
+  obtain ⟨nb, hnb⟩ := pow_unbounded_of_one_lt (1/(1-q)) one_lt_two,
 
   let b : ℚ := 1 - 1 / 2^nb,
   have hb1 : b < 1 := by norm_num,
   have haq : q < b,
   { have hbb : 0 < (1 - q) := sub_pos.mpr hlt1,
-    have hbb': 1 < (1 - q) * 2 ^ nb := (div_lt_iff' hbb).mp hnb',
+    have hbb': 1 < (1 - q) * 2 ^ nb := (div_lt_iff' hbb).mp hnb,
     rw mul_comm at hbb',
     have := (div_lt_iff' (by norm_num)).mpr hbb',
     exact lt_sub.mp this,
