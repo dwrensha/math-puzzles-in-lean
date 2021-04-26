@@ -68,27 +68,30 @@ begin
       let ps' : finset {q // q ∈ S} := {⟨t1, h6⟩},
       let ps : finset {q // q ∈ S} := insert ⟨t2, h7⟩ ps',
 
-      have hcard : ps.card = 2,
-      { -- use finset.card_insert_of_not_mem,
-        have hnotmem: (⟨t2, h7⟩ : {q // q ∈ S}) ∉ ps',
-        {
-          have hne : t2 ≠ t1 := by field_simp,
-          have : ps'.card = 1 := finset.card_singleton _,
-          simp [this],
-          solve_by_elim
-        },
-        have hinsertcard := finset.card_insert_of_not_mem hnotmem,
-        rwa [finset.card_singleton] at hinsertcard,
+      have hnotmem: (⟨t2, h7⟩ : {q // q ∈ S}) ∉ ps',
+      { have hne : t2 ≠ t1 := by field_simp,
+        have : ps'.card = 1 := finset.card_singleton _,
+        simp [this],
+        solve_by_elim
       },
+
+      have hcard : ps.card = 2,
+      { have hinsertcard := finset.card_insert_of_not_mem hnotmem,
+        rwa [finset.card_singleton] at hinsertcard },
 
       have hmean := hm ps,
       rw hcard at hmean,
       norm_cast at hmean,
 
-      have hsum1 : ∑ (i : {q // q ∈ S}) in ps, i.val/2 =
-                  t2/2 + ∑ (i : {q // q ∈ S}) in (finset.erase ps ⟨t2,h7⟩), i.val/2,
-      { sorry },
-      sorry,
+      have hsum2 : ∑ (i : {q // q ∈ S}) in ps, i.val/2 =
+                  t2/2 + ∑ (i : {q // q ∈ S}) in ps', i.val/2 := finset.sum_insert hnotmem,
+
+      have hsum1 : ∑ (i : {q // q ∈ S}) in ps', i.val / 2 = t1/2,
+      { simp only [finset.sum_singleton, subtype.coe_mk] },
+
+      rw [hsum2, hsum1] at hmean,
+      have : t2 / 2 + t1 /2 = (t1 + t2) / 2 := by { field_simp, ring },
+      rwa this at hmean,
     },
   },
 end
