@@ -6,6 +6,7 @@ import data.rat.order
 import data.set.intervals.basic
 
 import tactic.field_simp
+import tactic.linarith
 
 /-
   A set S contains 0 and 1, and the mean of every finite nonempty subset of S.
@@ -33,8 +34,61 @@ begin
   {
     intros m hmn,
     obtain ⟨t, ht : m = 2 * t⟩ | ⟨t, ht : m = 2 * t + 1⟩ := m.even_or_odd,
-    { rw ht, sorry },
-    { sorry
+    { -- m is even. reduces to smaller exponent
+      rw ht,
+      have h2 := calc ↑(2 * t) / 2 ^ pn.succ
+                = ↑(2 * t) / (2 * 2 ^ pn) : by rw pow_succ
+            ... = ((t : ℕ) : ℚ) / 2 ^ pn : by {field_simp, ring, },
+      rw h2,
+      have h3 : t ≤ 2 ^ pn,
+      { rw [ht, pow_succ] at hmn,
+        linarith },
+      exact hpn t h3 },
+    { -- m is odd. need to take midpoint
+      -- m = 2 * t + 1 =  (t  + (t + 1))
+      -- so m / 2^pn.succ = (t / 2^pn + (t + 1)/2^pn) / 2
+      have h3 : t + 1 ≤ 2 ^ pn := by { rw [ht, pow_succ] at hmn, linarith},
+      have h4 : t ≤ 2 ^ pn := nat.le_of_succ_le h3,
+
+      let t1 : ℚ := t / 2^pn,
+      let t2 : ℚ := ((t + 1):ℕ)/2^pn,
+
+      have h5 := calc (m:ℚ) / 2 ^ pn.succ
+              = (m:ℚ) / (2 * 2 ^ pn) : by rw pow_succ
+          ... = ((m:ℚ) / 2 ^ pn) / 2 : by {rw mul_comm, field_simp}
+          ... = ((((2 * t + 1):ℕ):ℚ) / 2 ^ pn) / 2 : by rw ht
+          ... = ((((t + t + 1):ℕ):ℚ) / 2 ^ pn) / 2 : by rw two_mul
+          ... = (t1 + t2) / 2 : by {field_simp, ring},
+
+      rw h5,
+
+      have h6 : t1 ∈ S := hpn t h4,
+      have h7 : t2 ∈ S := hpn (t+1) h3,
+
+      let ps' : finset {q // q ∈ S} := {⟨t1, h6⟩},
+      let ps : finset {q // q ∈ S} := insert ⟨t2, h7⟩ ps',
+
+      have hcard : ps.card = 2,
+      { -- use finset.card_insert_of_not_mem,
+        have hnotmem: (⟨t2, h7⟩ : {q // q ∈ S}) ∉ ps',
+        {
+          have hne : t2 ≠ t1 := by field_simp,
+          have : ps'.card = 1 := finset.card_singleton _,
+          simp [this],
+          solve_by_elim
+        },
+        have hinsertcard := finset.card_insert_of_not_mem hnotmem,
+        rwa [finset.card_singleton] at hinsertcard,
+      },
+
+      have hmean := hm ps,
+      rw hcard at hmean,
+      norm_cast at hmean,
+
+      have hsum1 : ∑ (i : {q // q ∈ S}) in ps, i.val/2 =
+                  t2/2 + ∑ (i : {q // q ∈ S}) in (finset.erase ps ⟨t2,h7⟩), i.val/2,
+      { sorry },
+      sorry,
     },
   },
 end
