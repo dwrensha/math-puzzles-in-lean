@@ -116,7 +116,6 @@ begin
   have haq : a < q := (one_div_lt hgt0 (by norm_num)).mp hna,
 
   obtain ⟨nb, hnb⟩ := pow_unbounded_of_one_lt (1/(1-q)) one_lt_two,
-
   let b : ℚ := 1 - 1 / 2^nb,
   have hb1 : b < 1 := by norm_num,
   have haq : q < b,

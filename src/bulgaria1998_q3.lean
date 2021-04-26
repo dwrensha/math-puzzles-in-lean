@@ -140,14 +140,8 @@ begin
 
   have he: ∃n:ℕ, f 1 / 2^n < f (1 + 3 * f 1),
   {
-    obtain ⟨N, hN⟩ := exists_nat_gt (f 1 / f (1 + 3 * f 1) - 1),
+    obtain ⟨N, hN⟩ := pow_unbounded_of_one_lt (f 1 / f (1 + 3 * f 1)) one_lt_two,
     use N,
-
-    have hc := calc f 1 / f (1 + 3 * f 1)
-             = f 1 / f (1 + 3 * f 1) - 1 + 1 : by ring
-         ... < N + 1  : add_lt_add_right hN 1
-         ... = 1 + N * (2 - 1) : by ring
-         ... ≤ 2 ^ N : one_add_mul_sub_le_pow (le_of_lt (lt_trans neg_one_lt_zero zero_lt_two)) N,
 
     have hp : 0 < f (1 + 3 * f 1),
     { have : 0 < 1 + 3 * f 1 := by linarith,
@@ -155,7 +149,7 @@ begin
     },
 
     have h2N : (0:ℝ) < 2^N := pow_pos (by norm_num) N,
-    exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hc),
+    exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hN),
   },
 
   obtain ⟨N, hN⟩ := he,
