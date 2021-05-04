@@ -278,10 +278,7 @@ begin
   let x2denom := 2 * x.denom,
   let x2num := 2 * x.num,
 
-  have hx2pos := calc 0 < x.denom           : x.pos
-                    ... < x.denom + x.denom : lt_add_of_pos_left x.denom x.pos
-                    ... = 2 * x.denom       : by ring,
-
+  have hx2pos : 0 < 2 * x.denom := by linarith[x.pos],
   have hxcnez   : (x.denom : ℚ) ≠ (0 : ℚ) := ne_of_gt (nat.cast_pos.mpr x.pos),
   have hx2cnezr : (x2denom : ℝ) ≠ (0 : ℝ) := nat.cast_ne_zero.mpr (ne_of_gt hx2pos),
 
