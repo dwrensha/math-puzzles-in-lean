@@ -126,5 +126,9 @@ begin
     exact lt_sub.mp this,
   },
 
+  -- if we could pick an element more than once,
+  -- we would choose (q - a) / (b - a) copies of a
+  -- and (b - q) / (b - a) copies of b.
+
   sorry
 end
