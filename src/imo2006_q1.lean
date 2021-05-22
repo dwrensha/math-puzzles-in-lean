@@ -17,4 +17,3 @@ theorem imo2006_q1 /-(t: affine.triangle ℝ (euclidean_space ℝ (fin 2)))-/ : 
 begin
   sorry
 end
-

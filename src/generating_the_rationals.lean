@@ -5,6 +5,7 @@ import data.nat.parity
 import data.rat.basic
 import data.rat.order
 import data.set.intervals.basic
+import logic.function.basic
 
 import tactic.field_simp
 import tactic.linarith
@@ -64,8 +65,7 @@ begin
       { have hne : t2 ≠ t1 := by field_simp,
         have : ps'.card = 1 := finset.card_singleton _,
         simp [this],
-        solve_by_elim
-      },
+        solve_by_elim },
 
       have hcard : ps.card = 2,
       { have hinsertcard := finset.card_insert_of_not_mem hnotmem,
@@ -87,6 +87,34 @@ begin
     },
   },
 end
+
+lemma dyadic_sum (q : ℚ) (n k : ℕ) :
+  (∑i in finset.range (2 * k), ((q - (2 * k - 1) / 2 ^ n.succ) + i / 2 ^ n)) = 2 * k * q :=
+begin
+  induction k with pk hpk,
+  { simp },
+  { have h1 : 2 * pk.succ = (2 * pk).succ.succ := rfl,
+    rw [h1, finset.sum_range_succ, finset.sum_range_succ],
+    have h2 : ∀ i ∈ finset.range (2 * pk),
+      (q - (2 * ↑(pk.succ) - 1) / 2 ^ n.succ + ↑i / 2 ^ n) =
+      (q - (2 * ↑pk - 1) / 2 ^ n.succ + ↑i / 2 ^ n - 1 / 2^n),
+    { intros i hi,
+      have h3: ((2:ℚ) * ↑(pk.succ) - 1) = (2 * ↑pk - 1) + 2,
+      { rw [nat.cast_succ], ring, },
+      have h4 : ((2:ℚ) * ↑pk - 1 + 2) / 2 ^ n.succ =
+                ((2:ℚ) * ↑pk - 1) / 2 ^ n.succ + 2 / 2^n.succ := add_div (2 * ↑pk - 1) 2 (2 ^ nat.succ n),
+
+      have h5 : (2:ℚ) / 2^n.succ = 1 / 2^n,
+      { field_simp, exact (pow_succ 2 n).symm },
+
+      rw [h3, h4, h5],
+      ring },
+
+    sorry,
+  },
+end
+
+-- finset.sum_union and finset.sum_map will be important ...
 
 theorem generating_the_rationals
   (S : set ℚ)
@@ -127,8 +155,18 @@ begin
   },
 
   -- if we could pick an element more than once,
-  -- we would choose (q - a) / (b - a) copies of a
-  -- and (b - q) / (b - a) copies of b.
+  -- we would choose (q - a).num * (b - q).denom copies of a
+  -- and (b - q).num * (q - a).denom copies of b.
+
+  -- let ka = 2 * (q - a).num * (b - q).denom
+  -- let kb = 2 * (b - q).num * (q - a).denom
+  -- let kmax = max ka kb
+
+  -- choose N such that (2 * k - 1) / 2 ^ n.succ < (b - a) / 2
+
+  let ka : ℚ := 2 * (q - a).num * (b - q).denom,
+  let kb : ℚ := 2 * (b - q).num * (q - a).denom,
+
 
   sorry
 end
