@@ -114,7 +114,32 @@ begin
   },
 end
 
--- finset.sum_union and finset.sum_map will be important ...
+lemma dyadic_summand_injective (q : ℚ) (n k : ℕ) :
+  function.injective (λ i : ℕ, (q - (2 * k - 1) / 2 ^ n.succ) + i / 2 ^ n) :=
+begin
+  intros i1 i2 h,
+  simp only [add_right_inj] at h,
+  have h1 : (0:ℚ) < 2^n := pow_pos zero_lt_two _,
+  have h2 : 2^n ≠ (0:ℚ) := ne_of_gt h1,
+  have h3 : (i1:ℚ)  = ↑i2 / 2 ^ n * 2^n := (div_eq_iff h2).mp h,
+  field_simp at h3,
+  assumption
+end
+
+lemma exists_pow_denom_lt_both (x y z : ℚ) (xpos : 0 < x) (ypos : 0 < y) :
+  (∃ n : ℕ, z / 2^n < x ∧ z / 2 ^n < y) :=
+begin
+  obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (z / min x y) one_lt_two,
+  use n,
+  have hm : 0 < min x y := lt_min xpos ypos,
+  have h1 : z < 2 ^ n * min x y := (div_lt_iff hm).mp hn,
+  have h2 : (0:ℚ) < 2^n := pow_pos zero_lt_two _,
+  rw mul_comm at h1,
+  have h3 : z / 2 ^ n < min x y := (div_lt_iff h2).mpr h1,
+  split,
+  { exact gt_of_ge_of_gt (min_le_left x y) h3 },
+  { exact gt_of_ge_of_gt (min_le_right x y) h3 },
+end
 
 theorem generating_the_rationals
   (S : set ℚ)
@@ -158,15 +183,65 @@ begin
   -- we would choose (q - a).num * (b - q).denom copies of a
   -- and (b - q).num * (q - a).denom copies of b.
 
-  -- let ka = 2 * (q - a).num * (b - q).denom
-  -- let kb = 2 * (b - q).num * (q - a).denom
-  -- let kmax = max ka kb
+  let ka : ℕ := (q - a).num.nat_abs * (b - q).denom,
+  let kb : ℕ := (b - q).num.nat_abs * (q - a).denom,
 
-  -- choose N such that (2 * k - 1) / 2 ^ n.succ < (b - a) / 2
+  -- choose Na such that (2 * ka - 1) / 2 ^ n.succ < min ((b - a) / 2) (1 - b)
 
-  let ka : ℚ := 2 * (q - a).num * (b - q).denom,
-  let kb : ℚ := 2 * (b - q).num * (q - a).denom,
+  have h3 : 0 < 1 - b := by linarith,
+  have h4 : 0 < (b - a) / 2 := by linarith,
 
+  obtain ⟨Na, hNa1, hNa2⟩ := exists_pow_denom_lt_both ((b - a) / 2) (1 - b) (2 * (ka:ℚ) - 1) h4 h3,
+  obtain ⟨Nb, hNb1, hNb2⟩ := exists_pow_denom_lt_both ((b - a) / 2) (1 - b) (2 * (kb:ℚ) - 1) h4 h3,
+  clear h3 h4,
+
+  have h5 := dyadic_sum a Na ka,
+  have h6 := dyadic_sum b Nb kb,
+
+  let ta : ℕ ↪ ℚ := ⟨_, dyadic_summand_injective a Na ka⟩,
+  let tb : ℕ ↪ ℚ := ⟨_, dyadic_summand_injective b Nb kb⟩,
+
+  have hta := finset.sum_map (finset.range (2 * ka)) ta id,
+  have htb := finset.sum_map (finset.range (2 * kb)) tb id,
+
+  dsimp at hta,
+  rw ←hta at h5,
+
+  dsimp at htb,
+  rw ←htb at h6,
+
+  have h7: disjoint (finset.map ta (finset.range (2 * ka)))
+                    (finset.map tb (finset.range (2 * kb))),
+  { sorry, },
+
+  let s := (finset.map ta (finset.range (2 * ka))) ∪ (finset.map tb (finset.range (2 * kb))),
+  have h8 : s.sum id = (finset.map ta (finset.range (2 * ka))).sum id +
+               (finset.map tb (finset.range (2 * kb))).sum id := finset.sum_union h7,
+  rw [h5, h6] at h8,
+
+  have h9 : s.card = 2 * ↑ka + 2 * ↑kb := sorry,
+
+  have hra : ∀ r ∈ (finset.map ta (finset.range (2 * ka))), q ∈ S,
+  {
+     intros r hr,
+     -- use contains_dyadics ...
+     sorry,
+  },
+
+  have hrb : ∀ r ∈ (finset.map tb (finset.range (2 * kb))), q ∈ S,
+  {
+     intros r hr,
+     -- use contains_dyadics ...
+     sorry,
+  },
+
+  have hrs : ∀ r ∈ s, q ∈ S,
+  { intros r hr,
+    obtain ha | hb := finset.mem_union.mp hr,
+    { exact hra r ha },
+    { exact hrb r hb } },
+
+  -- hm... maybe we actually want `ta : ℕ ↪ {q // q ∈ S}`
 
   sorry
 end
