@@ -93,7 +93,7 @@ begin
     { use p,
       calc dm / 2 ≤ a p - x p : hpm
               ... ≤ abs (a p - x p) : le_abs_self _
-              ... = abs (x p - a p) : abs_sub _ _ },
+              ... = abs (x p - a p) : abs_sub_comm _ _ },
     { use r,
       calc dm / 2 ≤ x r - a r : hrm
               ... ≤ abs (x r - a r) : le_abs_self _ }
@@ -108,3 +108,4 @@ begin
     },
   },
 end
+
