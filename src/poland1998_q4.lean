@@ -1,6 +1,8 @@
 import data.nat.basic
 import data.int.basic
 
+import tactic.norm_num
+
 
 /-
 Polish Mathematical Olympiad 1998, Problem 4
@@ -13,11 +15,46 @@ contains infinitely many integers divisible by 7.
 
 -/
 
-theorem poland1998_q4
-  (a : ℤ → ℤ)
+lemma can_get_a_later_one
+  (a : ℕ → ℤ)
   (h1 : a 1 = 1)
-  (ha : ∀ n : ℤ, 2 ≤ n → a n = a (n - 1) + a (n / 2)) :
-  (∀ N : ℤ, ∃ M : ℤ, N ≤ M ∧ 7 ∣ a M) :=
+  (ha : ∀ n : ℕ, 2 ≤ n → a n = a (n - 1) + a (n / 2)) :
+  (∀ N : ℕ, 7 ∣ a N → (∃ M : ℕ, N < M ∧ 7 ∣ a M)) :=
 begin
+  intros n hn,
+
+  -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
+  -- then the seven elements begining with a (4 * n - 3) will all have different
+  -- residues mod 7.
   sorry
+end
+
+lemma strengthen
+  {P : ℕ → Prop}
+  (h : ∀ N : ℕ, P N → (∃ M : ℕ, N < M ∧ P M))
+  (he : ∃ N : ℕ, P N) :
+  (∀ N : ℕ, ∃ M : ℕ, N < M ∧ P M) :=
+begin
+  obtain ⟨N0, hn0⟩ := he,
+  intro N,
+  obtain (hlt : N < N0) |  (hlte : N0 ≤ N) := lt_or_ge N N0,
+  { exact ⟨N0, hlt, hn0⟩ },
+  { sorry, }
+end
+
+
+theorem poland1998_q4
+  (a : ℕ → ℤ)
+  (h1 : a 1 = 1)
+  (ha : ∀ n : ℕ, 2 ≤ n → a n = a (n - 1) + a (n / 2)) :
+  (∀ N : ℕ, ∃ M : ℕ, N < M ∧ 7 ∣ a M) :=
+begin
+  have h2 : a 2 = 2 := by { have h := ha 2 rfl.le, norm_num at h, rwa [h1] at h },
+  have h3 : a 3 = 3 := by { have h := ha 3 (by norm_num), norm_num at h, rwa [h2, h1] at h },
+  have h4 : a 4 = 5 := by {have h := ha 4 (by norm_num), norm_num at h, rwa [h3, h2] at h },
+  have h5 : a 5 = 7 := by {have h := ha 5 (by norm_num), norm_num at h, rwa [h4, h2] at h },
+  have he: 7 ∣ a 5 := by rw [h5],
+  have hf := can_get_a_later_one a h1 ha,
+
+  exact strengthen hf ⟨5, he⟩,
 end
