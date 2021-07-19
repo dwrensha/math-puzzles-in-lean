@@ -27,10 +27,41 @@ begin
   intros n hn,
 
   -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
-  -- then the seven elements begining with a (4 * n - 3) will all have different
+  -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
 
 --  let a := a (2 * n - 1)
+   let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
+
+
+   have hn2: 2 ≤ n1 + 1,
+   {
+     sorry
+   },
+
+   let an1 := a n1,
+   let := a (n1 + 1),
+
+   have hn1 : (n1 + 1).val = 2 * n.val,
+   {
+      have hnpos : 0 < n.val := n.pos,
+      have hrw : (n1 + 1).val = 2 * (n.val - 1) + 1 + 1 := rfl,
+      rw [hrw],
+      cases n.val,
+      { linarith },
+      { refl },
+   },
+
+   have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
+   have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
+
+   have : a (n1 + 1) = an1 + a n,
+   {
+      have haa := ha (n1 + 1) hn2,
+      simp_rw[haa, h2n1', hn1],
+
+      sorry,
+   },
    sorry
 end
 
@@ -64,4 +95,3 @@ begin
   have hf := can_get_a_later_one a h1 ha,
   exact strengthen hf ⟨5, he⟩,
 end
-
