@@ -16,6 +16,13 @@ contains infinitely many integers divisible by 7.
 
 -/
 
+lemma lemma1 (n : ℕ) (npos : 0 < n) : 2 * (n - 1) + 1 = 2 * n - 1 :=
+begin
+  cases n,
+  { linarith },
+  { finish, },
+end
+
 lemma can_get_a_later_one
   (a : ℕ+ → ℤ)
   (h1 : a 1 = 1)
@@ -30,39 +37,31 @@ begin
   -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
 
---  let a := a (2 * n - 1)
-   let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
+  let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
 
+  have hn1v : n1.val = 2 * n.val - 1 := lemma1 n.val n.pos,
+  have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
 
-   have hn1v : n1.val = 2 * n.val - 1,
-   { sorry,
-   },
+  let an1 := a n1,
+  let := a (n1 + 1),
 
-   have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
+  have hn1 : (n1 + 1).val = 2 * n.val,
+  { have hnpos : 0 < n.val := n.pos,
+    have hrw : (n1 + 1).val = 2 * (n.val - 1) + 1 + 1 := rfl,
+    rw [hrw],
+    cases n.val,
+    { linarith },
+    { refl } },
 
-   let an1 := a n1,
-   let := a (n1 + 1),
+  have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
+  have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
 
-   have hn1 : (n1 + 1).val = 2 * n.val,
-   {
-      have hnpos : 0 < n.val := n.pos,
-      have hrw : (n1 + 1).val = 2 * (n.val - 1) + 1 + 1 := rfl,
-      rw [hrw],
-      cases n.val,
-      { linarith },
-      { refl },
-   },
+  have : a (n1 + 1) = an1 + a n,
+  { have haa := ha (n1 + 1) hn2,
+    simp_rw[haa, h2n1', hn1, ← hn1v],
+    finish },
 
-   have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
-   have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
-
-   have : a (n1 + 1) = an1 + a n,
-   {
-      have haa := ha (n1 + 1) hn2,
-      simp_rw[haa, h2n1', hn1, ← hn1v],
-      finish,
-   },
-   sorry
+  sorry
 end
 
 lemma strengthen
