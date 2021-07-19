@@ -34,10 +34,11 @@ begin
    let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
 
 
-   have hn2: 2 ≤ n1 + 1,
-   {
-     sorry
+   have hn1v : n1.val = 2 * n.val - 1,
+   { sorry,
    },
+
+   have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
 
    let an1 := a n1,
    let := a (n1 + 1),
@@ -58,9 +59,8 @@ begin
    have : a (n1 + 1) = an1 + a n,
    {
       have haa := ha (n1 + 1) hn2,
-      simp_rw[haa, h2n1', hn1],
-
-      sorry,
+      simp_rw[haa, h2n1', hn1, ← hn1v],
+      finish,
    },
    sorry
 end
