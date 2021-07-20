@@ -72,9 +72,23 @@ lemma strengthen
 begin
   obtain ⟨N0, hn0⟩ := he,
   intro N,
-  obtain (hlt : N < N0) |  (hlte : N0 ≤ N) := lt_or_ge N N0,
-  { exact ⟨N0, hlt, hn0⟩ },
-  { sorry, }
+  refine pnat.rec_on N _ _,
+  { obtain (hlt : 1 < N0) |  (hlte : N0 ≤ 1) := lt_or_ge 1 N0,
+    { exact ⟨N0, hlt, hn0⟩},
+    { have heq : N0 = 1 := eq_bot_iff.mpr hlte,
+      rw [←heq],
+      exact h N0 hn0 } },
+  { intros pn hpn,
+    obtain ⟨m, hm, hmp⟩ := hpn,
+    obtain (hlt : pn + 1 < m) |  (hlte : m ≤ pn + 1) := lt_or_ge (pn + 1) m,
+    { exact ⟨m, hlt, hmp⟩ },
+    { have heq : m = pn + 1,
+      { have h1 : pn.val < m.val := hm,
+        have h2 : m.val ≤ pn.val + 1 := hlte,
+        have h3 : (m.val:ℕ) = pn.val + 1 := by linarith,
+        exact pnat.eq h3 },
+      rw ← heq,
+      exact h m hmp } }
 end
 
 theorem poland1998_q4
