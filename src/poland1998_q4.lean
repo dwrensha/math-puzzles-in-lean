@@ -1,6 +1,7 @@
 import data.nat.basic
 import data.int.basic
 
+
 import tactic.linarith
 import tactic.omega
 import tactic.norm_num
@@ -23,6 +24,18 @@ begin
   { finish, },
 end
 
+lemma lemma2 (n : ℕ) : (2 * n + 1) / 2 = n :=
+begin
+  have h1 : ¬ 2 ∣ 2 * n + 1,
+  { intro h,
+    have h1: 2 ∣ 2 * n := dvd.intro n rfl,
+    have : 2 ∣ 1 := (nat.dvd_add_right h1).mp h,
+    finish },
+  have h2 := nat.succ_div_of_not_dvd h1,
+  rw [h2],
+  finish,
+end
+
 lemma can_get_a_later_one
   (a : ℕ+ → ℤ)
   (h1 : a 1 = 1)
@@ -41,6 +54,7 @@ begin
 
   have hn1v : n1.val = 2 * n.val - 1 := lemma1 n.val n.pos,
   have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
+  have hn3: 2 ≤ (n1:ℕ) + 2 := le_add_self,
 
   let an1 := a n1,
   let := a (n1 + 1),
@@ -53,13 +67,35 @@ begin
     { linarith },
     { refl } },
 
-  have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
-  have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
-
-  have : a (n1 + 1) = an1 + a n,
+  have ha1 : a (n1 + 1) = an1 + a n,
   { have haa := ha (n1 + 1) hn2,
-    simp_rw[haa, h2n1', hn1, ← hn1v],
+    have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
+    have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
+    simp_rw [haa, h2n1', hn1, ← hn1v],
     finish },
+
+  have hn1' : (n1 + 2).val = 2 * n.val + 1,
+  { have hnpos : 0 < n.val := n.pos,
+    have hrw : (n1 + 2).val = 2 * (n.val - 1) + 1 + 1 + 1 := rfl,
+    rw [hrw],
+    cases n.val,
+    { linarith },
+    { refl } },
+
+  have ha2 : a (n1 + 2) = a (n1 + 1) +  a n,
+  { have haa := ha (n1 + 2) hn3,
+    have h1 : (2 * n.val + 1) / 2 = n.val := lemma2 n.val,
+    have hn1v' : 2 * n.val + 1 - 1 = n1.val + 1,
+    { have hrw : n1.val + 1 = 2 * (n.val - 1) + 1 + 1 := rfl,
+      rw [hrw],
+      have hnpos : 0 < n.val := n.pos,
+      cases n.val,
+      { linarith },
+      { refl } },
+    simp_rw [haa, hn1', h1],
+    congr,
+    { rw hn1v', simp },
+    { ext, simp } },
 
   sorry
 end
