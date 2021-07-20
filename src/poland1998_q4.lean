@@ -30,10 +30,11 @@ begin
   { intro h,
     have h1: 2 ∣ 2 * n := dvd.intro n rfl,
     have : 2 ∣ 1 := (nat.dvd_add_right h1).mp h,
-    finish },
+    rw nat.dvd_one at this,
+    exact nat.succ_succ_ne_one 0 this },
   have h2 := nat.succ_div_of_not_dvd h1,
   rw [h2],
-  finish,
+  exact nat.mul_div_right n zero_lt_two,
 end
 
 lemma can_get_a_later_one
@@ -47,8 +48,6 @@ begin
   intros n hn,
 
   -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
-  -- then the seven elements beginning with a (4 * n - 3) will all have different
-  -- residues mod 7.
 
   let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
 
@@ -96,6 +95,9 @@ begin
     congr,
     { rw hn1v', simp },
     { ext, simp } },
+
+  -- then the seven elements beginning with a (4 * n - 3) will all have different
+  -- residues mod 7.
 
   sorry
 end
