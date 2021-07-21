@@ -20,7 +20,7 @@ contains infinitely many integers divisible by 7.
 lemma lemma1 (n : ℕ) (npos : 0 < n) : 2 * (n - 1) + 1 = 2 * n - 1 :=
 begin
   cases n,
-  { linarith },
+  { exfalso, exact lt_asymm npos npos },
   { finish, },
 end
 
@@ -63,7 +63,7 @@ begin
     have hrw : (n1 + 1).val = 2 * (n.val - 1) + 1 + 1 := rfl,
     rw [hrw],
     cases n.val,
-    { linarith },
+    { exfalso, exact lt_asymm hnpos hnpos },
     { refl } },
 
   have ha1 : a (n1 + 1) = an1 + a n,
@@ -71,14 +71,15 @@ begin
     have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
     have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
     simp_rw [haa, h2n1', hn1, ← hn1v],
-    finish },
+    congr,
+    { simp only [subtype.coe_eta, subtype.val_eq_coe] } },
 
   have hn1' : (n1 + 2).val = 2 * n.val + 1,
   { have hnpos : 0 < n.val := n.pos,
     have hrw : (n1 + 2).val = 2 * (n.val - 1) + 1 + 1 + 1 := rfl,
     rw [hrw],
     cases n.val,
-    { linarith },
+    { exfalso, exact lt_asymm hnpos hnpos },
     { refl } },
 
   have ha2 : a (n1 + 2) = a (n1 + 1) +  a n,
@@ -89,7 +90,7 @@ begin
       rw [hrw],
       have hnpos : 0 < n.val := n.pos,
       cases n.val,
-      { linarith },
+      { exfalso, exact lt_asymm hnpos hnpos },
       { refl } },
     simp_rw [haa, hn1', h1],
     congr,
