@@ -1,4 +1,6 @@
 import data.nat.basic
+import data.nat.modeq
+import data.zmod.basic
 import data.int.basic
 
 
@@ -37,14 +39,34 @@ begin
   exact nat.mul_div_right n zero_lt_two,
 end
 
-lemma can_get_a_later_one
-  (a : ℕ+ → ℤ)
-  (h1 : a 1 = 1)
-  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
-         a n = a ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
-               a ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
-  (∀ N : ℕ+, 7 ∣ a N → (∃ M : ℕ+, N < M ∧ 7 ∣ a M)) :=
+lemma lemma3
+  (a' : ℕ+ → zmod 7)
+  (N0 : ℕ+)
+  (k : zmod 7)
+  (hk : k ≠ 0)
+  (hN : ∀ i : ℕ, i < 7 → a' ⟨N0.val + i, nat.add_pos_left N0.pos i⟩ = a' N0 + k * i) :
+  (∃ i : ℕ, i < 7 ∧ a' ⟨N0.val + i, nat.add_pos_left N0.pos i⟩ = 0) :=
 begin
+  haveI hp : fact (nat.prime 7) := ⟨by norm_num⟩,
+  let ii := - (a' N0) / k,
+  use ii.val,
+  split,
+  { exact zmod.val_lt ii },
+  { have := hN ii.val (zmod.val_lt ii),
+    rw [this],
+    field_simp,
+    ring },
+end
+
+lemma can_get_a_later_one_zmod
+  (a' : ℕ+ → zmod 7)
+  (h1 : a' 1 = 1)
+  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
+         a' n = a' ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
+               a' ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
+  (∀ N : ℕ+, a' N = 0 → (∃ M : ℕ+, N < M ∧ a' M = 0)) :=
+begin
+/-
   intros n hn,
 
   -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
@@ -99,6 +121,36 @@ begin
 
   -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
+
+  let n4 := 4 * n - 3,
+  -- a (n4 + 1) = a n4 + a n1
+  -- a (n4 + 2) = a (n4 + 1) + a n1
+  -- a (n4 + 3) = a (n4 + 2) + a (n1 + 1)
+  -- a (n4 + 4) = a (n4 + 3) + a (n1 + 1)
+  -- a (n4 + 5) = a (n4 + 4) + a (n1 + 2)
+  -- a (n4 + 6) = a (n4 + 5) + a (n1 + 2)
+
+-/
+  sorry
+end
+
+def aa : ℕ → ℤ
+| 0 := 1 -- unused dummy value
+| 1 := 1
+| (nat.succ n) :=
+           have hp : n < n.succ, from lt_add_one n,
+           have h2 : (n.succ / 2) < n.succ, from nat.div_lt_self' n 0,
+           aa n + aa (n.succ / 2)
+
+
+lemma can_get_a_later_one
+  (a : ℕ+ → ℤ)
+  (h1 : a 1 = 1)
+  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
+         a n = a ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
+               a ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
+  (∀ N : ℕ+, 7 ∣ a N → (∃ M : ℕ+, N < M ∧ 7 ∣ a M)) :=
+begin
 
   sorry
 end
