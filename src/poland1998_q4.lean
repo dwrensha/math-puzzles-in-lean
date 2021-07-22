@@ -38,6 +38,16 @@ begin
   exact h5
 end
 
+lemma a_recurrence (n : ℕ) (hn : 2 ≤ n) :
+  a n = a (n - 1) + a (n / 2) :=
+begin
+  cases n,
+  { linarith },
+  cases n,
+  { linarith },
+  simp [a],
+end
+
 lemma lemma1 (n : ℕ) (npos : 0 < n) : 2 * (n - 1) + 1 = 2 * n - 1 :=
 begin
   cases n,
@@ -70,6 +80,20 @@ begin
   ring_nf,
 end
 
+lemma a'_recurrence (n : ℕ) (hn : 2 ≤ n) :
+  a' n = a' (n - 1) + a' (n / 2) :=
+begin
+  have har := a_recurrence n hn,
+  have hva: (a' (n - 1) + a' (n / 2)).val = ((a' (n - 1)).val + (a' (n / 2)).val) % 7 := zmod.val_add _ _,
+  have : (a' n).val = (a' (n - 1) + a' (n / 2)).val,
+  { rw [hva],
+    simp_rw [a', har],
+    rw [zmod.val],
+    simp },
+  ext,
+  finish,
+end
+
 lemma lemma3
   (N0 : ℕ)
   (k : zmod 7)
@@ -100,63 +124,67 @@ begin
          ... < 5 : by norm_num },
     {exact a'_5_is_0} },
 
+  let n1 : ℕ := 2 * (n - 1) + 1,
 
-  
---  let n1 : ℕ := ⟨2 * (n - 1) + 1, nat.succ_pos _⟩,
+  -- a' (2 * n - 1), a' (2 * n), and a' (2 * n + 1) are all equal
 
+  have npos := calc 0 < 2 : by norm_num
+                  ... ≤ n : hlte,
+  have hn1v : n1 = 2 * n - 1 := lemma1 n npos,
+  have hn2: 2 ≤ n1 + 1,
+  { have : 1 ≤ n1 := le_add_self,
+    exact nat.succ_le_succ this },
+
+  have hn3: 2 ≤ n1 + 2 := le_add_self,
+
+  let an1 := a' n1,
+
+  have hn1 : (n1 + 1) = 2 * n,
+  { have hrw : (n1 + 1) = 2 * (n - 1) + 1 + 1 := rfl,
+    rw [hrw],
+    cases n,
+    { exfalso, exact lt_asymm npos npos },
+    { refl } },
+
+  have ha1 : a' (n1 + 1) = an1 + a' n,
+  { have haa : a' (n1 + 1) = a' n1 + a' (n1.succ / 2) := a'_recurrence (n1 + 1) hn2,
+    have h2n1 : 2 * n / 2 = n := by norm_num,
+    have h2n1' : (n1 + 1) / 2 = n := by { rw [hn1, h2n1] },
+    rw [haa, h2n1'] },
+
+  have hn1' : n1 + 2 = 2 * n + 1,
+  { have hrw : (n1 + 2) = 2 * (n - 1) + 1 + 1 + 1 := rfl,
+    rw [hrw],
+    cases n,
+    { exfalso, exact lt_asymm npos npos },
+    { refl } },
+
+  have ha2 : a' (n1 + 2) = a' (n1 + 1) +  a' n,
+  { have haa : a' (n1 + 2) = a' (n1 + 1) + a' (n1.succ.succ / 2) := a'_recurrence (n1 + 2) hn3,
+    have h1 : (2 * n + 1) / 2 = n := lemma2 n,
+    have hn1v' : 2 * n = n1 + 1,
+    { have hrw : n1 + 1 = 2 * (n - 1) + 1 + 1 := rfl,
+      rw [hrw],
+      cases n,
+      { exfalso, exact lt_asymm npos npos },
+      { refl } },
+    rw [haa],
+    congr,
+    have : n1.succ.succ = (n1 + 1 + 1) := rfl,
+    rw this,
+    rw [← hn1v', h1] },
+
+  have ha1' : a' (n1 + 1) = a' n1,
+  { rw [hn] at ha1,
+    simp at ha1,
+    exact ha1 },
+
+  have ha2' : a' (n1 + 2) = a' n1,
+  { rw [hn, ha1'] at ha2,
+    simp at ha2,
+    exact ha2 },
 
 /-
-
-
-  -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
-
-
-
-  have hn1v : n1.val = 2 * n.val - 1 := lemma1 n.val n.pos,
-  have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
-  have hn3: 2 ≤ (n1:ℕ) + 2 := le_add_self,
-
-  let an1 := a n1,
-  let := a (n1 + 1),
-
-  have hn1 : (n1 + 1).val = 2 * n.val,
-  { have hnpos : 0 < n.val := n.pos,
-    have hrw : (n1 + 1).val = 2 * (n.val - 1) + 1 + 1 := rfl,
-    rw [hrw],
-    cases n.val,
-    { exfalso, exact lt_asymm hnpos hnpos },
-    { refl } },
-
-  have ha1 : a (n1 + 1) = an1 + a n,
-  { have haa := ha (n1 + 1) hn2,
-    have h2n1 : 2 * n.val / 2 = n.val := by norm_num,
-    have h2n1' : ((n1 + 1).val : ℕ ) / 2 = n.val := by { rw [hn1, h2n1] },
-    simp_rw [haa, h2n1', hn1, ← hn1v],
-    congr,
-    { simp only [subtype.coe_eta, subtype.val_eq_coe] } },
-
-  have hn1' : (n1 + 2).val = 2 * n.val + 1,
-  { have hnpos : 0 < n.val := n.pos,
-    have hrw : (n1 + 2).val = 2 * (n.val - 1) + 1 + 1 + 1 := rfl,
-    rw [hrw],
-    cases n.val,
-    { exfalso, exact lt_asymm hnpos hnpos },
-    { refl } },
-
-  have ha2 : a (n1 + 2) = a (n1 + 1) +  a n,
-  { have haa := ha (n1 + 2) hn3,
-    have h1 : (2 * n.val + 1) / 2 = n.val := lemma2 n.val,
-    have hn1v' : 2 * n.val + 1 - 1 = n1.val + 1,
-    { have hrw : n1.val + 1 = 2 * (n.val - 1) + 1 + 1 := rfl,
-      rw [hrw],
-      have hnpos : 0 < n.val := n.pos,
-      cases n.val,
-      { exfalso, exact lt_asymm hnpos hnpos },
-      { refl } },
-    simp_rw [haa, hn1', h1],
-    congr,
-    { rw hn1v', simp },
-    { ext, simp } },
 
   -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
