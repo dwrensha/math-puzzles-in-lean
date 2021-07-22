@@ -112,6 +112,59 @@ begin
     ring },
 end
 
+lemma lemma4 (i : ℕ) (h : i.succ.succ.succ ≤ 2) : false :=
+begin
+  have h1 : i.succ.succ ≤ 1 := nat.succ_le_succ_iff.mp h,
+  have h2 : i.succ ≤ 0 := nat.succ_le_succ_iff.mp h1,
+  exact nat.not_succ_le_zero i h2,
+end
+
+lemma lemma4' (i : ℕ) (h : i.succ.succ.succ.succ.succ.succ < 6) : false :=
+begin
+  have h1 : i.succ.succ.succ.succ.succ < 5 := nat.succ_lt_succ_iff.mp h,
+  have h2 : i.succ.succ.succ.succ < 4 := nat.succ_lt_succ_iff.mp h1,
+  have h3 : i.succ.succ.succ < 3 := nat.succ_lt_succ_iff.mp h2,
+  have h4 : i.succ.succ < 2 := nat.succ_lt_succ_iff.mp h3,
+  have h5 : i.succ < 1 := nat.succ_lt_succ_iff.mp h4,
+  have h6 : i < 0 := nat.succ_lt_succ_iff.mp h5,
+  exact nat.not_lt_zero i h6,
+end
+
+
+lemma lemma5 (n : ℕ) : (4 * (n - 1) + 1 + 1) / 2 = (2 * (n - 1) + 1) :=
+begin
+  have : (4 * (n - 1) + 1 + 1) = 2 * (2 * (n - 1) + 1) := by linarith,
+  have h2 : 2 ≠ 0 := by linarith,
+  finish
+end
+
+lemma lemma5' (n : ℕ) : (4 * (n - 1) + 1 + 2) / 2 = (2 * (n - 1) + 1) :=
+begin
+  sorry
+end
+
+
+lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
+begin
+  sorry
+end
+
+lemma lemma6' (n : ℕ) : (4 * (n - 1) + 1 + 4) / 2 = (2 * (n - 1) + 1 + 1) :=
+begin
+  sorry
+end
+
+
+lemma lemma7 (n : ℕ) : (4 * (n - 1) + 1 + 5) / 2 = (2 * (n - 1) + 1 + 2) :=
+begin
+  sorry
+end
+
+lemma lemma7' (n : ℕ) : (4 * (n - 1) + 1 + 6) / 2 = (2 * (n - 1) + 1 + 2) :=
+begin
+  sorry
+end
+
 lemma can_get_a_later_one_zmod :
   (∀ N : ℕ, a' N = 0 → (∃ M : ℕ, N < M ∧ a' M = 0)) :=
 begin
@@ -184,10 +237,20 @@ begin
     simp at ha2,
     exact ha2 },
 
-/-
+  clear ha1 ha2,
+
+  have : ∀ i, i ≤ 2 → a' (n1 + i) = a' n1,
+  { intros i hi,
+    cases i, { refl },
+    cases i, { exact ha1' },
+    cases i, { exact ha2' },
+    exfalso,
+    exact lemma4 i hi },
 
   -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
+
+/-
 
   let n4 := 4 * n - 3,
   -- a (n4 + 1) = a n4 + a n1
@@ -198,7 +261,67 @@ begin
   -- a (n4 + 6) = a (n4 + 5) + a (n1 + 2)
 
 -/
-  sorry
+
+  -- n2 = 4 * n - 3
+  --   = 4 * (n - 1) + 1
+  let n2: ℕ := 4 * (n - 1) + 1,
+
+  have hii : ∀ i, i < 6 → a' (n2 + i + 1) = a' (n2 + i) + a' n1,
+  { intros i hi,
+    have hn2ge2 : 2 ≤ n2 + i + 1 := by linarith,
+    have hr := a'_recurrence (n2 + i + 1) hn2ge2,
+    cases i,
+    { have hn1 : (n2 + 1) / 2 = n1 := lemma5 n,
+      rw [hn1] at hr,
+      exact hr },
+    cases i,
+    { have hn1 : (n2 + 2) / 2 = n1 := lemma5' n,
+      rw [hn1] at hr,
+      exact hr},
+    cases i,
+    { have hn1 : (n2 + 3) / 2 = n1 + 1 := lemma6 n,
+      rw [hn1, ha1'] at hr,
+      exact hr},
+    cases i,
+    { have hn1 : (n2 + 4) / 2 = n1 + 1 := lemma6' n,
+      rw [hn1, ha1'] at hr,
+      exact hr},
+    cases i,
+    { have hn1 : (n2 + 5) / 2 = n1 + 2 := lemma7 n,
+      rw [hn1, ha2'] at hr,
+      exact hr},
+    cases i,
+    { have hn1 : (n2 + 6) / 2 = n1 + 2 := lemma7' n,
+      rw [hn1, ha2'] at hr,
+      exact hr},
+    exfalso,
+    exact lemma4' i hi },
+
+  have hik : ∀ i, i < 7 → a' (n2 + i) = a' n2 + a' n1 * i,
+  { intros i,
+    induction i with p hp,
+    { intro, simp, },
+    { intro hpi7,
+      have hpi6 : p < 6 := nat.succ_lt_succ_iff.mp hpi7,
+      have hinc := hii p hpi6,
+      have hadd : n2 + p + 1 = n2 + p.succ := rfl,
+      have hi6 : p < 7 := nat.lt.step hpi6,
+      have hpp := hp hi6,
+      rw [←hadd, hinc, hpp],
+      ring_nf } },
+
+  obtain (haez : a' n1 = 0) | (hanez : ¬ a' n1 = 0) := em (a' n1 = 0),
+  { use n1,
+    split,
+    { linarith },
+    { exact haez }},
+
+  { have := lemma3 n2 (a' n1) hanez hik,
+    obtain ⟨ii, hii7, hia'⟩ := this,
+    use (n2 + ii),
+    split,
+    { linarith },
+    { assumption } }
 end
 
 lemma can_get_a_later_one :
