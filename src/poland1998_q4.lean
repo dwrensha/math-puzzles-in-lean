@@ -138,31 +138,44 @@ begin
   finish
 end
 
-lemma lemma5' (n : ℕ) : (4 * (n - 1) + 1 + 2) / 2 = (2 * (n - 1) + 1) :=
+example (x : ℕ) : x * 2 / 2 = x :=
 begin
-  sorry
+  norm_num,
 end
 
+lemma lemma5' (n : ℕ) : (4 * (n - 1) + 1 + 2) / 2 = (2 * (n - 1) + 1) :=
+begin
+  have h1 : (4 * (n - 1) + 1 + 2) = 2 * (2 * (n - 1) + 1) + 1 := by linarith,
+  rw [h1],
+  exact lemma2 (2 * (n - 1) + 1),
+end
 
 lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
 begin
-  sorry
+  have : (4 * (n - 1) + 1 + 3) = 2 * (2 * (n - 1) + 1 + 1) := by linarith,
+  have h2 : 2 ≠ 0 := by linarith,
+  finish
 end
 
 lemma lemma6' (n : ℕ) : (4 * (n - 1) + 1 + 4) / 2 = (2 * (n - 1) + 1 + 1) :=
 begin
-  sorry
+  have h1 : (4 * (n - 1) + 1 + 4) = 2 * (2 * (n - 1) + 1 + 1) + 1 := by linarith,
+  rw [h1],
+  exact lemma2 (2 * (n - 1) + 1 + 1),
 end
-
 
 lemma lemma7 (n : ℕ) : (4 * (n - 1) + 1 + 5) / 2 = (2 * (n - 1) + 1 + 2) :=
 begin
-  sorry
+  have : (4 * (n - 1) + 1 + 5) = 2 * (2 * (n - 1) + 1 + 2) := by linarith,
+  have h2 : 2 ≠ 0 := by linarith,
+  finish
 end
 
 lemma lemma7' (n : ℕ) : (4 * (n - 1) + 1 + 6) / 2 = (2 * (n - 1) + 1 + 2) :=
 begin
-  sorry
+  have h1 : (4 * (n - 1) + 1 + 6) = 2 * (2 * (n - 1) + 1 + 2) + 1 := by linarith,
+  rw [h1],
+  exact lemma2 (2 * (n - 1) + 1 + 2),
 end
 
 lemma can_get_a_later_one_zmod :
