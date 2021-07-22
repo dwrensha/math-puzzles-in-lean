@@ -19,6 +19,25 @@ contains infinitely many integers divisible by 7.
 
 -/
 
+def a : ℕ → ℕ
+| 0 := 1 -- unused dummy value
+| 1 := 1
+| (nat.succ n) :=
+           have hp : n < n.succ := lt_add_one n,
+           have h2 : (n.succ / 2) < n.succ := nat.div_lt_self' n 0,
+           a n + a (n.succ / 2)
+
+lemma a_1_is_1 : a 1 = 1 := by simp [a]
+lemma a_2_is_2 : a 2 = 2 := by simp [a]
+
+lemma a_5_is_7 : a 5 = 7 :=
+begin
+  have h3 : a 3 = 3 := by { simp[a], norm_num, rw [a_1_is_1] },
+  have h4 : a 4 = 5 := by { simp[a], norm_num, rw [a_1_is_1, a_2_is_2] },
+  have h5 : a 5 = 7 := by { simp[a], norm_num, rw [a_1_is_1, a_2_is_2] },
+  exact h5
+end
+
 lemma lemma1 (n : ℕ) (npos : 0 < n) : 2 * (n - 1) + 1 = 2 * n - 1 :=
 begin
   cases n,
@@ -39,13 +58,24 @@ begin
   exact nat.mul_div_right n zero_lt_two,
 end
 
+
+def a' : ℕ → zmod 7
+| n := ⟨(a n) % 7, nat.mod_lt _ (by norm_num)⟩
+
+lemma a'_5_is_0 : a' 5 = 0 :=
+begin
+  simp [a',a],
+  norm_num,
+  simp_rw [a_1_is_1, a_2_is_2],
+  ring_nf,
+end
+
 lemma lemma3
-  (a' : ℕ+ → zmod 7)
-  (N0 : ℕ+)
+  (N0 : ℕ)
   (k : zmod 7)
   (hk : k ≠ 0)
-  (hN : ∀ i : ℕ, i < 7 → a' ⟨N0.val + i, nat.add_pos_left N0.pos i⟩ = a' N0 + k * i) :
-  (∃ i : ℕ, i < 7 ∧ a' ⟨N0.val + i, nat.add_pos_left N0.pos i⟩ = 0) :=
+  (hN : ∀ i : ℕ, i < 7 → a' (N0 + i) = a' N0 + k * i) :
+  (∃ i : ℕ, i < 7 ∧ a' (N0 + i) = 0) :=
 begin
   haveI hp : fact (nat.prime 7) := ⟨by norm_num⟩,
   let ii := - (a' N0) / k,
@@ -58,20 +88,29 @@ begin
     ring },
 end
 
-lemma can_get_a_later_one_zmod
-  (a' : ℕ+ → zmod 7)
-  (h1 : a' 1 = 1)
-  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
-         a' n = a' ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
-               a' ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
-  (∀ N : ℕ+, a' N = 0 → (∃ M : ℕ+, N < M ∧ a' M = 0)) :=
+lemma can_get_a_later_one_zmod :
+  (∀ N : ℕ, a' N = 0 → (∃ M : ℕ, N < M ∧ a' M = 0)) :=
 begin
-/-
   intros n hn,
+
+  obtain (hlt : n < 2) | (hlte : 2 ≤ n) := lt_or_ge n 2,
+  { use 5,
+    split,
+    { calc n < 2 : hlt
+         ... < 5 : by norm_num },
+    {exact a'_5_is_0} },
+
+
+  
+--  let n1 : ℕ := ⟨2 * (n - 1) + 1, nat.succ_pos _⟩,
+
+
+/-
+
 
   -- a (2 * n - 1), a (2 * n), and a (2 * n + 1) are all equivalent mod 7.
 
-  let n1 : ℕ+ := ⟨2 * (n.val - 1) + 1, nat.succ_pos _⟩,
+
 
   have hn1v : n1.val = 2 * n.val - 1 := lemma1 n.val n.pos,
   have hn2: 2 ≤ (n1:ℕ) + 1 := add_le_add_right (pnat.pos n1) 1,
@@ -134,68 +173,54 @@ begin
   sorry
 end
 
-def aa : ℕ → ℤ
-| 0 := 1 -- unused dummy value
-| 1 := 1
-| (nat.succ n) :=
-           have hp : n < n.succ, from lt_add_one n,
-           have h2 : (n.succ / 2) < n.succ, from nat.div_lt_self' n 0,
-           aa n + aa (n.succ / 2)
-
-
-lemma can_get_a_later_one
-  (a : ℕ+ → ℤ)
-  (h1 : a 1 = 1)
-  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
-         a n = a ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
-               a ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
-  (∀ N : ℕ+, 7 ∣ a N → (∃ M : ℕ+, N < M ∧ 7 ∣ a M)) :=
+lemma can_get_a_later_one :
+  (∀ N : ℕ, 7 ∣ a N → (∃ M : ℕ, N < M ∧ 7 ∣ a M)) :=
 begin
-
-  sorry
+  intros n hn,
+  have ha' : a' n = 0,
+  { have : a' n = ⟨a n % 7, nat.mod_lt _ (by norm_num)⟩ := by simp[a'],
+    rw [this],
+    congr,
+    exact nat.mod_eq_zero_of_dvd hn, },
+  obtain ⟨m, hmgt, hm7⟩ := can_get_a_later_one_zmod n ha',
+  use m,
+  use hmgt,
+  unfold a' at hm7,
+  have : a m % 7 = 0,
+  { injections_and_clear,
+    assumption, },
+  exact nat.dvd_of_mod_eq_zero this
 end
 
 lemma strengthen
-  {P : ℕ+ → Prop}
-  (h : ∀ N : ℕ+, P N → (∃ M : ℕ+, N < M ∧ P M))
-  (he : ∃ N : ℕ+, P N) :
-  (∀ N : ℕ+, ∃ M : ℕ+, N < M ∧ P M) :=
+  {P : ℕ → Prop}
+  (h : ∀ N : ℕ, P N → (∃ M : ℕ, N < M ∧ P M))
+  (he : ∃ N : ℕ, P N) :
+  (∀ N : ℕ, ∃ M : ℕ, N < M ∧ P M) :=
 begin
   obtain ⟨N0, hn0⟩ := he,
   intro N,
-  refine pnat.rec_on N _ _,
-  { obtain (hlt : 1 < N0) |  (hlte : N0 ≤ 1) := lt_or_ge 1 N0,
+  refine nat.rec_on N _ _,
+  { obtain (hlt : 0 < N0) | (hlte : N0 ≤ 0) := lt_or_ge 0 N0,
     { exact ⟨N0, hlt, hn0⟩},
-    { have heq : N0 = 1 := eq_bot_iff.mpr hlte,
-      rw [←heq],
-      exact h N0 hn0 } },
+    { have heq : N0 = 0 := eq_bot_iff.mpr hlte,
+      rw [heq] at hn0,
+      exact h 0 hn0 } },
   { intros pn hpn,
     obtain ⟨m, hm, hmp⟩ := hpn,
     obtain (hlt : pn + 1 < m) |  (hlte : m ≤ pn + 1) := lt_or_ge (pn + 1) m,
     { exact ⟨m, hlt, hmp⟩ },
     { have heq : m = pn + 1,
-      { have h1 : pn.val < m.val := hm,
-        have h2 : m.val ≤ pn.val + 1 := hlte,
-        have h3 : (m.val:ℕ) = pn.val + 1 := by linarith,
-        exact pnat.eq h3 },
-      rw ← heq,
-      exact h m hmp } }
+      { have h1 : pn < m := hm,
+        have h2 : m ≤ pn + 1 := hlte,
+        have h3 : m = pn + 1 := by linarith,
+        exact h3 },
+      rw [heq] at hmp,
+      exact h (pn.succ) hmp } }
 end
 
-theorem poland1998_q4
-  (a : ℕ+ → ℤ)
-  (h1 : a 1 = 1)
-  (ha : ∀ (n : ℕ+) (h2: 2 ≤ n),
-         a n = a ⟨n.val - 1, nat.lt_pred_iff.mpr h2⟩ +
-               a ⟨n.val / 2, nat.div_pos h2 zero_lt_two⟩) :
-  (∀ N : ℕ+, ∃ M : ℕ+, N < M ∧ 7 ∣ a M) :=
+theorem poland1998_q4 : (∀ N : ℕ, ∃ M : ℕ, N < M ∧ 7 ∣ a M) :=
 begin
-  have h2 : a 2 = 2 := by { have h := ha 2 rfl.le, norm_num at h, rwa [h1] at h },
-  have h3 : a 3 = 3 := by { have h := ha 3 (by norm_num), norm_num at h, rwa [h2, h1] at h },
-  have h4 : a 4 = 5 := by { have h := ha 4 (by norm_num), norm_num at h, rwa [h3, h2] at h },
-  have h5 : a 5 = 7 := by { have h := ha 5 (by norm_num), norm_num at h, rwa [h4, h2] at h },
-  have he: 7 ∣ a 5 := by rw [h5],
-
-  have hf := can_get_a_later_one a h1 ha,
-  exact strengthen hf ⟨5, he⟩,
+  have he: 7 ∣ a 5 := by rw [a_5_is_7],
+  exact strengthen can_get_a_later_one ⟨5, he⟩,
 end
