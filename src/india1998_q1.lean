@@ -1,4 +1,5 @@
 import data.int.basic
+import data.int.modeq
 import data.zmod.basic
 
 import tactic.ring
@@ -18,12 +19,36 @@ begin
   ring,
 end
 
-lemma foo (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 :=
+lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 :=
 begin
   have h7 : 7 ≠ 0 := by norm_num,
---  have h8 : (a : zmod 7).val = a % 7,
---  have := zmod.val_nat_cast a,
-  sorry,
+  obtain (hp : 0 ≤ a) | (hn : a < 0) := le_or_lt 0 a,
+  { obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le hp,
+    simp [hA, zmod.val_nat_cast A] },
+  { have hnn : a = - (- a) := eq_neg_of_eq_neg rfl,
+    let neg_one : ℤ := -1,
+    have h1 : (- (-a)) = neg_one * (-a) := neg_eq_neg_one_mul (-a),
+    rw [h1] at hnn,
+    have h2 : ((( neg_one * -a ) : ℤ) : zmod 7) = ((neg_one : ℤ) : zmod 7) * ((-a : ℤ) : zmod 7) := by norm_cast,
+    rw [hnn, h2],
+    have h4 : 0 < -a := neg_pos.mpr hn,
+    have h5 : 0 ≤ -a := le_of_lt h4,
+    obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h5,
+    rw [hA],
+
+    have h3: ((neg_one: zmod 7) * (A: zmod 7)).val = ((neg_one : zmod 7).val * (A: zmod 7).val) % 7 :=
+        zmod.val_mul _ _,
+    have h6: (A : zmod 7) = ((A : ℤ) : zmod 7) := by norm_cast,
+    rw [←h6,h3],
+    simp [zmod.val_nat_cast],
+    have h7: (-1 : zmod 7).val = 6 := by ring,
+    rw [h7],
+    have h8 : ((6 : ℕ) : ℤ) = (-1 : ℤ) % 7 := by norm_cast,
+    rw [h8],
+    have h9 : (((-1 : ℤ) % 7) * (↑A % 7)) % 7 = ((-1 : ℤ) * (↑A)) % 7 := (int.mul_mod _ _ 7).symm,
+    rw [h9],
+    simp,
+  },
 end
 
 theorem india1998_q1b (n a b: ℤ) (hn : a^2 + 3 * b^2 = 7 * n) :
@@ -69,7 +94,8 @@ begin
       have h53 : (3 * bz).val = (3 : zmod 7).val * bz.val % 7 := zmod.val_mul _ _,
       rw [h51, h52, h53] at h50,
       simp at h50,
-       sorry, },
+      have h51 : (2 * az.val + 3 * bz.val) % 7 = 0 := h50,
+      sorry, },
     have h14 : (∃ m1, 2 * a + 3 * b = 7 * m1) := exists_eq_mul_right_of_dvd h13,
     obtain ⟨m1, hm1⟩ := h14,
 
