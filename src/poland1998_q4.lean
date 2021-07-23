@@ -134,13 +134,7 @@ end
 lemma lemma5 (n : ℕ) : (4 * (n - 1) + 1 + 1) / 2 = (2 * (n - 1) + 1) :=
 begin
   have : (4 * (n - 1) + 1 + 1) = 2 * (2 * (n - 1) + 1) := by linarith,
-  have h2 : 2 ≠ 0 := by linarith,
   finish
-end
-
-example (x : ℕ) : x * 2 / 2 = x :=
-begin
-  norm_num,
 end
 
 lemma lemma5' (n : ℕ) : (4 * (n - 1) + 1 + 2) / 2 = (2 * (n - 1) + 1) :=
@@ -153,7 +147,6 @@ end
 lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
 begin
   have : (4 * (n - 1) + 1 + 3) = 2 * (2 * (n - 1) + 1 + 1) := by linarith,
-  have h2 : 2 ≠ 0 := by linarith,
   finish
 end
 
@@ -167,7 +160,6 @@ end
 lemma lemma7 (n : ℕ) : (4 * (n - 1) + 1 + 5) / 2 = (2 * (n - 1) + 1 + 2) :=
 begin
   have : (4 * (n - 1) + 1 + 5) = 2 * (2 * (n - 1) + 1 + 2) := by linarith,
-  have h2 : 2 ≠ 0 := by linarith,
   finish
 end
 
