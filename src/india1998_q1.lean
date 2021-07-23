@@ -30,25 +30,17 @@ begin
     have h1 : (- (-a)) = neg_one * (-a) := neg_eq_neg_one_mul (-a),
     rw [h1] at hnn,
     have h2 : ((( neg_one * -a ) : ℤ) : zmod 7) = ((neg_one : ℤ) : zmod 7) * ((-a : ℤ) : zmod 7) := by norm_cast,
-    rw [hnn, h2],
     have h4 : 0 < -a := neg_pos.mpr hn,
     have h5 : 0 ≤ -a := le_of_lt h4,
     obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h5,
-    rw [hA],
-
     have h3: ((neg_one: zmod 7) * (A: zmod 7)).val = ((neg_one : zmod 7).val * (A: zmod 7).val) % 7 :=
         zmod.val_mul _ _,
     have h6: (A : zmod 7) = ((A : ℤ) : zmod 7) := by norm_cast,
-    rw [←h6,h3],
-    simp [zmod.val_nat_cast], -- this is the crucial step
     have h7: (-1 : zmod 7).val = 6 := by ring,
-    rw [h7],
     have h8 : ((6 : ℕ) : ℤ) = (-1 : ℤ) % 7 := by norm_cast,
-    rw [h8],
     have h9 : (((-1 : ℤ) % 7) * (↑A % 7)) % 7 = ((-1 : ℤ) * (↑A)) % 7 := (int.mul_mod _ _ 7).symm,
-    rw [h9],
-    simp,
-  },
+    rw [hnn,h2,hA,←h6,h3],
+    simp [zmod.val_nat_cast, h7, h8, h9] },
 end
 
 theorem india1998_q1b (n a b: ℤ) (hn : a^2 + 3 * b^2 = 7 * n) :
