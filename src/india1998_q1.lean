@@ -57,8 +57,6 @@ begin
   let az : zmod 7 := a,
   let bz : zmod 7 := b,
 
-  have haz : (az.val : ℤ) = a % 7 := sorry,
-
   have h1 : (((a^2 + 3 * b^2) : ℤ) : zmod 7) = (((7 * n) : ℤ) : zmod 7) := congr_arg coe hn,
   have h2 : (((a^2 + 3 * b^2) : ℤ) : zmod 7) = ((a^2 : ℤ) : zmod 7) + (((3 * b^2) : ℤ) : zmod 7) :=
     int.cast_add _ _,
