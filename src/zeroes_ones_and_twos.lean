@@ -5,6 +5,7 @@ import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd
 import algebra.big_operators.pi
+import algebra.big_operators.ring
 
 /-!
 Let n be a natural number. Prove that
@@ -114,7 +115,7 @@ begin
     ... = 1 + ∑ (i : ℕ) in finset.range pk, b * b ^ i :
           by {simp, exact finset.sum_congr rfl (λx _, pow_succ _ _)}
     ... =  1 + b * ∑ (i : ℕ) in finset.range pk, b ^ i :
-          by simp [(finset.range pk).sum_hom (has_mul.mul b)],
+          by simp [finset.mul_sum],
     have := times_base_plus_one_still_all_zero_or_one
                b h2
                (∑ (i : ℕ) in finset.range pk, b ^ i) hpk,
@@ -131,8 +132,7 @@ begin
              by { refine finset.sum_congr rfl _, intros x hx, exact pow_add b x m }
     ... = (∑ (i : ℕ) in finset.range k, b ^ m * b ^ i) :
              by { refine finset.sum_congr rfl _, intros x hx, exact mul_comm (b ^ x) (b ^ m) }
-    ... = b^m * (∑ (i : ℕ) in finset.range k, b ^ i) :
-             finset.sum_hom _ (has_mul.mul (b ^ m)),
+    ... = b^m * (∑ (i : ℕ) in finset.range k, b ^ i) : finset.mul_sum.symm,
 
   have := base_pow_still_all_zero_or_one b h2 m
                        (∑ (i : ℕ) in finset.range k, b ^ i)
