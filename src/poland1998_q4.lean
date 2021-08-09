@@ -5,7 +5,7 @@ import data.int.basic
 
 
 import tactic.linarith
-import tactic.omega
+import tactic.field_simp
 import tactic.norm_num
 
 /-

@@ -41,7 +41,7 @@ begin
     unfold xx_seq,
     exact le_max_left (xx_seq a n) (a (nat.succ n)),
   },
-  exact monotone_of_monotone_nat h,
+  exact monotone_nat_of_le_succ h,
 end
 
 lemma monotone_fin_of_nat {n : ℕ} (f: ℕ → ℝ) (h : monotone f) : monotone (λ m: fin n, f m.val) :=
