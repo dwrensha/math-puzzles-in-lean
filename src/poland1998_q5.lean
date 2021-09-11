@@ -20,8 +20,8 @@ open_locale euclidean_geometry
 theorem poland1998_q5
     (A B C D E: euclidean_space ℝ (fin 2))
 --  TODO: something like (ht : triangle A B C)
-    (hd : D ∈ segment A B)
-    (he : E ∈ segment A B)
+    (hd : D ∈ segment ℝ A B)
+    (he : E ∈ segment ℝ A B)
     (hr : (dist A D / dist D B) * (dist A E / dist E B) = (dist A C / dist C B)^2) :
     ∠ A C D = ∠ B C E :=
 begin
