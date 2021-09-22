@@ -1,10 +1,10 @@
 [package]
 name = "."
 version = "0.1"
-lean_version = "leanprover-community/lean:3.32.1"
+lean_version = "leanprover-community/lean:3.33.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "b9ad73330481f7133aca294b738d3888c6bcb5d4"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "5b3b71a079e626dcdd3240aa7f88e10691403c00"}
 
 #lean-gptf = {path = "/home/dwrensha/src/lean-gptf" }
