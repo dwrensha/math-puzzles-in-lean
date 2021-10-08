@@ -1,6 +1,5 @@
 import analysis.convex.basic
-import analysis.normed_space.inner_product
-import analysis.normed_space.pi_Lp
+import analysis.inner_product_space.pi_L2
 import geometry.euclidean.basic
 import geometry.euclidean.triangle
 

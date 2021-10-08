@@ -3,8 +3,8 @@ import data.int.gcd
 import data.pnat.basic
 import data.rat.basic
 
-import algebra.big_operators.pi
-import ring_theory.coprime
+import algebra.big_operators.basic
+import ring_theory.coprime.basic
 
 import tactic.field_simp
 import tactic.linarith

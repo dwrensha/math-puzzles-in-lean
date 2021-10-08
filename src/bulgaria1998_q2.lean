@@ -1,5 +1,5 @@
-import analysis.normed_space.inner_product
-import analysis.normed_space.pi_Lp
+import analysis.inner_product_space.pi_L2
+import linear_algebra.affine_space.midpoint
 import geometry.euclidean.basic
 import geometry.euclidean.triangle
 
