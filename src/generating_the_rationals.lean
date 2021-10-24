@@ -1,4 +1,4 @@
-import algebra.archimedean
+import algebra.order.archimedean
 import algebra.big_operators.basic
 import data.finset.basic
 import data.nat.parity

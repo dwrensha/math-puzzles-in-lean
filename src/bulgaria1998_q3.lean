@@ -1,4 +1,4 @@
-import algebra.archimedean
+import algebra.order.archimedean
 import data.real.basic
 import algebra.big_operators.pi
 import analysis.specific_limits
