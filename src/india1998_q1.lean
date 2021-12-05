@@ -169,7 +169,7 @@ begin
     obtain ⟨m1, hm1⟩ := h14,
 
     have h15: (az + 2 * bz) = 0,
-    { rw [hen], ring_nf, simp },
+    { rw [hen], ring_nf },
     have h16: 7 ∣ (a + 2 * b),
     { have h50 : (az + 2 * bz).val = (0 : zmod 7).val := congr_arg zmod.val h15,
       have h51 : (az + 2 * bz).val = (az.val + (2 * bz).val) % 7 := zmod.val_add _ _,
