@@ -11,11 +11,11 @@ Indian Mathematical Olympiad 1998, problem 1
 (b) If an integer n is such that 7n is of the form a² + 3b², prove that n is also of that form.
 -/
 
-theorem india1998_q1a (a1 a2 b1 b2 : ℤ) :
-  (∃ a3 b3, (a1^2 + 3 * b1^2) * (a2^2 + 3 * b2^2) = (a3^2 + 3 * b3^2)) :=
+theorem india1998_q1a (a₁ a₂ b₁ b₂ : ℤ) :
+  (∃ a₃ b₃, (a₁^2 + 3 * b₁^2) * (a₂^2 + 3 * b₂^2) = (a₃^2 + 3 * b₃^2)) :=
 begin
-  use (a1 * a2 + 3 * b1 * b2),
-  use (a1 * b2 - b1 * a2),
+  use (a₁ * a₂ + 3 * b₁ * b₂),
+  use (a₁ * b₂ - b₁ * a₂),
   ring,
 end
 
