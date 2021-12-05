@@ -259,22 +259,28 @@ def all_one_or_two : list ℕ → Prop
 | _ := false
 
 lemma prepend_one (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
-    all_one_or_two (nat.digits 10 (10 ^ (list.length (nat.digits 10 n)).succ + n)) :=
+    all_one_or_two (nat.digits 10 (10 ^ (list.length (nat.digits 10 n)) + n)) :=
 begin
-  sorry
+ sorry
+end
+
+lemma prepend_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
+    all_one_or_two (nat.digits 10 (20 ^ (list.length (nat.digits 10 n)) + n)) :=
+begin
+ sorry
 end
 
 lemma ones_and_twos_aux (n : ℕ) :
-  ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
-             all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
+  ∃ k : ℕ, (list.length (nat.digits 10 (2^n * k)) = n) ∧
+             all_one_or_two (nat.digits 10 (2^n * k)) :=
 begin
   induction n with pn hpn,
-  { use 1, simp, },
+  { use 0, simp },
   obtain ⟨pk, hpk1, hpk2⟩ := hpn,
 
   /-
     Adding a 1 or a 2 to the front of 2^pn.succ * pk increments it by 2^pn.succ * 5^pn.succ or
-    by 2^{pn.succ+1} * 5^pn.succ, in each case preserving dvisibility by 2^pn.succ. Since the
+    by 2^{pn.succ+1} * 5^pn.succ, in each case preserving divisibility by 2^pn.succ. Since the
     two choices differ by 2^pn.succ * 2^pn.succ, one of them must actually achieve
     divisibility by 2^{pn.succ+1}.
   -/
@@ -282,11 +288,8 @@ begin
   sorry
 end
 
-
-theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
+theorem ones_and_twos (n : ℕ) : ∃ k : ℕ, all_one_or_two (nat.digits 10 (2^n * k)) :=
 begin
-  cases n,
-  { use 1, simp, },
   obtain ⟨k, hk1, hk2⟩ := ones_and_twos_aux n,
   exact ⟨k, hk2⟩
 end
