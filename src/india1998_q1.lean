@@ -13,11 +13,9 @@ Indian Mathematical Olympiad 1998, problem 1
 
 theorem india1998_q1a (a₁ a₂ b₁ b₂ : ℤ) :
   (∃ a₃ b₃, (a₁^2 + 3 * b₁^2) * (a₂^2 + 3 * b₂^2) = (a₃^2 + 3 * b₃^2)) :=
-begin
-  use (a₁ * a₂ + 3 * b₁ * b₂),
-  use (a₁ * b₂ - b₁ * a₂),
-  ring,
-end
+⟨a₁ * a₂ + 3 * b₁ * b₂,
+ a₁ * b₂ - b₁ * a₂,
+ by ring⟩
 
 lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 :=
 begin
@@ -26,11 +24,9 @@ begin
     simp [hA, zmod.val_nat_cast A] },
   { have hnn : a = - (- a) := eq_neg_of_eq_neg rfl,
     let neg_one : ℤ := -1,
-    have h1 : (- (-a)) = neg_one * (-a) := neg_eq_neg_one_mul (-a),
-    rw [h1] at hnn,
+    rw [neg_eq_neg_one_mul (-a)] at hnn,
     have h2 : ((( neg_one * -a ) : ℤ) : zmod 7) = ((neg_one : ℤ) : zmod 7) * ((-a : ℤ) : zmod 7) := by norm_cast,
-    have h4 : 0 < -a := neg_pos.mpr hn,
-    have h5 : 0 ≤ -a := le_of_lt h4,
+    have h5 : 0 ≤ -a := le_of_lt (neg_pos.mpr hn),
     obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h5,
     have h3: ((neg_one: zmod 7) * (A: zmod 7)).val = ((neg_one : zmod 7).val * (A: zmod 7).val) % 7 :=
         zmod.val_mul _ _,
