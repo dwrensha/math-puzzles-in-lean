@@ -21,7 +21,6 @@ end
 
 lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 :=
 begin
-  have h7 : 7 ≠ 0 := by norm_num,
   obtain (hp : 0 ≤ a) | (hn : a < 0) := le_or_lt 0 a,
   { obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le hp,
     simp [hA, zmod.val_nat_cast A] },
