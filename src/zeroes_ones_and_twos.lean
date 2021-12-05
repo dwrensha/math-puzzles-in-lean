@@ -233,6 +233,9 @@ begin
                   (finset.sum_range_succ' (λ (i : ℕ), f i) k).symm
 end
 
+--
+-- Prove that n has a positive multiple whose representation contains only zeroes and ones.
+--
 theorem zeroes_and_ones (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
 begin
   obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
@@ -271,11 +274,11 @@ begin
 end
 
 lemma ones_and_twos_aux (n : ℕ) :
-  ∃ k : ℕ, (list.length (nat.digits 10 (2^n * k)) = n) ∧
-             all_one_or_two (nat.digits 10 (2^n * k)) :=
+  ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
+             all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
 begin
   induction n with pn hpn,
-  { use 0, simp },
+  { use 1, simp, },
   obtain ⟨pk, hpk1, hpk2⟩ := hpn,
 
   /-
@@ -288,8 +291,13 @@ begin
   sorry
 end
 
-theorem ones_and_twos (n : ℕ) : ∃ k : ℕ, all_one_or_two (nat.digits 10 (2^n * k)) :=
+--
+-- Prove that 2^n has a positive multiple whose representation contains only ones and twos.
+--
+theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
 begin
+  cases n,
+  { use 1, simp, },
   obtain ⟨k, hk1, hk2⟩ := ones_and_twos_aux n,
   exact ⟨k, hk2⟩
 end
