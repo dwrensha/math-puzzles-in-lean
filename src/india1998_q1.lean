@@ -23,13 +23,11 @@ by linarith[int.mod_lt_of_pos (b-a) hb, (b - a).mod_add_div b]
 
 lemma lemma1' (a : ℤ) (b : ℕ) (hb : 0 < b) : ((a : zmod b).val : ℤ) = a % (b : ℤ) :=
 begin
-  have h : a % (b:ℤ) = (a + b * ((b - a) / b)) % (b : ℤ) :=
-     (int.add_mul_mod_self_left a ↑b ((↑b - a) / ↑b)).symm,
   have h1: (a : zmod b) = ((( a + b * ((b - a )/ b)) : ℤ): zmod b) := by simp,
-  rw[h,h1],
+  rw [←int.add_mul_mod_self_left a b ((b - a)/ b), h1],
   have h2 : 0 ≤ (( a + b * ((b - a )/ b)) : ℤ) := make_nonneg a ↑b (int.coe_nat_pos.mpr hb),
   obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h2,
-  simp[hA, zmod.val_nat_cast A]
+  simp [hA, zmod.val_nat_cast A],
 end
 
 lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 := lemma1' a 7 (by norm_num)
