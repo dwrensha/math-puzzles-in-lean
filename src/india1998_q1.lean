@@ -2,6 +2,7 @@ import data.int.basic
 import data.int.modeq
 import data.zmod.basic
 
+import tactic.linarith
 import tactic.ring
 
 /-
@@ -17,26 +18,21 @@ theorem india1998_q1a (a₁ a₂ b₁ b₂ : ℤ) :
  a₁ * b₂ - b₁ * a₂,
  by ring⟩
 
-lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 :=
+lemma make_nonneg (a b: ℤ) (hb : 0 < b) : 0 ≤ a + b * ((b - a) / b) :=
+by linarith[int.mod_lt_of_pos (b-a) hb, (b - a).mod_add_div b]
+
+lemma lemma1' (a : ℤ) (b : ℕ) (hb : 0 < b) : ((a : zmod b).val : ℤ) = a % (b : ℤ) :=
 begin
-  obtain (hp : 0 ≤ a) | (hn : a < 0) := le_or_lt 0 a,
-  { obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le hp,
-    simp [hA, zmod.val_nat_cast A] },
-  { have hnn : a = - (- a) := eq_neg_of_eq_neg rfl,
-    let neg_one : ℤ := -1,
-    rw [neg_eq_neg_one_mul (-a)] at hnn,
-    have h2 : ((( neg_one * -a ) : ℤ) : zmod 7) = ((neg_one : ℤ) : zmod 7) * ((-a : ℤ) : zmod 7) := by norm_cast,
-    have h5 : 0 ≤ -a := le_of_lt (neg_pos.mpr hn),
-    obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h5,
-    have h3: ((neg_one: zmod 7) * (A: zmod 7)).val = ((neg_one : zmod 7).val * (A: zmod 7).val) % 7 :=
-        zmod.val_mul _ _,
-    have h6: (A : zmod 7) = ((A : ℤ) : zmod 7) := by norm_cast,
-    have h7: (-1 : zmod 7).val = 6 := by ring,
-    have h8 : ((6 : ℕ) : ℤ) = (-1 : ℤ) % 7 := by norm_cast,
-    have h9 : (((-1 : ℤ) % 7) * (↑A % 7)) % 7 = ((-1 : ℤ) * (↑A)) % 7 := (int.mul_mod _ _ 7).symm,
-    rw [hnn,h2,hA,←h6,h3],
-    simp [zmod.val_nat_cast, h7, h8, h9] },
+  have h : a % (b:ℤ) = (a + b * ((b - a) / b)) % (b : ℤ) :=
+     (int.add_mul_mod_self_left a ↑b ((↑b - a) / ↑b)).symm,
+  have h1: (a : zmod b) = ((( a + b * ((b - a )/ b)) : ℤ): zmod b) := by simp,
+  rw[h,h1],
+  have h2 : 0 ≤ (( a + b * ((b - a )/ b)) : ℤ) := make_nonneg a ↑b (int.coe_nat_pos.mpr hb),
+  obtain ⟨A, hA⟩ := int.eq_coe_of_zero_le h2,
+  simp[hA, zmod.val_nat_cast A]
 end
+
+lemma lemma1 (a: ℤ) : ((a : zmod 7).val : ℤ) = a % 7 := lemma1' a 7 (by norm_num)
 
 theorem india1998_q1b (n a b: ℤ) (hn : a^2 + 3 * b^2 = 7 * n) :
   (∃ a b : ℤ, a^2 + 3 * b^2 = n) :=
