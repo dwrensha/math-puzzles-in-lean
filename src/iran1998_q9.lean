@@ -18,5 +18,12 @@ theorem iran1998_q9
   (h : 1/x + 1/y + 1/z = 2) :
   real.sqrt(x - 1) + real.sqrt(y - 1) + real.sqrt(z - 1) ≤ real.sqrt (x + y + z) :=
 begin
+  -- By cauchy schwarz,
+  -- √(x + y + z) √((x-1)/x + (y-1)/y + (z-1)/z) ≥ √(x - 1) + √(y - 1) + √(z - 1).
+  --
+  -- On the other hand, by hypothesis,
+  -- (x-1)/x + (y-1)/y + (z-1)/z = 1.
+  --
+  -- The desired result follows.
   sorry
 end
