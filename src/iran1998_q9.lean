@@ -25,5 +25,18 @@ begin
   -- (x-1)/x + (y-1)/y + (z-1)/z = 1.
   --
   -- The desired result follows.
+
+  have hxz : x ≠ 0 := by linarith,
+  have hyz : y ≠ 0 := by linarith,
+  have hzz : z ≠ 0 := by linarith,
+
+  have hxf : (x-1)/x = 1 - 1/x := by field_simp,
+  have hyf : (y-1)/y = 1 - 1/y := by field_simp,
+  have hzf : (z-1)/z = 1 - 1/z := by field_simp,
+
+  have : (x-1)/x + (y-1)/y + (z-1)/z = 1,
+  { rw[hxf, hyf, hzf],
+    linarith },
+
   sorry
 end
