@@ -51,7 +51,13 @@ begin
   let v₁ := construct_vector (real.sqrt x) (real.sqrt y) (real.sqrt z),
   let v₂ := construct_vector (real.sqrt ((x - 1)/x)) (real.sqrt ((y-1)/y)) (real.sqrt ((z-1)/z)),
 
-  --have : abs_inner_le_norm v₁ v₂,
+  have := @abs_inner_le_norm ℝ (euclidean_space ℝ (fin 3)) _ _ v₁ v₂,
+
+  have hv₁ : ∥v₁∥ = real.sqrt (x + y + z),
+  { sorry },
+
+  have hv₂ : ∥v₂∥ = 1,
+  { sorry },
 
   sorry
 end
