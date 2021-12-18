@@ -21,7 +21,6 @@ def construct_vector (x y z : ℝ) : euclidean_space ℝ (fin 3)
 | ⟨2, _⟩ := z
 | _ := 0 -- impossible
 
-
 lemma compute_norm_aux (v : euclidean_space ℝ (fin 3)) : ∥v∥^2 = (∑(i : fin 3), (v i)^2) :=
 begin
   have hips := @euclidean_space.inner_product_space (fin 3) ℝ _ _,
@@ -86,15 +85,36 @@ begin
   let v₁ := construct_vector (real.sqrt x) (real.sqrt y) (real.sqrt z),
   let v₂ := construct_vector (real.sqrt ((x - 1)/x)) (real.sqrt ((y-1)/y)) (real.sqrt ((z-1)/z)),
 
-  have := @abs_inner_le_norm ℝ (euclidean_space ℝ (fin 3)) _ _ v₁ v₂,
+  have cauchy_schwarz := @abs_inner_le_norm ℝ (euclidean_space ℝ (fin 3)) _ _ v₁ v₂,
 
   have hv₁ : ∥v₁∥ = real.sqrt (x + y + z),
-  { have := compute_norm v₁,
-    sorry },
+  { have hn := compute_norm v₁,
+    have h1: ((∑ (i : fin 3), ((v₁ i) ^ 2)) : ℝ) = (v₁ 0)^2 + (v₁ 1)^2 + (v₁ 2)^2,
+    { rw[fin.sum_univ_succ, fin.sum_univ_succ, fin.sum_univ_one],
+      ring },
+    rw [h1] at hn,
+    have hv1 : v₁ 0 = real.sqrt x := rfl,
+    have hv2 : v₁ 1 = real.sqrt y := rfl,
+    have hv3 : v₁ 2 = real.sqrt z := rfl,
+    rw [hv1, hv2, hv3] at hn,
+    have hxx : (real.sqrt x) ^ 2 = x,
+    { have hx0 : 0 ≤ x := by linarith,
+      exact real.sq_sqrt hx0},
+
+    have hyy : (real.sqrt y) ^ 2 = y,
+    { have hy0 : 0 ≤ y := by linarith,
+      exact real.sq_sqrt hy0},
+
+    have hzz : (real.sqrt z) ^ 2 = z,
+    { have hz0 : 0 ≤ z := by linarith,
+      exact real.sq_sqrt hz0},
+
+    rwa [hxx, hyy, hzz] at hn},
 
   have hv₂ : ∥v₂∥ = 1,
-  { have := compute_norm v₂,
+  { have hn := compute_norm v₂,
     sorry },
 
+  rw [hv₁, hv₂, mul_one] at cauchy_schwarz,
   sorry
 end
