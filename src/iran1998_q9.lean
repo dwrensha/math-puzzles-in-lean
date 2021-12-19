@@ -23,10 +23,6 @@ def construct_vector (x y z : ℝ) : euclidean_space ℝ (fin 3)
 
 lemma compute_norm_aux (v : euclidean_space ℝ (fin 3)) : ∥v∥^2 = (∑(i : fin 3), (v i)^2) :=
 begin
-  have hips := @euclidean_space.inner_product_space (fin 3) ℝ _ _,
-  have hi := hips.to_has_inner,
-  have := @inner ℝ (euclidean_space ℝ (fin 3)) hi v v,
-
   have hh : ((inner v v): ℝ) = (∑(i : fin 3), (v i)^2),
   { simp,
     have hs : ∀ (x : fin 3), v x * v x = (v x) ^2,
