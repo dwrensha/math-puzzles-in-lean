@@ -11,6 +11,17 @@ has no solutions in positive integers.
 
 -/
 
+lemma lemma_1
+  (s t u : ℤ)
+  (hs : 0 < s)
+  (ht : 0 < t)
+  (hu : 0 < u)
+  (h : s^4 - t^4 = u^2) :
+  false :=
+begin
+  sorry
+end
+
 theorem bulgaria1998_q6
   (x y z : ℤ)
   (hx : 0 < x)
