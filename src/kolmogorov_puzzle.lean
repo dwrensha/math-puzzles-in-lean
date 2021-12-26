@@ -1,5 +1,10 @@
 import data.stream.defs
 
+import tactic.basic
+import tactic.push_neg
+import tactic.rcases
+import tactic.suggest
+
 /-
 
 Suppose each (finite) word is either "decent" or "indecent". Given an infinite
@@ -31,13 +36,45 @@ def all_same_class
   (is_decent : list A → Prop) : Prop :=
  stream.all is_decent b ∨ stream.all (λ w ,¬is_decent w) b
 
+def prefix_decent
+  (is_decent : list A → Prop)
+  (a : stream A) : Prop :=
+stream.all is_decent (stream.inits a)
+
+def unravel
+    (is_decent : list A → Prop)
+    (a : stream A)
+    (hnot: ∀ (n : ℕ), ∃ (k : ℕ), n < k ∧
+            prefix_decent is_decent (stream.drop k a))
+     : stream ℕ :=
+@stream.corec ℕ ℕ id
+                  begin
+                    intro x,
+--                    obtain ⟨y,_⟩ := hnot x,
+                    sorry,
+                  end
+                  0
+
 theorem kolmogorov_puzzle
   (A : Type)
   (is_decent : list A → Prop)
   (a : stream A)
   : (∃ (b : stream ℕ),
-     all_same_class
-      (stream.tail $ break_into_words ⟨b, a⟩) is_decent) :=
+     (stream.all (λ x, 0 < x) b ∧
+      all_same_class
+       (stream.tail $ break_into_words ⟨b, a⟩) is_decent)) :=
 begin
-  sorry
+  let p : Prop :=
+     (∃ (n : ℕ), ∀ (k : ℕ), n < k →
+         ¬ prefix_decent is_decent (stream.drop k a)),
+
+  have h := classical.em p,
+  cases h with h hnot,
+  { sorry },
+  {
+    push_neg at hnot,
+    use unravel is_decent a hnot,
+    sorry
+  },
+
 end
