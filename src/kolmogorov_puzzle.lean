@@ -41,20 +41,6 @@ def prefix_decent
   (a : stream A) : Prop :=
 stream.all is_decent (stream.inits a)
 
-def unravel
-    (is_decent : list A → Prop)
-    (a : stream A)
-    (hnot: ∀ (n : ℕ), ∃ (k : ℕ), n < k ∧
-            prefix_decent is_decent (stream.drop k a))
-     : stream ℕ :=
-@stream.corec ℕ ℕ id
-                  begin
-                    intro x,
---                    obtain ⟨y,_⟩ := hnot x,
-                    sorry,
-                  end
-                  0
-
 theorem kolmogorov_puzzle
   (A : Type)
   (is_decent : list A → Prop)
@@ -73,7 +59,8 @@ begin
   { sorry },
   {
     push_neg at hnot,
-    use unravel is_decent a hnot,
+    obtain ⟨b : stream ℕ, hb⟩ := classical.axiom_of_choice hnot,
+    use b,
     sorry
   },
 
