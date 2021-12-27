@@ -36,10 +36,10 @@ def all_same_class
   (is_decent : list α → Prop) : Prop :=
  stream.all is_decent b ∨ stream.all (λ w ,¬is_decent w) b
 
-def prefix_decent
-  (is_decent : list α → Prop)
+def all_prefixes
+  (p : list α → Prop)
   (a : stream α) : Prop :=
-stream.all is_decent (stream.inits a)
+stream.all p (stream.inits a)
 
 theorem kolmogorov_puzzle
   (is_decent : list α → Prop)
@@ -51,14 +51,14 @@ theorem kolmogorov_puzzle
 begin
   let p : Prop :=
      (∃ (n : ℕ), ∀ (k : ℕ), n < k →
-         ¬ prefix_decent is_decent (stream.drop k a)),
+         ¬ all_prefixes is_decent (stream.drop k a)),
 
   have h := classical.em p,
   cases h with h hnot,
   { sorry },
   { push_neg at hnot,
     obtain ⟨c : stream ℕ,
-            hc : ∀ (x : ℕ), x < c x ∧ prefix_decent is_decent (stream.drop (c x) a)⟩
+            hc : ∀ (x : ℕ), x < c x ∧ all_prefixes is_decent (stream.drop (c x) a)⟩
       := classical.axiom_of_choice hnot,
     sorry,
   },
