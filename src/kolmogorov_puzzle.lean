@@ -57,11 +57,11 @@ begin
   have h := classical.em p,
   cases h with h hnot,
   { sorry },
-  {
-    push_neg at hnot,
-    obtain ⟨b : stream ℕ, hb⟩ := classical.axiom_of_choice hnot,
-    use b,
-    sorry
+  { push_neg at hnot,
+    obtain ⟨c : stream ℕ,
+            hc : ∀ (x : ℕ), x < c x ∧ prefix_decent is_decent (stream.drop (c x) a)⟩
+      := classical.axiom_of_choice hnot,
+    sorry,
   },
 
 end
