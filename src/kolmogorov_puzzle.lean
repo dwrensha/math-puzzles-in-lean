@@ -39,8 +39,9 @@ def break_into_words :
 -- #eval (stream.take 10 (break_into_words ⟨id, id⟩))
 
 def all_same_class
+  (is_decent : list α → Prop)
   (b : stream (list α))
-  (is_decent : list α → Prop) : Prop :=
+  : Prop :=
  stream.all is_decent b ∨ stream.all (λ w ,¬is_decent w) b
 
 def all_prefixes
@@ -48,26 +49,49 @@ def all_prefixes
   (a : stream α) : Prop :=
 stream.all p (stream.inits a)
 
+noncomputable def unravel
+    (is_decent : list α → Prop)
+    (a : stream α)
+    (hnot: ∀ (n : ℕ), ∃ (k : ℕ), 0 < k ∧
+            all_prefixes is_decent (stream.drop (n + k) a))
+     : stream ℕ :=
+stream.corec (λ acc, classical.some (hnot acc))
+             (λ acc, acc + classical.some (hnot acc))
+             0
+
+lemma unraveled_is_decent
+  (is_decent : list α → Prop)
+  (a : stream α)
+  (hnot: ∀ (n : ℕ), ∃ (k : ℕ), 0 < k ∧
+           all_prefixes is_decent (stream.drop (n + k) a))
+  : stream.all is_decent (break_into_words (unravel is_decent a hnot) a).tail :=
+begin
+  intro n,
+  sorry
+end
+
+
 theorem kolmogorov_puzzle
   (is_decent : list α → Prop)
   (a : stream α)
   : (∃ (b : stream ℕ),
      (stream.all (λ x, 0 < x) b ∧
-      all_same_class
-       (stream.tail $ break_into_words b a) is_decent)) :=
+      all_same_class is_decent
+       (stream.tail $ break_into_words b a))) :=
 begin
   let p : Prop :=
-     (∃ (n : ℕ), ∀ (k : ℕ), n < k →
-         ¬ all_prefixes is_decent (stream.drop k a)),
+     (∃ (n : ℕ), ∀ (k : ℕ), 0 < k →
+         ¬ all_prefixes is_decent (stream.drop (n + k) a)),
 
   have h := classical.em p,
   cases h with h hnot,
   { sorry },
   { push_neg at hnot,
-    obtain ⟨c : stream ℕ,
-            hc : ∀ (x : ℕ), x < c x ∧ all_prefixes is_decent (stream.drop (c x) a)⟩
-      := classical.axiom_of_choice hnot,
-    sorry,
+    use unravel is_decent a hnot,
+    split,
+    { sorry },
+    { left,
+      exact unraveled_is_decent is_decent a hnot }
   },
 
 end
