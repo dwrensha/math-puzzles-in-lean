@@ -15,15 +15,15 @@ Answer: yes.
 
 -/
 
-variable {A : Type}
+variable {α : Type}
 
 def break_into_words :
    (stream ℕ) × -- word lengths
-   (stream A) → -- original sequence
-   (stream (list A)) -- sequence of words
+   (stream α) → -- original sequence
+   (stream (list α)) -- sequence of words
  := @stream.corec
-     (stream ℕ × stream A)
-     (list A)
+     (stream ℕ × stream α)
+     (list α)
      (λ ⟨lengths, seq⟩, stream.take (lengths.head) seq)
      (λ ⟨lengths, seq⟩,
           ⟨lengths.tail,
@@ -32,19 +32,18 @@ def break_into_words :
 -- #eval (stream.take 10 (break_into_words ⟨id, id⟩))
 
 def all_same_class
-  (b : stream (list A))
-  (is_decent : list A → Prop) : Prop :=
+  (b : stream (list α))
+  (is_decent : list α → Prop) : Prop :=
  stream.all is_decent b ∨ stream.all (λ w ,¬is_decent w) b
 
 def prefix_decent
-  (is_decent : list A → Prop)
-  (a : stream A) : Prop :=
+  (is_decent : list α → Prop)
+  (a : stream α) : Prop :=
 stream.all is_decent (stream.inits a)
 
 theorem kolmogorov_puzzle
-  (A : Type)
-  (is_decent : list A → Prop)
-  (a : stream A)
+  (is_decent : list α → Prop)
+  (a : stream α)
   : (∃ (b : stream ℕ),
      (stream.all (λ x, 0 < x) b ∧
       all_same_class
