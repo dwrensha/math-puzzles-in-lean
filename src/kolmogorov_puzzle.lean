@@ -28,13 +28,9 @@ def break_into_words :
    (stream α) → -- original sequence
    (stream (list α)) -- sequence of words
  := function.curry
-     (@stream.corec
-       (stream ℕ × stream α)
-       (list α)
-       (λ ⟨lengths, seq⟩, stream.take (lengths.head) seq)
-       (λ ⟨lengths, seq⟩,
-            ⟨lengths.tail,
-             stream.drop (lengths.head) seq⟩))
+     (stream.corec
+       (λ ⟨lengths, a'⟩, stream.take (lengths.head) a')
+       (λ ⟨lengths, a'⟩, ⟨lengths.tail, stream.drop (lengths.head) a'⟩))
 
 -- #eval (stream.take 10 (break_into_words ⟨id, id⟩))
 
@@ -90,7 +86,7 @@ begin
     split,
     { intro n,
       have h : (unravel is_decent a hnot).nth n =
-      classical.some (hnot (n.rec_on 0 (λ (n:ℕ)(r:ℕ), r + classical.some (hnot r)))) := rfl,
+        classical.some (hnot (n.rec_on 0 (λ (n:ℕ)(r:ℕ), r + classical.some (hnot r)))) := rfl,
       rw[h],
       exact (classical.some_spec (hnot _)).1 },
     { left,
