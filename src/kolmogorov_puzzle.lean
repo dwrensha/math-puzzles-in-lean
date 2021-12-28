@@ -1,4 +1,7 @@
 import data.stream.defs
+import data.stream.init
+
+import algebra.big_operators
 
 import tactic.basic
 import tactic.push_neg
@@ -21,6 +24,8 @@ Answer: yes.
 
 -/
 
+open_locale big_operators
+
 variable {α : Type}
 
 def break_into_words :
@@ -33,6 +38,23 @@ def break_into_words :
        (λ ⟨lengths, a'⟩, ⟨lengths.tail, stream.drop (lengths.head) a'⟩))
 
 -- #eval (stream.take 10 (break_into_words ⟨id, id⟩))
+
+lemma break_into_words_closed_form
+    (b : stream ℕ)
+    (a : stream α)
+   : break_into_words b a =
+      (λ i, stream.take (b i) (stream.drop (∑(j : ℕ) in finset.range i, b j) a)) :=
+begin
+  funext n,
+  induction n with pn hpn,
+  { refl, },
+  { have h : break_into_words b a pn.succ
+            = (@stream.corec (stream ℕ × stream α) (list α) _ _) ⟨b, a⟩ pn.succ := rfl,
+    rw[stream.corec_eq] at h,
+    rw [h],
+    sorry,
+  }
+end
 
 def all_same_class
   (is_decent : list α → Prop)
