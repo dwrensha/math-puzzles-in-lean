@@ -79,8 +79,7 @@ begin
      (∃ (n : ℕ), ∀ (k : ℕ), 0 < k →
          ¬ all_prefixes is_decent (stream.drop (n + k) a)),
 
-  have h := classical.em p,
-  cases h with h hnot,
+  cases classical.em p with h hnot,
   { sorry },
   { push_neg at hnot,
     use choose_decent_words is_decent a hnot,
