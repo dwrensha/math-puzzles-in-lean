@@ -45,7 +45,7 @@ def all_prefixes
   (a : stream α) : Prop :=
 stream.all p (stream.inits a)
 
-noncomputable def unravel
+noncomputable def choose_decent_words
     (is_decent : list α → Prop)
     (a : stream α)
     (hnot: ∀ (n : ℕ), ∃ (k : ℕ), 0 < k ∧
@@ -60,9 +60,10 @@ lemma unraveled_is_decent
   (a : stream α)
   (hnot: ∀ (n : ℕ), ∃ (k : ℕ), 0 < k ∧
            all_prefixes is_decent (stream.drop (n + k) a))
-  : stream.all is_decent (break_into_words (unravel is_decent a hnot) a).tail :=
+  : stream.all is_decent (break_into_words (choose_decent_words is_decent a hnot) a).tail :=
 begin
   intro n,
+--  have h : ((break_into_words (unravel is_decent a hnot) a).tail.nth n) =
   sorry
 end
 
@@ -82,12 +83,9 @@ begin
   cases h with h hnot,
   { sorry },
   { push_neg at hnot,
-    use unravel is_decent a hnot,
+    use choose_decent_words is_decent a hnot,
     split,
     { intro n,
-      have h : (unravel is_decent a hnot).nth n =
-        classical.some (hnot (n.rec_on 0 (λ (n:ℕ)(r:ℕ), r + classical.some (hnot r)))) := rfl,
-      rw[h],
       exact (classical.some_spec (hnot _)).1 },
     { left,
       exact unraveled_is_decent is_decent a hnot }
