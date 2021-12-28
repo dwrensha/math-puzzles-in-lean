@@ -55,7 +55,7 @@ stream.corec (λ acc, classical.some (hnot acc))
              (λ acc, acc + classical.some (hnot acc))
              0
 
-lemma unraveled_is_decent
+lemma check_decent_words
   (is_decent : list α → Prop)
   (a : stream α)
   (hnot: ∀ (n : ℕ), ∃ (k : ℕ), 0 < k ∧
@@ -88,7 +88,7 @@ begin
     { intro n,
       exact (classical.some_spec (hnot _)).1 },
     { left,
-      exact unraveled_is_decent is_decent a hnot }
+      exact check_decent_words is_decent a hnot }
   },
 
 end
