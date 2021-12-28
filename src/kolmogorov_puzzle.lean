@@ -70,7 +70,6 @@ begin
   sorry
 end
 
-
 theorem kolmogorov_puzzle
   (is_decent : list α → Prop)
   (a : stream α)
@@ -89,7 +88,11 @@ begin
   { push_neg at hnot,
     use unravel is_decent a hnot,
     split,
-    { sorry },
+    { intro n,
+      have h : (unravel is_decent a hnot).nth n =
+      classical.some (hnot (n.rec_on 0 (λ (n:ℕ)(r:ℕ), r + classical.some (hnot r)))) := rfl,
+      rw[h],
+      exact (classical.some_spec (hnot _)).1 },
     { left,
       exact unraveled_is_decent is_decent a hnot }
   },
