@@ -46,14 +46,27 @@ lemma break_into_words_closed_form
       (λ i, stream.take (b i) (stream.drop (∑(j : ℕ) in finset.range i, b j) a)) :=
 begin
   funext n,
-  induction n with pn hpn,
-  { refl, },
-  { have h : break_into_words b a pn.succ
-            = (@stream.corec (stream ℕ × stream α) (list α) _ _) ⟨b, a⟩ pn.succ := rfl,
-    rw[stream.corec_eq] at h,
-    rw [h],
-    sorry,
-  }
+  convert_to ((stream.corec (λ x, stream.take (x.fst.head) x.snd)
+                 (λ x, ⟨x.fst.tail, stream.drop (x.fst.head) x.snd⟩)) :
+                  stream ℕ × stream α → stream (list α)) ⟨b, a⟩ n =
+             stream.take (b n) (stream.drop (∑(j : ℕ) in finset.range n, b j) a),
+  { rw[break_into_words, function.curry], congr; ext ⟨a,b⟩; refl },
+  rw [stream.corec_def,stream.map],
+  simp only,
+  congr,
+  { revert a b,
+    induction n with pn hpn,
+    { intros a b, refl},
+    { intros a b,
+      { have hnth: b pn.succ = b.nth pn.succ := rfl,
+        rw[hnth, stream.nth_succ, stream.nth_succ, stream.iterate_eq, stream.tail_cons, hpn],
+        refl } } },
+  { revert a b,
+    induction n with pn hpn,
+    { intros a b, refl},
+    { intros a b,
+      rw [stream.nth_succ, stream.iterate_eq, stream.tail_cons, hpn, stream.drop_drop, finset.sum_range_succ'],
+      congr } }
 end
 
 def all_same_class
