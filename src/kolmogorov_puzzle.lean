@@ -37,7 +37,7 @@ def break_into_words :
        (λ ⟨lengths, a'⟩, stream.take (lengths.head) a')
        (λ ⟨lengths, a'⟩, ⟨lengths.tail, stream.drop (lengths.head) a'⟩))
 
--- #eval (stream.take 10 (break_into_words ⟨id, id⟩))
+--#eval (stream.take 10 (break_into_words id id))
 
 lemma break_into_words_closed_form
     (b : stream ℕ)
@@ -98,7 +98,6 @@ lemma check_decent_words
   : stream.all is_decent (break_into_words (choose_decent_words is_decent a hnot) a).tail :=
 begin
   intro n,
---  have h : ((break_into_words (unravel is_decent a hnot) a).tail.nth n) =
   sorry
 end
 
