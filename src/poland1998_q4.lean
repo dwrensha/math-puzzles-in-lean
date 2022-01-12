@@ -113,13 +113,6 @@ begin
     ring },
 end
 
-lemma lemma4 (i : ℕ) (h : i.succ.succ.succ ≤ 2) : false :=
-begin
-  have h1 : i.succ.succ ≤ 1 := nat.succ_le_succ_iff.mp h,
-  have h2 : i.succ ≤ 0 := nat.succ_le_succ_iff.mp h1,
-  exact nat.not_succ_le_zero i h2,
-end
-
 lemma lemma5 (n : ℕ) : (4 * (n - 1) + 1 + 1) / 2 = (2 * (n - 1) + 1) :=
 begin
   have : (4 * (n - 1) + 1 + 1) = 2 * (2 * (n - 1) + 1) := by linarith,
@@ -235,11 +228,9 @@ begin
 
   have : ∀ i, i ≤ 2 → a' (n1 + i) = a' n1,
   { intros i hi,
-    cases i, { refl },
-    cases i, { exact ha1' },
-    cases i, { exact ha2' },
-    exfalso,
-    exact lemma4 i hi },
+    interval_cases i,
+    { exact ha1' },
+    { exact ha2' } },
 
   -- then the seven elements beginning with a (4 * n - 3) will all have different
   -- residues mod 7.
