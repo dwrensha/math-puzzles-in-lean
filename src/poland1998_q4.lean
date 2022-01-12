@@ -7,6 +7,7 @@ import data.int.basic
 import tactic.linarith
 import tactic.field_simp
 import tactic.norm_num
+import tactic.interval_cases
 
 /-
 Polish Mathematical Olympiad 1998, Problem 4
@@ -118,18 +119,6 @@ begin
   have h2 : i.succ ≤ 0 := nat.succ_le_succ_iff.mp h1,
   exact nat.not_succ_le_zero i h2,
 end
-
-lemma lemma4' (i : ℕ) (h : i.succ.succ.succ.succ.succ.succ < 6) : false :=
-begin
-  have h1 : i.succ.succ.succ.succ.succ < 5 := nat.succ_lt_succ_iff.mp h,
-  have h2 : i.succ.succ.succ.succ < 4 := nat.succ_lt_succ_iff.mp h1,
-  have h3 : i.succ.succ.succ < 3 := nat.succ_lt_succ_iff.mp h2,
-  have h4 : i.succ.succ < 2 := nat.succ_lt_succ_iff.mp h3,
-  have h5 : i.succ < 1 := nat.succ_lt_succ_iff.mp h4,
-  have h6 : i < 0 := nat.succ_lt_succ_iff.mp h5,
-  exact nat.not_lt_zero i h6,
-end
-
 
 lemma lemma5 (n : ℕ) : (4 * (n - 1) + 1 + 1) / 2 = (2 * (n - 1) + 1) :=
 begin
@@ -275,32 +264,25 @@ begin
   { intros i hi,
     have hn2ge2 : 2 ≤ n2 + i + 1 := by linarith,
     have hr := a'_recurrence (n2 + i + 1) hn2ge2,
-    cases i,
+    interval_cases i,
     { have hn1 : (n2 + 1) / 2 = n1 := lemma5 n,
       rw [hn1] at hr,
       exact hr },
-    cases i,
     { have hn1 : (n2 + 2) / 2 = n1 := lemma5' n,
       rw [hn1] at hr,
       exact hr},
-    cases i,
     { have hn1 : (n2 + 3) / 2 = n1 + 1 := lemma6 n,
       rw [hn1, ha1'] at hr,
       exact hr},
-    cases i,
     { have hn1 : (n2 + 4) / 2 = n1 + 1 := lemma6' n,
       rw [hn1, ha1'] at hr,
       exact hr},
-    cases i,
     { have hn1 : (n2 + 5) / 2 = n1 + 2 := lemma7 n,
       rw [hn1, ha2'] at hr,
       exact hr},
-    cases i,
     { have hn1 : (n2 + 6) / 2 = n1 + 2 := lemma7' n,
       rw [hn1, ha2'] at hr,
-      exact hr},
-    exfalso,
-    exact lemma4' i hi },
+      exact hr} },
 
   have hik : ∀ i, i < 7 → a' (n2 + i) = a' n2 + a' n1 * i,
   { intros i,
