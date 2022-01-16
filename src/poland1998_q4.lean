@@ -113,13 +113,6 @@ begin
     ring },
 end
 
-lemma lemma5' (n : ℕ) : (4 * (n - 1) + 1 + 2) / 2 = (2 * (n - 1) + 1) :=
-begin
-  have h1 : (4 * (n - 1) + 1 + 2) = 2 * (2 * (n - 1) + 1) + 1 := by linarith,
-  rw [h1],
-  exact lemma2 (2 * (n - 1) + 1),
-end
-
 lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
 begin
   have : (4 * (n - 1) + 1 + 3) = 2 * (2 * (n - 1) + 1 + 1) := by linarith,
@@ -250,12 +243,13 @@ begin
     have hn2ge2 : 2 ≤ n2 + i + 1 := by linarith,
     have hr := a'_recurrence (n2 + i + 1) hn2ge2,
     interval_cases i,
-    { suffices : (n2 + 1) / 2 = n1, by {rwa [this] at hr},
+    { suffices : (n2 + 1) / 2 = n1, by { rwa [this] at hr },
       have : (4 * (n - 1) + 1 + 1) = 2 * (2 * (n - 1) + 1) := by ring,
       simp only [this, nat.succ_pos', nat.mul_div_right], },
-    { have hn1 : (n2 + 2) / 2 = n1 := lemma5' n,
-      rw [hn1] at hr,
-      exact hr},
+    { suffices hn1 : (n2 + 2) / 2 = n1, by { rwa [hn1] at hr },
+      have h1 : (4 * (n - 1) + 1 + 2) = 2 * (2 * (n - 1) + 1) + 1 := by ring,
+      rw [h1],
+      exact lemma2 (2 * (n - 1) + 1)},
     { have hn1 : (n2 + 3) / 2 = n1 + 1 := lemma6 n,
       rw [hn1, ha1'] at hr,
       exact hr},
