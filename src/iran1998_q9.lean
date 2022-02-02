@@ -24,9 +24,9 @@ begin
     exact fintype.sum_congr (λ (a : fin 3), v a * v a) (λ (a : fin 3), v a ^ 2) hs
   },
 
-  have hn : ∥v∥^2 = is_R_or_C.re (inner v v) := norm_sq_eq_inner v,
+  have hn := @norm_sq_eq_inner ℝ (euclidean_space ℝ (fin 3)) _ _ v,
   have h1 : is_R_or_C.re ((inner v v):ℝ) = ((inner v v) :ℝ) := by finish,
-  rw [hn,h1],
+  rw [hn, h1],
   exact hh,
 end
 
