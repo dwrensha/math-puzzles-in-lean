@@ -15,12 +15,6 @@ Let x,y,z > 1 and 1/x + 1/y + 1/z = 2. Prove that
 
 -/
 
-def construct_vector (x y z : ℝ) : euclidean_space ℝ (fin 3)
-| ⟨0, _⟩ := x
-| ⟨1, _⟩ := y
-| ⟨2, _⟩ := z
-| _ := 0 -- impossible
-
 lemma compute_norm_aux (v : euclidean_space ℝ (fin 3)) : ∥v∥^2 = (∑(i : fin 3), (v i)^2) :=
 begin
   have hh : ((inner v v): ℝ) = (∑(i : fin 3), (v i)^2),
@@ -86,8 +80,9 @@ begin
   { rw[hxf, hyf, hzf],
     linarith },
 
-  let v₁ := construct_vector (real.sqrt x) (real.sqrt y) (real.sqrt z),
-  let v₂ := construct_vector (real.sqrt ((x - 1)/x)) (real.sqrt ((y-1)/y)) (real.sqrt ((z-1)/z)),
+  let v₁ : euclidean_space ℝ (fin 3) := ![real.sqrt x, real.sqrt y, real.sqrt z],
+  let v₂ : euclidean_space ℝ (fin 3) :=
+      ![real.sqrt ((x - 1)/x), real.sqrt ((y-1)/y), real.sqrt ((z-1)/z)],
 
   have cauchy_schwarz := @abs_inner_le_norm ℝ (euclidean_space ℝ (fin 3)) _ _ v₁ v₂,
 
