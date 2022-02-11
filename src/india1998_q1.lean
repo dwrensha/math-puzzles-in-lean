@@ -54,7 +54,7 @@ begin
   rw [h8] at h1,
 
   have h9: az ^ 2 + (-4) * bz ^ 2 + 4 * bz^2 = 0 + 4 * bz^2 := congr_fun (congr_arg has_add.add h1) _,
-  rw [neg_mul_eq_neg_mul_symm, neg_add_cancel_right, fin.zero_add] at h9,
+  rw [neg_mul, neg_add_cancel_right, fin.zero_add] at h9,
 
   have h10 : 4 * bz^2 = (2 * bz) ^ 2 := by ring,
   rw [h10] at h9,
