@@ -13,7 +13,9 @@ Show that AP ≥ AI, and that equality holds if and only if P = I.
 
 -/
 
-theorem imo2006_q1 /-(t: affine.triangle ℝ (euclidean_space ℝ (fin 2)))-/ : Prop :=
+/-
+theorem imo2006_q1 (t: affine.triangle ℝ (euclidean_space ℝ (fin 2))) : Prop :=
 begin
   sorry
 end
+-/
