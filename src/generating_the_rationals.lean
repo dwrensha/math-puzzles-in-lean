@@ -35,10 +35,10 @@ begin
     { simpa [nat.le_zero_iff.mp (nat.succ_le_succ_iff.mp hmn)] } },
   {
     intros m hmn,
-    obtain ⟨t, ht : m = 2 * t⟩ | ⟨t, ht : m = 2 * t + 1⟩ := m.even_or_odd,
+    obtain ⟨t, ht : m = t + t⟩ | ⟨t, ht : m = 2 * t + 1⟩ := m.even_or_odd,
     { -- m is even. reduces to smaller exponent
       rw ht,
-      have h2 : ↑(2 * t) / 2 ^ pn.succ = ((t : ℕ) : ℚ) / 2 ^ pn :=
+      have h2 : ↑(t + t) / 2 ^ pn.succ = ((t : ℕ) : ℚ) / 2 ^ pn :=
         by {field_simp[pow_succ], ring },
       rw h2,
       have h3 : t ≤ 2 ^ pn := by { rw [ht, pow_succ] at hmn, linarith },

@@ -89,7 +89,7 @@ begin
     obtain ⟨m1, hm1⟩ := h14,
 
     have h15: (az + (- 2) * bz) = 0,
-    { rw [hep], ring_nf, simp },
+    { rw [hep], ring_nf },
     have h16: 7 ∣ (a + (-2) * b),
     { have h50 : (az + (-2) * bz).val = (0 : zmod 7).val := congr_arg zmod.val h15,
       have h51 : (az + (-2) * bz).val = (az.val + ((-2) * bz).val) % 7 := zmod.val_add _ _,
@@ -119,8 +119,8 @@ begin
       ring_nf,
       have h21 : (2 * a + 3 * b) ^ 2 + 3 * (a - 2 * b) ^ 2 = 7 * (a ^2 + 3 * b^2) := by ring,
       have h18: 7 * (a ^ 2 + 3 * b ^ 2) = 7 * (7 * n) := congr_arg (has_mul.mul 7) hn,
-      rw [h21, h18],
-      ring },
+      ring_nf at h18,
+      rw [h18] },
 
     have h21 : (7 * m1) ^ 2 + 3 * (7 * m2) ^ 2 = 7 * 7 * (m1 ^ 2 + 3 * m2 ^ 2) := by ring,
 
@@ -130,7 +130,7 @@ begin
 
   { have h11: (2 * az + (-3) * bz) = 0,
     { rw [hen], ring_nf,
-      simp, ring_nf,
+      simp,
       have h12: (7 : zmod 7) = 0 := rfl,
       rw [h12], simp},
 
@@ -189,10 +189,9 @@ begin
     have h20 : (7 * m1) ^ 2 + 3 * (7 * m2) ^ 2 = 7 * 7 * n,
     { rw [←hm1, ←hm2],
       ring_nf,
-      have h21 : (2 * a - 3 * b) ^ 2 + 3 * (a + 2 * b) ^ 2 = 7 * (a ^2 + 3 * b^2) := by ring,
       have h18: 7 * (a ^ 2 + 3 * b ^ 2) = 7 * (7 * n) := congr_arg (has_mul.mul 7) hn,
-      rw [h21, h18],
-      ring },
+      ring_nf at h18,
+      rw [h18]},
 
     have h21 : (7 * m1) ^ 2 + 3 * (7 * m2) ^ 2 = 7 * 7 * (m1 ^ 2 + 3 * m2 ^ 2) := by ring,
 
