@@ -38,18 +38,15 @@ begin
   let az : zmod 7 := a,
   let bz : zmod 7 := b,
 
-  have h1 : (((a^2 + 3 * b^2) : ℤ) : zmod 7) = (((7 * n) : ℤ) : zmod 7) := congr_arg coe hn,
-  have h2 : (((a^2 + 3 * b^2) : ℤ) : zmod 7) = ((a^2 : ℤ) : zmod 7) + (((3 * b^2) : ℤ) : zmod 7) :=
-    int.cast_add _ _,
-  have h3 : ((a^2 : ℤ) : zmod 7) = az^2 := int.cast_pow a 2,
-  have h4 : (((3 * b^2) : ℤ) : zmod 7) = ((3:ℤ):zmod 7) * (((b^2) : ℤ) : zmod 7) := int.cast_mul 3 (b ^ 2),
-  have h5 : ((b^2 : ℤ) : zmod 7) = bz^2 := int.cast_pow b 2,
-  have h6 : ((3:ℤ):zmod 7) = (3 : zmod 7) := rfl,
-  have h7' : ((7 : ℤ) : zmod 7) = 0 := rfl,
-  have h7 : (((7 * n) : ℤ) : zmod 7) = 0 := by {rw [int.cast_mul, h7'], exact zero_mul _},
-  have h8: (3:zmod 7) = -4 := by ring,
-  rw [h2,h3,h4,h5,h6,h7,h8] at h1,
-  clear h2 h3 h4 h5 h6 h7 h7' h8,
+  have h1 := calc az ^ 2 + (-4) * bz ^ 2
+        = az^2 + (3:zmod 7) * bz^2 : by ring
+    ... = az^2 + ((3:ℤ):zmod 7) * bz^2 : rfl
+    ... = ((a^2 : ℤ) : zmod 7) + ((3:ℤ):zmod 7) * (((b^2) : ℤ) : zmod 7)
+                                                            : by rw [int.cast_pow a 2, int.cast_pow b 2]
+    ... = ((a^2 : ℤ) : zmod 7) + (((3 * b^2) : ℤ) : zmod 7) : by rw [int.cast_mul 3 (b^2)]
+    ... = (((a^2 + 3 * b^2) : ℤ) : zmod 7) : (int.cast_add _ _).symm
+    ... = (((7 * n) : ℤ) : zmod 7) : congr_arg coe hn
+    ... = 0 : by {rw [int.cast_mul], exact zero_mul _},
 
   have h9: az ^ 2 + (-4) * bz ^ 2 + 4 * bz^2 = 0 + 4 * bz^2 := congr_fun (congr_arg has_add.add h1) _,
   rw [neg_mul, neg_add_cancel_right, fin.zero_add] at h9,
