@@ -39,8 +39,7 @@ begin
   let bz : zmod 7 := b,
 
   have h1 := calc az ^ 2 + (-4) * bz ^ 2
-        = az^2 + (3:zmod 7) * bz^2 : by ring
-    ... = az^2 + ((3:ℤ):zmod 7) * bz^2 : rfl
+        = az^2 + ((3:ℤ):zmod 7) * bz^2 : by ring
     ... = ((a^2 : ℤ) : zmod 7) + ((3:ℤ):zmod 7) * (((b^2) : ℤ) : zmod 7)
                                                             : by rw [int.cast_pow a 2, int.cast_pow b 2]
     ... = ((a^2 : ℤ) : zmod 7) + (((3 * b^2) : ℤ) : zmod 7) : by rw [int.cast_mul 3 (b^2)]
