@@ -47,11 +47,9 @@ begin
   have h6 : ((3:ℤ):zmod 7) = (3 : zmod 7) := rfl,
   have h7' : ((7 : ℤ) : zmod 7) = 0 := rfl,
   have h7 : (((7 * n) : ℤ) : zmod 7) = 0 := by {rw [int.cast_mul, h7'], exact zero_mul _},
-  rw [h2,h3,h4,h5,h6,h7] at h1,
-  clear h2 h3 h4 h5 h6 h7,
-
   have h8: (3:zmod 7) = -4 := by ring,
-  rw [h8] at h1,
+  rw [h2,h3,h4,h5,h6,h7,h8] at h1,
+  clear h2 h3 h4 h5 h6 h7 h7' h8,
 
   have h9: az ^ 2 + (-4) * bz ^ 2 + 4 * bz^2 = 0 + 4 * bz^2 := congr_fun (congr_arg has_add.add h1) _,
   rw [neg_mul, neg_add_cancel_right, fin.zero_add] at h9,
