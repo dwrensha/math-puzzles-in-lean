@@ -77,8 +77,7 @@ begin
       rw [h53],
       have h54 : 7 ∣ 7 * (2 * (a / 7) + 3 * (b / 7)) := dvd.intro _ rfl,
       exact dvd_add h52 h54 },
-    have h14 : (∃ m1, 2 * a + 3 * b = 7 * m1) := exists_eq_mul_right_of_dvd h13,
-    obtain ⟨m1, hm1⟩ := h14,
+    obtain ⟨m1, hm1⟩ := exists_eq_mul_right_of_dvd h13,
 
     have h15: (az + (- 2) * bz) = 0,
     { rw [hep], ring_nf },
@@ -98,8 +97,7 @@ begin
       rw [h53],
       have h54 : 7 ∣ 7 * (a / 7 - 2 * (b / 7) - (b % 7)) := dvd.intro _ rfl,
       exact dvd_add h52' h54 },
-    have h17 : (∃ m2, a + (-2) * b = 7 * m2) := exists_eq_mul_right_of_dvd h16,
-    obtain ⟨m2, hm2⟩ := h17,
+    obtain ⟨m2, hm2⟩ := exists_eq_mul_right_of_dvd h16,
 
     use m1,
     use m2,
