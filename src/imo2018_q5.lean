@@ -77,7 +77,7 @@ begin
       = (a:ℚ) * (c:ℚ) * N := congr_arg (has_mul.mul (↑a * ↑c)) hN,
 
     have : (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
-     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp[-rat.coe_int_div_eq_mk], ring},
+     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp, ring},
 
     linarith,
   },
@@ -116,7 +116,7 @@ begin
       = (a:ℚ) * (c:ℚ) * N := congr_arg (has_mul.mul (↑a * ↑c)) hN,
 
     have : (a:ℚ) * (c:ℚ) * ((b:ℚ)/(c:ℚ) + ((c:ℚ) - (b:ℚ)) / (a:ℚ))
-     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp[-rat.coe_int_div_eq_mk], ring},
+     = (a:ℚ) * (b:ℚ) + (c:ℚ) * ((c:ℚ) - (b:ℚ)) := by {field_simp, ring},
 
     linarith,
    },
