@@ -1,5 +1,5 @@
 import algebra.big_operators.pi
-import data.rat.basic
+import data.rat.defs
 
 
 /-!

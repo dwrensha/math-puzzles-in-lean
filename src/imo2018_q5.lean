@@ -1,7 +1,7 @@
 import data.int.basic
 import data.int.gcd
 import data.pnat.basic
-import data.rat.basic
+import data.rat.defs
 
 import algebra.big_operators.basic
 import ring_theory.coprime.basic

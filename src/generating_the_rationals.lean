@@ -2,7 +2,7 @@ import algebra.order.archimedean
 import algebra.big_operators.basic
 import data.finset.basic
 import data.nat.parity
-import data.rat.basic
+import data.rat.defs
 import data.rat.order
 import data.set.intervals.basic
 import logic.function.basic

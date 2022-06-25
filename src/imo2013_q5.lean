@@ -1,5 +1,5 @@
 import algebra.geom_sum
-import data.rat.basic
+import data.rat.defs
 import data.real.basic
 
 /-!
