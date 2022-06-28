@@ -104,10 +104,10 @@ end
 theorem kolmogorov_puzzle
   (is_decent : list α → Prop)
   (a : stream α)
-  : (∃ (b : stream ℕ),
-     (stream.all (λ x, 0 < x) b ∧
+  : (∃ (lengths : stream ℕ),
+     (stream.all (λ x, 0 < x) lengths ∧
       all_same_class is_decent
-       (stream.tail $ break_into_words b a))) :=
+       (stream.tail $ break_into_words lengths a))) :=
 begin
   let p : Prop :=
      (∃ (n : ℕ), ∀ (k : ℕ), 0 < k →
