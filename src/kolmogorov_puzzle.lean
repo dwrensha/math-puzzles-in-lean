@@ -39,6 +39,9 @@ def break_into_words :
 
 --#eval (stream.take 10 (break_into_words id id))
 
+/--
+  Dropping the first word is equivalent to dropping `first_length` symbols of the original stream.
+-/
 lemma break_into_words_cons
   (lengths: stream ℕ)
   (first_length : ℕ)
@@ -235,9 +238,8 @@ theorem kolmogorov_puzzle
   (is_decent : list α → Prop)
   (a : stream α)
   : (∃ (lengths : stream ℕ),
-     (stream.all (λ x, 0 < x) lengths ∧
-      all_same_class is_decent
-       (break_into_words lengths a).tail)) :=
+     (stream.all (λ length, 0 < length) lengths ∧
+      all_same_class is_decent (break_into_words lengths a).tail)) :=
 begin
   let p : Prop :=
      (∃ (n : ℕ), ∀ (k : ℕ), 0 < k →
