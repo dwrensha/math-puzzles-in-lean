@@ -4,9 +4,6 @@ import data.stream.init
 import algebra.big_operators
 
 import tactic.basic
-import tactic.push_neg
-import tactic.rcases
-import tactic.suggest
 
 /-
 
