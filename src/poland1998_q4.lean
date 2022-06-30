@@ -273,8 +273,9 @@ begin
       have hadd : n2 + p + 1 = n2 + p.succ := rfl,
       have hi6 : p < 7 := nat.lt.step hpi6,
       have hpp := hp hi6,
-      rw [←hadd, hinc, hpp],
-      ring_nf } },
+      have hp1: (p.succ : zmod 7) = (p : zmod 7) + 1 := by norm_cast,
+      rw [←hadd, hinc, hpp, hp1],
+      ring_nf} },
 
   obtain (haez : a' n1 = 0) | (hanez : ¬ a' n1 = 0) := em (a' n1 = 0),
   { use n1,
