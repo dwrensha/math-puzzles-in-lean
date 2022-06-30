@@ -33,17 +33,34 @@ def word_head : word α → α
 | (word.base a) := a
 | (word.cons a _) := a
 
+def prepend_word : word α → stream α → stream α
+| (word.base a) s := a :: s
+| (word.cons a as) s := a :: prepend_word as s
+
+/--
+ Number of symbols in the word, minus one.
+-/
+def word_size : word α → ℕ
+| (word.base a) := 0
+| (word.cons a as) := 1 + word_size as
+
 def append : word α → word α → word α
 | (word.base c) b := word.cons c b
 | (word.cons c cs) b := (word.cons c (append cs b))
 
-def flatten (words: stream (word α)) : stream α :=
+def flatten (words : stream (word α)) : stream α :=
  stream.corec' (λ acc: ((word α) × stream (word α)),
                   match acc with
                   | ⟨word.base c, ws⟩ := ⟨c, ⟨ws.head, ws.tail⟩⟩
                   | ⟨word.cons c cs, ws⟩ := ⟨c,⟨cs,ws⟩⟩
                   end)
                ⟨words.head, words.tail⟩
+
+lemma flatten_cons (w : word α) (words : stream (word α)) :
+      flatten (w :: words) = prepend_word w (flatten words) :=
+begin
+  sorry
+end
 
 lemma flatten_head (words: stream (word α)) : (flatten words).nth 0 = word_head words.head :=
 begin

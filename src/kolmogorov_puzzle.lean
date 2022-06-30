@@ -40,7 +40,7 @@ def break_into_words :
   Dropping the first word is equivalent to dropping `first_length` symbols of the original stream.
 -/
 lemma break_into_words_cons
-  (lengths: stream ℕ)
+  (lengths : stream ℕ)
   (first_length : ℕ)
   (a : stream α) :
   (break_into_words (first_length::lengths) a).tail = break_into_words lengths (a.drop first_length) :=
