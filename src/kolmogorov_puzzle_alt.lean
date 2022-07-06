@@ -48,26 +48,50 @@ def append : word α → word α → word α
 | (word.base c) b := word.cons c b
 | (word.cons c cs) b := (word.cons c (append cs b))
 
+structure accumulator_rest (α : Type) : Type :=
+  (word_rest : word α)
+  (stream_rest : stream (word α))
+
+structure accumulator (α : Type) : Type :=
+  (current : α)
+  (rest : accumulator_rest α)
+
+def flatten_step : accumulator_rest α → accumulator α
+| ⟨word.base c, ws⟩ := ⟨c, ws.head, ws.tail⟩
+| ⟨word.cons c cs, ws⟩ := ⟨c, cs, ws⟩
+
+def flatten_aux (words : stream (word α)) : stream (accumulator α) :=
+  stream.corec id
+               (λ (acc : accumulator α), flatten_step acc.rest)
+               (flatten_step ⟨words.head, words.tail⟩)
+
 def flatten (words : stream (word α)) : stream α :=
- stream.corec' (λ acc: ((word α) × stream (word α)),
-                  match acc with
-                  | ⟨word.base c, ws⟩ := ⟨c, ⟨ws.head, ws.tail⟩⟩
-                  | ⟨word.cons c cs, ws⟩ := ⟨c,⟨cs,ws⟩⟩
-                  end)
-               ⟨words.head, words.tail⟩
+  (flatten_aux words).map (λ acc, acc.current)
 
 lemma flatten_cons (w : word α) (words : stream (word α)) :
       flatten (w :: words) = prepend_word w (flatten words) :=
 begin
-  sorry
+  simp[flatten, flatten_aux, stream.corec],
+  rw [stream.map_id, stream.map_id],
+  have hwh : (w::words).head = w := rfl,
+  have hwt : (w::words).tail = words := rfl,
+  rw [hwh, hwt], clear hwh hwt,
+  induction w with wz a pw hpw,
+  { have h :
+       flatten_step {word_rest := word.base wz, stream_rest := words}
+      = ⟨wz, words.head, words.tail⟩ := rfl,
+    rw[prepend_word, h, stream.iterate_eq, stream.map_cons] },
+  { have h : flatten_step {word_rest := word.cons a pw, stream_rest := words}
+       = ⟨a, pw, words⟩ := rfl,
+    rw[h, prepend_word, ←hpw, stream.iterate_eq, stream.map_cons] },
 end
 
 lemma flatten_head (words: stream (word α)) : (flatten words).nth 0 = word_head words.head :=
 begin
-  simp [flatten],
+  rw [flatten, flatten_aux],
   cases words.head with a a as,
-  refl,
-  refl,
+  {refl},
+  {refl},
 end
 
 def prefixes_core (w : word α) (s : stream α) : stream (word α) :=
@@ -100,6 +124,10 @@ begin
   sorry
 end
 
+structure decent_word (is_decent: word α → Prop) : Type :=
+  (w: word α)
+  (h : is_decent w)
+
 /-
   accumulator is:
     n, the number of symbols already consumed
@@ -111,7 +139,7 @@ noncomputable def choose_decent_words
     (hinit: all_prefixes' is_decent a)
     (hnot: ∀ (n : ℕ), ∃ (k : ℕ),
             all_prefixes' is_decent (stream.drop (k + 1 + n) a))
-     : stream (psigma (λ (w: word α), is_decent w)) :=
+     : stream (decent_word is_decent) :=
 stream.corec' (λ (acc: psigma (λ (n: ℕ), all_prefixes' is_decent (a.drop n))),
                  let ⟨n,hprev⟩ := acc in
                  let new_word_length := classical.some (hnot n) in
@@ -123,20 +151,24 @@ stream.corec' (λ (acc: psigma (λ (n: ℕ), all_prefixes' is_decent (a.drop n))
 
 lemma extract_all_decent
     (is_decent : word α → Prop)
-    (s : stream (psigma (λ (w: word α), is_decent w)))
-    : stream.all is_decent (s.map (λ x, x.1)) :=
+    (s : stream (decent_word is_decent))
+    : stream.all is_decent (s.map (λ x, x.w)) :=
 begin
   intro n,
-  exact (s n).2,
+  exact (s n).h,
 end
+
+structure word_indices :=
+  (start : ℕ)
+  (size : ℕ) -- word length minus one
 
 lemma unflatten
   (a : stream α)
-  (b : stream (ℕ × ℕ)) -- start index and (length - 1)
+  (b : stream word_indices)
   (w : stream (word α))
-  (hw : ∀ n, take_word (b n).2 (a.drop (b n).1) = w n)
-  (hn : ∀ n, (b n).1 + 1 + (b n).2 = (b (n + 1)).1)
-  (hz : (b 0).1 = 0) :
+  (hw : ∀ n, take_word (b n).size (a.drop (b n).start) = w n)
+  (hn : ∀ n, (b n).start + 1 + (b n).size = (b (n + 1)).start)
+  (hz : (b 0).start = 0) :
   a = flatten w :=
 begin
 /-
@@ -153,7 +185,7 @@ begin
     have hnth : w 0 = w.head := rfl,
     rw [hz, hsd, hnth] at hw0,
     rw [flatten_head, ← hw0],
-    cases (b 0).snd,
+    cases (b 0).size,
     { refl },
     { refl },
   },
