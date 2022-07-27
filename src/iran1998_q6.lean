@@ -1,5 +1,7 @@
 import data.nat.basic
-import data.pnat.basic
+import data.nat.pow
+
+import algebra.group_power.basic
 
 /-
 Iranian Mathematical Olympiad 1998, Problem 6
@@ -16,5 +18,17 @@ theorem iran1998_q6
   (h : x^(a+b) = a^b * b)
  : a = x ∧ b = x^x :=
 begin
+  cases x,
+  { exact false.elim (nat.lt_asymm hx hx) },
+  cases x,
+  { rw [one_pow] at h,
+    have hab : 1 ≤ a ^ b := nat.one_le_pow b a ha,
+    have habb : a ^ b ≤ a ^ b * b := nat.le_mul_of_pos_right hb,
+    rw [←h] at habb,
+    have hab' : a ^ b = 1 := le_antisymm habb hab,
+    rw [hab', one_mul, eq_comm] at h,
+    rw[one_pow],
+    rw [h, pow_one] at hab',
+    exact ⟨hab', h⟩ },
   sorry
 end
