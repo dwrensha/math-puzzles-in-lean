@@ -1,7 +1,10 @@
 import data.nat.basic
+import data.nat.gcd
 import data.nat.pow
 
+import algebra.associated
 import algebra.group_power.basic
+
 
 /-
 Iranian Mathematical Olympiad 1998, Problem 6
@@ -30,5 +33,9 @@ begin
     rw[one_pow],
     rw [h, pow_one] at hab',
     exact ⟨hab', h⟩ },
+  let x' := x.succ.succ,
+  have : ∀ p : ℕ, prime p → p ∣ x → p ∣ b,
+  { intros p hpp hpx,
+    sorry },
   sorry
 end
