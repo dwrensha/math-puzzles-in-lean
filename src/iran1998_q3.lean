@@ -15,14 +15,16 @@ Prove that
 -/
 
 theorem iran1998_q3
-  (x : fin 4 → ℝ)
+  (x : ℕ → ℝ)
   (x_positive : ∀ i, 0 < x i)
-  (h : ∏ (i : fin 4), x i = 1)
-  : max (∑(i : fin 4), x i) (∑(i : fin 4), 1 / x i) ≤ ∑ (i : fin 4), (x i)^3 :=
+  (h : ∏ (i : ℕ) in finset.range 4, x i = 1)
+  : max (∑(i : ℕ) in finset.range 4, x i) (∑(i : ℕ) in finset.range 4, 1 / x i)
+     ≤ ∑ (i : ℕ) in finset.range 4, (x i)^3 :=
 begin
-  let A := ∑ (i : fin 4), (x i)^3,
-  let B : fin 4 → ℝ := λ i, A - (x i)^3,
-  have : A = (1/3) * (∑ (i : fin 4), B i),
-  { sorry },
+  let A := ∑ (i : ℕ) in finset.range 4, (x i)^3,
+  let B : ℕ → ℝ := λ i, A - (x i)^3,
+  have hab : A = (1/3) * (∑ (i : ℕ) in finset.range 4, B i),
+  { simp[finset.sum_range_succ, B, A],
+    ring },
   sorry
 end
