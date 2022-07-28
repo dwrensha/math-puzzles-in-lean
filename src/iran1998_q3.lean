@@ -24,7 +24,7 @@ begin
   exact real.rpow_one x,
 end
 
-/- seems like there should somthing like this in mathlib... -/
+/- seems like there should be something like this in mathlib... -/
 
 lemma prod_pow' (n : ℕ) (x : ℝ) (f : ℕ → ℝ) (hf : ∀ i < n, 0 ≤ f i)  :
 (finset.range n).prod (λ (i : ℕ), f i ^ x) = (finset.range n).prod (λ (i : ℕ), f i) ^ x :=
