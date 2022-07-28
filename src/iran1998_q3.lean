@@ -24,6 +24,33 @@ begin
   exact real.rpow_one x,
 end
 
+/- seems like there should somthing like this in mathlib... -/
+
+lemma prod_pow' (n : ℕ) (x : ℝ) (f : ℕ → ℝ) (hf : ∀ i < n, 0 ≤ f i)  :
+(finset.range n).prod (λ (i : ℕ), f i ^ x) = (finset.range n).prod (λ (i : ℕ), f i) ^ x :=
+begin
+  suffices : 0 ≤ (finset.range n).prod (λ (i : ℕ), f i) ∧
+    (finset.range n).prod (λ (i : ℕ), f i ^ x) = (finset.range n).prod (λ (i : ℕ), f i) ^ x,
+  { exact this.2 },
+
+  induction n with n' ih,
+  { simp},
+  { rw[finset.prod_range_succ, finset.prod_range_succ],
+    have hp: ∀ (i : ℕ), i < n' → 0 ≤ f i,
+    { intros i hi,
+      exact hf i (nat.lt.step hi)},
+    obtain ⟨hs0, hs⟩ := ih hp,
+    rw [hs],
+    split,
+    { have : 0 ≤ f n' := hf n' (lt_add_one n'),
+      exact mul_nonneg hs0 this},
+    { clear ih hp hs,
+      have : 0 ≤ f n' := hf n' (lt_add_one n'),
+      exact (real.mul_rpow hs0 this).symm,
+    },
+  },
+end
+
 theorem iran1998_q3
   (x : ℕ → ℝ)
   (x_positive : ∀ i, 0 < x i)
@@ -73,5 +100,36 @@ begin
     rw[←finset.prod_erase_mul _ _ hj],
     have : x j ≠ 0 := ne_of_gt (x_positive j),
     field_simp },
+  have h4 : ∀ j ∈ finset.range 4, 1 / x j ≤ 1 / 3 * B j,
+  { intros j hj,
+    have h2j := h2 j hj,
+    have h3j := h3 j hj,
+    rwa[h3j] at h2j },
+  have h5 : ∑ (i : ℕ) in finset.range 4, 1 / x i ≤ A,
+  { have h5': ∑ (i : ℕ) in finset.range 4, 1 / x i ≤ ∑ (i : ℕ) in finset.range 4, (1 / 3) * B i,
+    { exact finset.sum_le_sum h4 },
+    rw [←finset.mul_sum] at h5',
+    rwa [hab] },
+  have amgm' := real.geom_mean_le_arith_mean_weighted
+                  (finset.range 4)
+                  (λ ii, (1:ℝ)/4)
+                  (λ ii, x ii)
+                  (by {intros i hi, norm_num})
+                  (by simp)
+                  (by {intros j hj, exact le_of_lt (x_positive j) }),
+  have x_pos' : ∀ i < 4, 0 ≤ x i := by { intros i _, exact le_of_lt (x_positive i) },
+  rw[prod_pow' 4 (1/4) x x_pos', h, real.one_rpow] at amgm',
+  dsimp at amgm',
+  rw [←finset.mul_sum] at amgm',
+  have xnonneg : ∀ i ∈ finset.range 4, 0 ≤ x i,
+  { intros i _, exact le_of_lt (x_positive i)},
+  let C := 1/4 * ∑ (i : ℕ) in finset.range 4, x i,
+  have hcp' : 0 ≤ ∑ (i : ℕ) in finset.range 4, x i := finset.sum_nonneg xnonneg,
+  have hcp : 0 ≤ C := mul_nonneg (by norm_num) hcp',
+  have hccp : 0 ≤ C * C := mul_nonneg hcp hcp,
+
+  have := calc C
+             ≤ C * C : le_mul_of_one_le_left hcp amgm'
+         ... ≤ C * C * C : le_mul_of_one_le_right hccp amgm',
   sorry
 end
