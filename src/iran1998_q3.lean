@@ -110,6 +110,9 @@ begin
     { exact finset.sum_le_sum h4 },
     rw [←finset.mul_sum] at h5',
     rwa [hab] },
+  rw[max_le_iff],
+  refine ⟨_, h5⟩,
+
   have amgm' := real.geom_mean_le_arith_mean_weighted
                   (finset.range 4)
                   (λ ii, (1:ℝ)/4)
@@ -128,8 +131,12 @@ begin
   have hcp : 0 ≤ C := mul_nonneg (by norm_num) hcp',
   have hccp : 0 ≤ C * C := mul_nonneg hcp hcp,
 
-  have := calc C
-             ≤ C * C : le_mul_of_one_le_left hcp amgm'
-         ... ≤ C * C * C : le_mul_of_one_le_right hccp amgm',
+  have hC := calc C
+              ≤ C * C : le_mul_of_one_le_left hcp amgm'
+          ... ≤ C * C * C : le_mul_of_one_le_right hccp amgm',
+
+  let xnn : ℕ → nnreal := λ i, ⟨x i, le_of_lt (x_positive i)⟩,
+  have h13 : (1:ℝ) ≤ 3 := by norm_num,
+  have := nnreal.rpow_sum_le_const_mul_sum_rpow (finset.range 4) xnn h13,
   sorry
 end
