@@ -51,6 +51,11 @@ begin
   },
 end
 
+lemma real_pow (x : ℝ) (n : ℕ) : x ^ (n:ℕ) = x ^ (n:ℝ) :=
+begin
+  norm_cast,
+end
+
 theorem iran1998_q3
   (x : ℕ → ℝ)
   (x_positive : ∀ i, 0 < x i)
@@ -131,12 +136,56 @@ begin
   have hcp : 0 ≤ C := mul_nonneg (by norm_num) hcp',
   have hccp : 0 ≤ C * C := mul_nonneg hcp hcp,
 
+  have hCC : C * C * C = C ^(3:ℕ) := by ring_exp,
+  rw[real_pow] at hCC,
+  simp at hCC,
+
   have hC := calc C
               ≤ C * C : le_mul_of_one_le_left hcp amgm'
-          ... ≤ C * C * C : le_mul_of_one_le_right hccp amgm',
+          ... ≤ C * C * C : le_mul_of_one_le_right hccp amgm'
+          ... = C^(3 : ℝ) : hCC,
 
-  let xnn : ℕ → nnreal := λ i, ⟨x i, le_of_lt (x_positive i)⟩,
   have h13 : (1:ℝ) ≤ 3 := by norm_num,
-  have := nnreal.rpow_sum_le_const_mul_sum_rpow (finset.range 4) xnn h13,
-  sorry
+  have holder := real.rpow_sum_le_const_mul_sum_rpow (finset.range 4) x h13,
+
+  have habs : ∀ i ∈ finset.range 4, |x i| = x i,
+  {intros i hi, exact abs_of_pos (x_positive i)},
+  rw[finset.sum_congr rfl habs] at holder,
+
+  have habs3 : ∀ i ∈ finset.range 4, |x i| ^ (3:ℝ) = x i ^ (3:ℝ),
+  { intros i hi, have := habs i hi, exact congr_fun (congr_arg pow this) 3},
+  rw[finset.sum_congr rfl habs3] at holder,
+  have hccc: (4:ℝ) * C =  ∑ (i : ℕ) in finset.range 4, x i := by {field_simp[C], ring},
+  rw[←hccc] at holder,
+
+  have h4nn : (0:ℝ) ≤ 4 := by norm_num,
+  rw[real.mul_rpow h4nn hcp] at holder,
+  have h43nn : (0:ℝ) ≤ 4 ^ (3:ℝ) := by norm_num,
+  have hcard' : (finset.range 4).card = 4 := by simp,
+  rw[hcard'] at holder,
+  have hss: C ^ (3:ℝ) ≤ ((1:ℝ) / 4) * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ),
+  { ring_exp at holder,
+    clear_except holder,
+    have hknn : (0:ℝ) ≤ (4:ℝ) ^ (-3 : ℝ) := by norm_num,
+    have hh := mul_le_mul_of_nonneg_left holder hknn,
+    rw[←mul_assoc] at hh,
+    have h4mm: (4:ℝ) ^ (-3: ℝ) * (4:ℝ) ^ (3:ℝ) = 1 := by norm_num,
+    rw[h4mm, one_mul] at hh,
+    rw[←mul_assoc] at hh,
+    have hnc: ((4:ℕ) :ℝ) = (4:ℝ) := by norm_cast,
+    rw[hnc] at hh,
+    have h4mm': (4:ℝ) ^ (-3: ℝ) * (4:ℝ) ^ (2:ℝ) = 1/4 := by norm_num,
+    rw[h4mm'] at hh,
+    exact hh },
+  have htrans := le_trans hC hss,
+  have hm4 : 4 * C ≤ 4 * ((1/4) * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ)) :=
+    mul_le_mul_of_nonneg_left htrans h4nn,
+  have h4c: 4 * C = ∑ (i : ℕ) in finset.range 4, x i,
+  { field_simp[C], ring },
+  rw[h4c] at hm4,
+  have hro : 4 * (1 / 4 * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ)) =
+                  ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ),
+  { field_simp, ring },
+  rw[hro] at hm4,
+  exact hm4
 end
