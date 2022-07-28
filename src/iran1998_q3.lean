@@ -50,7 +50,8 @@ begin
                   (λ ii, x ii ^ (3:ℝ))
                   (by { intros i hi, simp, norm_num})
                   (by { simp[finset.sum_range_succ, hcard]})
-                  (by {intros i _, simp, sorry }),--exact le_of_lt (x_positive i)}),
+                  (by {intros i _,
+                       exact real.rpow_nonneg_of_nonneg (le_of_lt (x_positive i)) 3}),
     have hr : ∀ i ∈ ((finset.range 4).erase j),
                  (λ (ii : ℕ), x ii ^ (3:ℝ)) i ^ (λ (ii : ℕ), (1:ℝ) / 3) i = x i,
     { intros i _, exact cube_root_cube _ (le_of_lt (x_positive i)) },
@@ -66,5 +67,11 @@ begin
     rw [←hrfl] at amgm,
     exact amgm,
   },
+  have h3 : ∀ j ∈ (finset.range 4), ∏ (i : ℕ) in (finset.range 4).erase j, x i = 1 / x j,
+  { intros j hj,
+    rw [←h],
+    rw[←finset.prod_erase_mul _ _ hj],
+    have : x j ≠ 0 := ne_of_gt (x_positive j),
+    field_simp },
   sorry
 end
