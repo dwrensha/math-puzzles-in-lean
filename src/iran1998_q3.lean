@@ -34,7 +34,7 @@ begin
   { exact this.2 },
 
   induction n with n' ih,
-  { simp},
+  { simp },
   { rw[finset.prod_range_succ, finset.prod_range_succ],
     have hp: ∀ (i : ℕ), i < n' → 0 ≤ f i,
     { intros i hi,

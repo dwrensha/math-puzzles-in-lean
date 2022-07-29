@@ -15,33 +15,14 @@ Let x,y,z > 1 and 1/x + 1/y + 1/z = 2. Prove that
 
 -/
 
-lemma compute_norm_aux (v : euclidean_space ℝ (fin 3)) : ∥v∥^2 = (∑(i : fin 3), (v i)^2) :=
-begin
-  have hh : ((inner v v): ℝ) = (∑(i : fin 3), (v i)^2),
-  { simp,
-    have hs : ∀ (x : fin 3), v x * v x = (v x) ^2,
-    { intro x, ring },
-    exact fintype.sum_congr (λ (a : fin 3), v a * v a) (λ (a : fin 3), v a ^ 2) hs
-  },
-
-  have hn := @norm_sq_eq_inner ℝ (euclidean_space ℝ (fin 3)) _ _ v,
-  have h1 : is_R_or_C.re ((inner v v):ℝ) = ((inner v v) :ℝ) := by finish,
-  rw [hn, h1],
-  exact hh,
-end
-
 lemma compute_norm (v : euclidean_space ℝ (fin 3)) : ∥v∥ = real.sqrt (∑(i : fin 3), (v i)^2) :=
 begin
-  have hf : ∥v∥^2 = (∑(i : fin 3), (v i)^2) := compute_norm_aux v,
-  have hfs : real.sqrt(∥v∥^2) = real.sqrt(∑(i : fin 3), (v i)^2) := congr_arg real.sqrt hf,
-
-  have h1 : real.sqrt(∥v∥^2) = | ∥v∥ | := ∥v∥.sqrt_sq_eq_abs,
-  have hp : 0 ≤ ∥v∥ := norm_nonneg v,
-  have hh : | ∥v∥ | = ∥v∥ := abs_eq_self.mpr hp,
-
-  rw[hh] at h1,
-  rw[h1] at hfs,
-  exact hfs,
+  have he := euclidean_space.norm_eq v,
+  have hvi : (∀ i : fin 3, (v i) ^2 = ∥v i∥^2),
+  {intro i, finish},
+  have := fintype.sum_congr ((λ jj, (v jj)^2): fin 3 → ℝ) (λ jj, ∥v jj∥^2) hvi,
+  rw[this],
+  exact he,
 end
 
 theorem iran1998_q9
