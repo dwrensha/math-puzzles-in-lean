@@ -18,9 +18,7 @@ Prove that
 
 lemma cube_root_cube (x : ℝ) (h: 0 ≤ x): (x^(3:ℝ)) ^ ((1:ℝ)/3) = x :=
 begin
-  rw[←real.rpow_mul h],
-  have : 3 * ((1:ℝ)/3) = 1 := by norm_num,
-  rw[this],
+  rw[←real.rpow_mul h, mul_div_cancel' (1:ℝ) three_ne_zero],
   exact real.rpow_one x,
 end
 
@@ -112,8 +110,7 @@ begin
       have hh := mul_le_mul_of_nonneg_left holder hknn,
       rw[←mul_assoc] at hh,
       have h4mm: (4:ℝ) ^ (-3: ℝ) * (4:ℝ) ^ (3:ℝ) = 1 := by norm_num,
-      rw[h4mm, one_mul] at hh,
-      rw[←mul_assoc] at hh,
+      rw[h4mm, one_mul, ←mul_assoc] at hh,
       have h4mm': (4:ℝ) ^ (-3: ℝ) * ((4:ℕ):ℝ) ^ (2:ℝ) = 1/4 := by norm_num,
       rw[h4mm'] at hh,
       exact hh },
