@@ -78,7 +78,7 @@ begin
     have hcp : 0 ≤ C := mul_nonneg (by norm_num) hcp',
     have hccp : 0 ≤ C * C := mul_nonneg hcp hcp,
 
-    have hCC : C * C * C = C ^(3:ℕ) := by ring_exp,
+    have hCC : C * C * C = C ^(3:ℕ) := by ring,
     rw[←real.rpow_nat_cast] at hCC,
     simp at hCC,
 
@@ -106,7 +106,8 @@ begin
     have hcard' : (finset.range 4).card = 4 := by simp,
     rw[hcard'] at holder,
     have hss: C ^ (3:ℝ) ≤ ((1:ℝ) / 4) * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ),
-    { ring_exp at holder,
+    { have h32: (3:ℝ) - 1 = 2 := by norm_num,
+      rw[h32] at holder,
       clear_except holder,
       have hknn : (0:ℝ) ≤ (4:ℝ) ^ (-3 : ℝ) := by norm_num,
       have hh := mul_le_mul_of_nonneg_left holder hknn,
