@@ -100,8 +100,7 @@ begin
     have hccc: (4:ℝ) * C =  ∑ (i : ℕ) in finset.range 4, x i := by {field_simp[C], ring},
     rw[←hccc] at holder,
 
-    have h4nn : (0:ℝ) ≤ 4 := by norm_num,
-    rw[real.mul_rpow h4nn hcp] at holder,
+    rw[real.mul_rpow zero_le_four hcp] at holder,
     have h43nn : (0:ℝ) ≤ 4 ^ (3:ℝ) := by norm_num,
     have hcard' : (finset.range 4).card = 4 := by simp,
     rw[hcard'] at holder,
@@ -120,7 +119,7 @@ begin
       exact hh },
     have htrans := le_trans hC hss,
     have hm4 : 4 * C ≤ 4 * ((1/4) * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ)) :=
-      mul_le_mul_of_nonneg_left htrans h4nn,
+      mul_le_mul_of_nonneg_left htrans zero_le_four,
     have h4c: 4 * C = ∑ (i : ℕ) in finset.range 4, x i,
     { field_simp[C], ring },
     rw[h4c] at hm4,
@@ -145,7 +144,7 @@ begin
                     ((finset.range 4).erase j)
                     (λ ii, (1:ℝ)/3)
                     (λ ii, x ii ^ (3:ℝ))
-                    (by { intros i hi, simp, norm_num})
+                    (by { intros i hi, simp, exact zero_le_three})
                     (by { simp[finset.sum_range_succ, hcard]})
                     (by {intros i _,
                          exact real.rpow_nonneg_of_nonneg (le_of_lt (x_positive i)) 3}),
