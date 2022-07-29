@@ -78,7 +78,7 @@ begin
 
     have hCC : C * C * C = C ^(3:ℕ) := by ring,
     rw[←real.rpow_nat_cast] at hCC,
-    simp at hCC,
+    simp only [nat.cast_bit1, nat.cast_one] at hCC,
 
     have hC := calc C
                 ≤ C * C : le_mul_of_one_le_left hcp amgm'
@@ -100,8 +100,7 @@ begin
 
     rw[real.mul_rpow zero_le_four hcp] at holder,
     have h43nn : (0:ℝ) ≤ 4 ^ (3:ℝ) := by norm_num,
-    have hcard' : (finset.range 4).card = 4 := by simp,
-    rw[hcard'] at holder,
+    rw[finset.card_range 4] at holder,
     have hss: C ^ (3:ℝ) ≤ ((1:ℝ) / 4) * ∑ (i : ℕ) in finset.range 4, x i ^ (3:ℝ),
     { have h32: (3:ℝ) - 1 = 2 := by norm_num,
       rw[h32] at holder,
@@ -141,7 +140,7 @@ begin
                     ((finset.range 4).erase j)
                     (λ ii, (1:ℝ)/3)
                     (λ ii, x ii ^ (3:ℝ))
-                    (by { intros i hi, simp, exact zero_le_three})
+                    (by { intros i hi, simp only [one_div, inv_nonneg], exact zero_le_three})
                     (by { simp[finset.sum_range_succ, hcard]})
                     (by {intros i _,
                          exact real.rpow_nonneg_of_nonneg (le_of_lt (x_positive i)) 3}),
