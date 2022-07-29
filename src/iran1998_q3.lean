@@ -51,11 +51,6 @@ begin
   },
 end
 
-lemma real_pow (x : ℝ) (n : ℕ) : x ^ (n:ℕ) = x ^ (n:ℝ) :=
-begin
-  norm_cast,
-end
-
 theorem iran1998_q3
   (x : ℕ → ℝ)
   (x_positive : ∀ i, 0 < x i)
@@ -137,7 +132,7 @@ begin
   have hccp : 0 ≤ C * C := mul_nonneg hcp hcp,
 
   have hCC : C * C * C = C ^(3:ℕ) := by ring_exp,
-  rw[real_pow] at hCC,
+  rw[←real.rpow_nat_cast] at hCC,
   simp at hCC,
 
   have hC := calc C
