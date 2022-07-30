@@ -26,15 +26,6 @@ for all n ≥ m.
 
 open_locale big_operators
 
-lemma gcd_coprime (a b c : ℤ)
-  (h_cp : is_coprime c a)
-  (h_cab : c ∣ a * b) :
-  c ∣ b :=
-begin
-  exact is_coprime.dvd_of_dvd_mul_left h_cp h_cab
-end
-
-
 lemma gcd_dvd (a b c : ℤ)
   (hgcd : a.gcd c = 1)
   (h_cab : c ∣ a * b) :
@@ -50,7 +41,7 @@ begin
     use a.gcd_a c,
     linarith,
   },
-  exact gcd_coprime a b c this h_cab,
+  exact is_coprime.dvd_of_dvd_mul_left this h_cab,
 end
 
 /-
