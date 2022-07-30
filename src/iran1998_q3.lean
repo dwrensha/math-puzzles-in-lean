@@ -24,29 +24,25 @@ end
 
 /- seems like there should be something like this in mathlib... -/
 
-lemma prod_pow' (n : ℕ) (x : ℝ) (f : ℕ → ℝ) (hf : ∀ i < n, 0 ≤ f i)  :
-(finset.range n).prod (λ (i : ℕ), f i ^ x) = (finset.range n).prod (λ (i : ℕ), f i) ^ x :=
+lemma prod_pow' (S : finset ℕ) (e : ℝ) (f : ℕ → ℝ) (hf : ∀ s ∈ S, (0:ℝ) ≤ f s)  :
+S.prod (λ (s : ℕ), f s ^ e) = S.prod (λ (s : ℕ), f s) ^ e :=
 begin
-  suffices : 0 ≤ (finset.range n).prod (λ (i : ℕ), f i) ∧
-    (finset.range n).prod (λ (i : ℕ), f i ^ x) = (finset.range n).prod (λ (i : ℕ), f i) ^ x,
+  suffices : 0 ≤ S.prod (λ (s : ℕ), f s ) ∧
+   S.prod (λ (s : ℕ), f s ^ e) = S.prod (λ (s : ℕ), f s) ^ e,
   { exact this.2 },
-
-  induction n with n' ih,
+  induction S using finset.induction with s S' hs ih,
   { simp },
-  { rw[finset.prod_range_succ, finset.prod_range_succ],
-    have hp: ∀ (i : ℕ), i < n' → 0 ≤ f i,
-    { intros i hi,
-      exact hf i (nat.lt.step hi)},
+  { rw[finset.prod_insert hs, finset.prod_insert hs],
+    have hp: ∀ s ∈ S', (0:ℝ) ≤ f s,
+    { intros s hs',
+      exact hf s (finset.mem_insert_of_mem hs')},
     obtain ⟨hs0, hs⟩ := ih hp,
     rw [hs],
+    have hsnn := hf s (finset.mem_insert_self s S'),
     split,
-    { have : 0 ≤ f n' := hf n' (lt_add_one n'),
-      exact mul_nonneg hs0 this},
-    { clear ih hp hs,
-      have : 0 ≤ f n' := hf n' (lt_add_one n'),
-      exact (real.mul_rpow hs0 this).symm,
-    },
-  },
+    { rw [mul_comm],
+      exact mul_nonneg hs0 hsnn },
+    { exact (real.mul_rpow hsnn hs0).symm } }
 end
 
 theorem iran1998_q3
@@ -65,12 +61,12 @@ begin
                     (by {intros i hi, norm_num})
                     (by simp)
                     (by {intros j hj, exact le_of_lt (x_positive j) }),
-    have x_pos' : ∀ i < 4, 0 ≤ x i := by { intros i _, exact le_of_lt (x_positive i) },
-    rw[prod_pow' 4 (1/4) x x_pos', h, real.one_rpow] at amgm',
-    dsimp at amgm',
-    rw [←finset.mul_sum] at amgm',
     have xnonneg : ∀ i ∈ finset.range 4, 0 ≤ x i,
     { intros i _, exact le_of_lt (x_positive i)},
+    rw[prod_pow' (finset.range 4) (1/4) x xnonneg, h, real.one_rpow] at amgm',
+    dsimp at amgm',
+    rw [←finset.mul_sum] at amgm',
+
     let C := 1/4 * ∑ (i : ℕ) in finset.range 4, x i,
     have hcp' : 0 ≤ ∑ (i : ℕ) in finset.range 4, x i := finset.sum_nonneg xnonneg,
     have hcp : 0 ≤ C := mul_nonneg (by norm_num) hcp',
@@ -160,19 +156,19 @@ begin
       exact amgm },
     have h3 : ∀ j ∈ (finset.range 4), ∏ (i : ℕ) in (finset.range 4).erase j, x i = 1 / x j,
     { intros j hj,
-      rw [←h],
-      rw[←finset.prod_erase_mul _ _ hj],
+      rw [←h, ←finset.prod_erase_mul _ _ hj],
       have : x j ≠ 0 := ne_of_gt (x_positive j),
       field_simp },
     have h4 : ∀ j ∈ finset.range 4, 1 / x j ≤ 1 / 3 * B j,
     { intros j hj,
       have h2j := h2 j hj,
-      have h3j := h3 j hj,
-      rwa[h3j] at h2j },
+      rw[h3 j hj] at h2j,
+      exact h2j },
     have h5 : ∑ (i : ℕ) in finset.range 4, 1 / x i ≤ A,
     { have h5': ∑ (i : ℕ) in finset.range 4, 1 / x i ≤ ∑ (i : ℕ) in finset.range 4, (1 / 3) * B i,
       { exact finset.sum_le_sum h4 },
       rw [←finset.mul_sum] at h5',
-      rwa [hab] },
+      rw [hab],
+      exact h5' },
     exact h5 }
 end
