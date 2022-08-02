@@ -261,14 +261,28 @@ def all_one_or_two : list ℕ → Prop
 | (2 :: ds) := all_one_or_two ds
 | _ := false
 
-lemma prepend_one (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
-    all_one_or_two (nat.digits 10 (10 ^ (list.length (nat.digits 10 n)) + n)) :=
+
+def prepend_one (n : ℕ) := 10 ^ (list.length (nat.digits 10 n)) + n
+
+lemma prepend_one_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
+    all_one_or_two (nat.digits 10 (prepend_one n)) :=
 begin
- sorry
+-- rw[prepend_one],
+-- induction (nat.digits 10 n).length with l' ih,
+ cases n,
+ { simp[prepend_one] },
+ { have hb : 2 ≤ 10 := by norm_num,
+   rw[prepend_one, nat.digits_len _ _ hb (nat.succ_pos n)],
+   rw[pow_succ],
+
+   sorry,
+  }
 end
 
-lemma prepend_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
-    all_one_or_two (nat.digits 10 (20 ^ (list.length (nat.digits 10 n)) + n)) :=
+def prepend_two (n : ℕ) := 2 * (10 ^ (list.length (nat.digits 10 n))) + n
+
+lemma prepend_two_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
+    all_one_or_two (nat.digits 10 (prepend_two n)) :=
 begin
  sorry
 end
