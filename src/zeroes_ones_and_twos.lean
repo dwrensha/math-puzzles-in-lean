@@ -438,17 +438,10 @@ begin
     have h2t : t + t = 2 * t := by ring,
     rw[h2t] at ht,
     have hd : 2 ^ pn.succ.succ ∣ prepend_two (2 ^ pn.succ * ↑pk),
-    { rw [prepend_two],
-      rw [factor_ten_pow],
-      rw [hpk1, ht],
-      have hl : 2 * (2 ^ pn.succ * 5 ^ pn.succ) = 2 ^ pn.succ.succ * 5 ^ pn.succ,
-      { ring_exp },
-      have hr : 2 ^ pn.succ * (2 * t) = 2^pn.succ.succ * t,
-      { ring_exp },
-      have hd: 2 ^ pn.succ.succ * 5 ^ pn.succ + 2 ^ pn.succ.succ * t
-                 = 2 ^ pn.succ.succ * (5 ^ pn.succ + t) := by ring,
-
-      rw[hl, hr, hd],
+    { rw [prepend_two, factor_ten_pow, hpk1, ht],
+      have hr : 2 * (2 ^ pn.succ * 5 ^ pn.succ) + 2 ^ pn.succ * (2 * t) =
+                   2 ^ pn.succ.succ * (5 ^ pn.succ + t) := by ring_exp,
+      rw[hr],
       exact dvd.intro (5 ^ nat.succ pn + t) rfl },
     obtain ⟨k', hk'⟩ := hd,
     have hkp': 0 < k',
