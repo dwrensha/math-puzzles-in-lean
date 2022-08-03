@@ -403,6 +403,21 @@ begin
     linarith }
 end
 
+lemma even_5_pow_plus_one (n : ℕ) : 2 ∣ 5 ^ n + 1 :=
+begin
+  apply nat.dvd_of_mod_eq_zero,
+  have h0 : 5 ^ n % 2 = 1,
+  { induction n with n' ih,
+    { simp },
+    { rw[pow_succ],
+      have h1: ((5 % 2) * (5^n' % 2))% 2 = 5 * 5 ^ n' % 2 :=
+       (nat.mul_mod 5 (5 ^ n') 2).symm,
+      rw[← h1, ih],
+      simp}},
+  rw[nat.add_mod, h0],
+  simp
+end
+
 lemma ones_and_twos_aux (n : ℕ) :
   ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
              all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
@@ -452,7 +467,32 @@ begin
     { exact prepend_two_all_one_or_two _ hpk2, },
   },
   { -- Odd case. Prepend 1.
-    sorry, },
+    have hd : 2 ^ pn.succ.succ ∣ prepend_one (2 ^ pn.succ * ↑pk),
+    { rw[prepend_one, hpk1, factor_ten_pow, ht],
+      have h5 : 2 ^ pn.succ * 5 ^ pn.succ + 2 ^ pn.succ * (2 * t + 1) =
+            2^pn.succ * (2 * (2 * 5 ^ pn + t) + (5^pn + 1)) := by ring_exp,
+      rw[h5],
+      obtain ⟨k5,hk5⟩:= even_5_pow_plus_one pn,
+      rw[hk5],
+      have h5' : 2 ^ pn.succ * (2 * (2 * 5 ^ pn + t) + 2 * k5) =
+           2^pn.succ.succ * (2 * 5 ^ pn + t + k5) := by ring_exp,
+      rw[h5'],
+      exact dvd.intro (2 * 5 ^ pn + t + k5) rfl},
+    obtain ⟨k', hk'⟩ := hd,
+    have hkp': 0 < k',
+    { cases k',
+      { exfalso,
+        have hzz := prepend_one_pos (2 ^ pn.succ * ↑pk),
+        rw[mul_zero] at hk',
+        linarith },
+      {exact nat.succ_pos _}, },
+    use ⟨k', hkp'⟩,
+    dsimp,
+    rw[← hk'],
+    split,
+    { rw [prepend_one_eq_append],
+      rw [list.length_append, list.length_singleton, hpk1] },
+    { exact prepend_one_all_one_or_two _ hpk2, }},
 end
 
 --
