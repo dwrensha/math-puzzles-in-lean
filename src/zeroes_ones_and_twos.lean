@@ -45,12 +45,13 @@ begin
   { use b, use a, exact ⟨hb, hfe.symm⟩},
 end
 
-@[simp]
-def all_zero_or_one : list ℕ → Prop
-| [] := true
-| (0 :: ds) := all_zero_or_one ds
-| (1 :: ds) := all_zero_or_one ds
+def is_zero_or_one : ℕ → Prop
+| 0 := true
+| 1 := true
 | _ := false
+
+@[simp]
+def all_zero_or_one (l : list ℕ) : Prop := ∀ e ∈ l, is_zero_or_one e
 
 lemma digits_lemma
   (base: ℕ)
@@ -72,9 +73,9 @@ lemma times_base_still_all_zero_or_one
 begin
   cases (nat.eq_zero_or_pos n) with hz hp,
   { rw hz,
-    simp only [mul_zero, nat.digits_zero] },
+    simp [mul_zero, nat.digits_zero] },
   { rw (digits_lemma base h2 n hp),
-    simpa }
+    simpa[is_zero_or_one] }
 end
 
 lemma base_pow_still_all_zero_or_one
@@ -98,7 +99,7 @@ lemma times_base_plus_one_still_all_zero_or_one
   : all_zero_or_one (nat.digits base (1 + base * n)) :=
 begin
   rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
-  simpa,
+  simpa[is_zero_or_one],
 end
 
 lemma lemma_0 (k b : ℕ) (h2 : 2 ≤ b) :
