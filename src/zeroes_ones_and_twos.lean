@@ -336,6 +336,24 @@ end
 
 def prepend_two (n : ℕ) := 2 * (10 ^ (list.length (nat.digits 10 n))) + n
 
+lemma prepend_two_div (n : ℕ) (hn : 0 < n) : prepend_two n / 10 = prepend_two (n / 10) :=
+begin
+  rw[prepend_two, prepend_two],
+  cases n,
+  { exfalso, exact nat.lt_asymm hn hn },
+  {
+    have hb : 2 ≤ 10 := by norm_num,
+    rw[digits_len' n.succ (nat.succ_pos n)],
+    rw[pow_add, pow_one],
+    rw[add_comm],
+    have tenpos: 0 < 10 := by norm_num,
+    rw[←mul_assoc],
+    sorry,
+    --rw [nat.add_mul_div_left _ _ tenpos],
+    --exact add_comm _ _
+}
+end
+
 lemma prepend_two_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
     all_one_or_two (nat.digits 10 (prepend_two n)) :=
 begin
@@ -353,7 +371,7 @@ begin
   /-
     Adding a 1 or a 2 to the front of 2^pn.succ * pk increments it by 2^pn.succ * 5^pn.succ or
     by 2^{pn.succ+1} * 5^pn.succ, in each case preserving divisibility by 2^pn.succ. Since the
-    two choices differ by 2^pn.succ * 2^pn.succ, one of them must actually achieve
+    two choices differ by 2^pn.succ * 5^pn.succ, one of them must actually achieve
     divisibility by 2^{pn.succ+1}.
   -/
 
