@@ -409,10 +409,7 @@ begin
   have h0 : 5 ^ n % 2 = 1,
   { induction n with n' ih,
     { simp },
-    { rw[pow_succ],
-      have h1: ((5 % 2) * (5^n' % 2))% 2 = 5 * 5 ^ n' % 2 :=
-       (nat.mul_mod 5 (5 ^ n') 2).symm,
-      rw[← h1, ih],
+    { rw[pow_succ, nat.mul_mod, ih],
       simp}},
   rw[nat.add_mod, h0],
   simp
@@ -435,8 +432,7 @@ begin
 
   obtain ⟨t, ht : ↑pk = t + t⟩ | ⟨t, ht : ↑pk = 2 * t + 1⟩ := (pk : ℕ).even_or_odd,
   { -- Even case. Prepend 2.
-    have h2t : t + t = 2 * t := by ring,
-    rw[h2t] at ht,
+    rw[← two_mul] at ht,
     have hd : 2 ^ pn.succ.succ ∣ prepend_two (2 ^ pn.succ * ↑pk),
     { rw [prepend_two, factor_ten_pow, hpk1, ht],
       have hr : 2 * (2 ^ pn.succ * 5 ^ pn.succ) + 2 ^ pn.succ * (2 * t) =
