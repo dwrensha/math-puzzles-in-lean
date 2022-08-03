@@ -7,6 +7,8 @@ import data.nat.gcd
 import algebra.big_operators.pi
 import algebra.big_operators.ring
 
+import tactic.ring_exp
+
 /-!
 Let n be a natural number. Prove that
 
@@ -393,6 +395,14 @@ begin
    simp[is_one_or_two] }
 end
 
+lemma factor_ten_pow (k : ℕ) : 10 ^ k = (2^k) * (5^k) :=
+begin
+  induction k with k' ih,
+  { simp only [pow_zero, mul_one] },
+  { rw[pow_succ, pow_succ, pow_succ],
+    linarith }
+end
+
 lemma ones_and_twos_aux (n : ℕ) :
   ∃ k : ℕ+, (list.length (nat.digits 10 (2^n.succ * k)) = n.succ) ∧
              all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
@@ -412,7 +422,34 @@ begin
   { -- Even case. Prepend 2.
     have h2t : t + t = 2 * t := by ring,
     rw[h2t] at ht,
-    sorry,
+    have hd : 2 ^ pn.succ.succ ∣ prepend_two (2 ^ pn.succ * ↑pk),
+    { rw [prepend_two],
+      rw [factor_ten_pow],
+      rw [hpk1, ht],
+      have hl : 2 * (2 ^ pn.succ * 5 ^ pn.succ) = 2 ^ pn.succ.succ * 5 ^ pn.succ,
+      { ring_exp },
+      have hr : 2 ^ pn.succ * (2 * t) = 2^pn.succ.succ * t,
+      { ring_exp },
+      have hd: 2 ^ pn.succ.succ * 5 ^ pn.succ + 2 ^ pn.succ.succ * t
+                 = 2 ^ pn.succ.succ * (5 ^ pn.succ + t) := by ring,
+
+      rw[hl, hr, hd],
+      exact dvd.intro (5 ^ nat.succ pn + t) rfl },
+    obtain ⟨k', hk'⟩ := hd,
+    have hkp': 0 < k',
+    { cases k',
+      { exfalso,
+        have hzz := prepend_two_pos (2 ^ pn.succ * ↑pk),
+        rw[mul_zero] at hk',
+        linarith },
+      {exact nat.succ_pos _}, },
+    use ⟨k', hkp'⟩,
+    dsimp,
+    rw[← hk'],
+    split,
+    { rw[prepend_two_eq_append],
+      rw [list.length_append, list.length_singleton, hpk1] },
+    { exact prepend_two_all_one_or_two _ hpk2, },
   },
   { -- Odd case. Prepend 1.
     sorry, },
