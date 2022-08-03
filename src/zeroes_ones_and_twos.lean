@@ -255,12 +255,13 @@ begin
   exact lemma_1 (b - a) 10 a (by norm_num)
 end
 
-def all_one_or_two : list ℕ → Prop
-| [] := true
-| (1 :: ds) := all_one_or_two ds
-| (2 :: ds) := all_one_or_two ds
+
+def is_one_or_two : ℕ → Prop
+| 1 := true
+| 2 := true
 | _ := false
 
+def all_one_or_two (l : list ℕ) : Prop := ∀ e ∈ l, is_one_or_two e
 
 def prepend_one (n : ℕ) := 10 ^ (list.length (nat.digits 10 n)) + n
 
@@ -322,11 +323,15 @@ end
 lemma prepend_one_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
     all_one_or_two (nat.digits 10 (prepend_one n)) :=
 begin
- rw[prepend_one_eq_append],
- cases (nat.digits 10 n),
- { simp },
- { rw[list.cons_append],
-   sorry },
+ rw[prepend_one_eq_append, all_one_or_two],
+ rw[all_one_or_two] at hn,
+ intros e he,
+ rw[list.mem_append] at he,
+ cases he,
+ { exact hn e he },
+ { rw[list.mem_singleton] at he,
+   rw[he],
+   simp[is_one_or_two] }
 end
 
 def prepend_two (n : ℕ) := 2 * (10 ^ (list.length (nat.digits 10 n))) + n
@@ -342,7 +347,7 @@ lemma ones_and_twos_aux (n : ℕ) :
              all_one_or_two (nat.digits 10 (2^n.succ * k)) :=
 begin
   induction n with pn hpn,
-  { use 1, simp, },
+  { use 1, simp[all_one_or_two] },
   obtain ⟨pk, hpk1, hpk2⟩ := hpn,
 
   /-
@@ -361,7 +366,7 @@ end
 theorem ones_and_twos (n : ℕ) : ∃ k : ℕ+, all_one_or_two (nat.digits 10 (2^n * k)) :=
 begin
   cases n,
-  { use 1, simp, },
+  { use 1, simp[all_one_or_two] },
   obtain ⟨k, hk1, hk2⟩ := ones_and_twos_aux n,
   exact ⟨k, hk2⟩
 end
