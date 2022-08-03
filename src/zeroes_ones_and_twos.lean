@@ -289,9 +289,7 @@ begin
   rw[prepend_one, prepend_one],
   cases n,
   { exfalso, exact nat.lt_asymm hn hn },
-  {
-    have hb : 2 ≤ 10 := by norm_num,
-    rw[digits_len' n.succ (nat.succ_pos n)],
+  { rw[digits_len' n.succ (nat.succ_pos n)],
     rw[pow_add, pow_one],
     rw[add_comm],
     have tenpos: 0 < 10 := by norm_num,
@@ -337,28 +335,62 @@ end
 
 def prepend_two (n : ℕ) := 2 * (10 ^ (list.length (nat.digits 10 n))) + n
 
+lemma prepend_two_pos (n: ℕ) : 0 < prepend_two n :=
+begin
+  cases n,
+  { simp[prepend_two], },
+  { rw[prepend_two],
+    norm_num },
+end
+
 lemma prepend_two_div (n : ℕ) (hn : 0 < n) : prepend_two n / 10 = prepend_two (n / 10) :=
 begin
   rw[prepend_two, prepend_two],
   cases n,
   { exfalso, exact nat.lt_asymm hn hn },
-  {
-    have hb : 2 ≤ 10 := by norm_num,
-    rw[digits_len' n.succ (nat.succ_pos n)],
+  { rw[digits_len' n.succ (nat.succ_pos n)],
     rw[pow_add, pow_one],
     rw[add_comm],
     have tenpos: 0 < 10 := by norm_num,
-    rw[←mul_assoc],
-    sorry,
-    --rw [nat.add_mul_div_left _ _ tenpos],
-    --exact add_comm _ _
-}
+    rw[←mul_left_comm],
+    rw [nat.add_mul_div_left _ _ tenpos],
+    exact add_comm _ _ }
+end
+
+lemma prepend_two_mod (n : ℕ) (hn : 0 < n) : prepend_two n % 10 = n % 10 :=
+begin
+  rw[prepend_two],
+  rw[nat.digits_len _ _ two_le_ten hn],
+  rw[pow_add, pow_one, ←mul_assoc],
+  exact nat.mul_add_mod _ 10 n
+end
+
+lemma prepend_two_eq_append (n : ℕ) :
+    nat.digits 10 (prepend_two n) = (nat.digits 10 n) ++ [2] :=
+begin
+  induction n using nat.strong_induction_on with n' ih,
+  cases n',
+  { simp[prepend_two], },
+  { rw[nat.digits_def' two_le_ten (prepend_two_pos _)],
+    rw[prepend_two_div _ (nat.succ_pos n')],
+    have hns : n'.succ / 10 < n'.succ := nat.div_lt_self' n' 8,
+    rw[ih _ hns],
+    rw[←list.cons_append],
+    rw[prepend_two_mod _ (nat.succ_pos _), ← nat.digits_def' two_le_ten (nat.succ_pos n')] }
 end
 
 lemma prepend_two_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
     all_one_or_two (nat.digits 10 (prepend_two n)) :=
 begin
- sorry
+ rw[prepend_two_eq_append, all_one_or_two],
+ rw[all_one_or_two] at hn,
+ intros e he,
+ rw[list.mem_append] at he,
+ cases he,
+ { exact hn e he },
+ { rw[list.mem_singleton] at he,
+   rw[he],
+   simp[is_one_or_two] }
 end
 
 lemma ones_and_twos_aux (n : ℕ) :
@@ -376,7 +408,14 @@ begin
     divisibility by 2^{pn.succ+1}.
   -/
 
-  sorry
+  obtain ⟨t, ht : ↑pk = t + t⟩ | ⟨t, ht : ↑pk = 2 * t + 1⟩ := (pk : ℕ).even_or_odd,
+  { -- Even case. Prepend 2.
+    have h2t : t + t = 2 * t := by ring,
+    rw[h2t] at ht,
+    sorry,
+  },
+  { -- Odd case. Prepend 1.
+    sorry, },
 end
 
 --
