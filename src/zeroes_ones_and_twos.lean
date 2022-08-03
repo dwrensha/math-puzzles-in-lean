@@ -297,32 +297,36 @@ begin
     exact add_comm _ _ }
 end
 
-lemma prepend_one_eq_cons (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
-    nat.digits 10 (prepend_one n) = (nat.digits 10 n) ++ [1] :=
+lemma prepend_one_mod (n : ℕ) (hn : 0 < n) : prepend_one n % 10 = n % 10 :=
 begin
-  have hb : 2 ≤ 10 := by norm_num,
-  rw[nat.digits_def' hb (prepend_one_pos _)],
-  sorry
+  rw[prepend_one],
+  rw[nat.digits_len _ _ two_le_ten hn],
+  rw[pow_add, pow_one],
+  exact nat.mul_add_mod _ 10 n
 end
 
+lemma prepend_one_eq_append (n : ℕ) :
+    nat.digits 10 (prepend_one n) = (nat.digits 10 n) ++ [1] :=
+begin
+  induction n using nat.strong_induction_on with n' ih,
+  cases n',
+  { simp[prepend_one], },
+  { rw[nat.digits_def' two_le_ten (prepend_one_pos _)],
+    rw[prepend_one_div _ (nat.succ_pos n')],
+    have hns : n'.succ / 10 < n'.succ := nat.div_lt_self' n' 8,
+    rw[ih _ hns],
+    rw[←list.cons_append],
+    rw[prepend_one_mod _ (nat.succ_pos _), ← nat.digits_def' two_le_ten (nat.succ_pos n')] }
+end
 
 lemma prepend_one_all_one_or_two (n : ℕ) (hn : all_one_or_two (nat.digits 10 n)) :
     all_one_or_two (nat.digits 10 (prepend_one n)) :=
 begin
- rw[prepend_one],
- sorry,
--- induction (nat.digits 10 n).length with l' ih,
- 
-/-
- cases n,
- { simp[prepend_one] },
- { have hb : 2 ≤ 10 := by norm_num,
-   rw[prepend_one, nat.digits_len _ _ hb (nat.succ_pos n)],
-   rw[pow_succ],
-
-   sorry,
-  }
--/
+ rw[prepend_one_eq_append],
+ cases (nat.digits 10 n),
+ { simp },
+ { rw[list.cons_append],
+   sorry },
 end
 
 def prepend_two (n : ℕ) := 2 * (10 ^ (list.length (nat.digits 10 n))) + n
