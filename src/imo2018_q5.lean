@@ -5,6 +5,7 @@ import data.rat.defs
 
 import algebra.big_operators.basic
 import ring_theory.coprime.basic
+import ring_theory.int.basic
 
 import tactic.field_simp
 import tactic.linarith
@@ -86,6 +87,13 @@ begin
   exact gcd_dvd a b c hgcd h_cab,
 end
 
+lemma nat_of_nonneg_int (x : ℤ) (hx : 0 ≤ x) : ∃ x' : ℕ, (x': ℤ) = x :=
+begin
+  cases x,
+  { use x, exact int.coe_nat_eq x,},
+  { exfalso, exact (int.neg_succ_not_nonneg x).mp hx, }
+end
+
 /-
  Let a,b,c be positive integers such that N = b/c + (c-b)/a is an integer. Then:
   (2) if gcd(a,b,c) = 1, then gcd(a,b) = 1
@@ -122,15 +130,23 @@ begin
   have h5 : ((a.gcd b):ℤ) ∣ c * c := (dvd_iff_dvd_of_dvd_sub h2).mpr h4,
 
   rw[←int.gcd_assoc] at hgcd,
-  sorry
+  have h6 := dvd_mul_gcd_of_dvd_mul h5,
+  rw[←int.coe_gcd] at h6,
+  rw[hgcd, nat.cast_one, mul_one] at h6,
+  obtain ⟨c', hc'⟩ := nat_of_nonneg_int c (le_of_lt hc),
+  rw [←hc'] at h6,
+  rw [←hc', ←nat.cast_one] at hgcd,
+  norm_cast at h6,
+  have : nat.gcd (int.gcd a b) c' = 1 := by finish,
+  exact nat.coprime.eq_one_of_dvd this h6
 end
 
 theorem imo2018_q5
-  (a: ℕ → ℕ+)
-  (ha: ∃k : ℕ,
-       ∀n : ℕ,
-       k ≤ n →
-        (∑ (i : ℕ) in finset.range n, ((a i):ℚ) / ((a ((i+1) % n)):ℚ)).denom = 1) :
+  (a : ℕ → ℕ+)
+  (ha : ∃k : ℕ,
+        ∀n : ℕ,
+        k ≤ n →
+         (∑ (i : ℕ) in finset.range n, ((a i):ℚ) / ((a ((i+1) % n)):ℚ)).denom = 1) :
   (∃m : ℕ, ∀ n : ℕ, m ≤ n → a n = a (n+1)) :=
 begin
   sorry
