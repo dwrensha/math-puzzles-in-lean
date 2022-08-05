@@ -157,7 +157,7 @@ begin
 
     have h2 := calc
           ∑ (i : ℕ) in finset.range (pc.succ + d), f i
-        = ∑ (i : ℕ) in finset.range (pc + d).succ, f i : by rw nat.succ_add
+        = ∑ (i : ℕ) in finset.range (pc + d).succ, f i        : by rw nat.succ_add
     ... = ∑ (i : ℕ) in finset.range (pc + d), f i + f(pc + d) : finset.sum_range_succ f _,
 
     linarith
@@ -228,12 +228,9 @@ lemma lemma_4 {k : ℕ} (hk : 0 < k) (f: ℕ → ℕ) (hf0 : 0 < f 0) :
 begin
   cases k,
   { exfalso, exact nat.lt_asymm hk hk },
-
-  calc 0 < f 0 : hf0
-     ... ≤ (∑(i : ℕ) in finset.range k, f i.succ) + f 0 :
-                  nat.le_add_left (f 0) (∑ (i : ℕ) in finset.range k, f i.succ)
-     ... = (∑(i : ℕ) in finset.range k.succ, f i) :
-                  (finset.sum_range_succ' (λ (i : ℕ), f i) k).symm
+  calc 0 < f 0                                         : hf0
+    ... ≤ (∑(i : ℕ) in finset.range k, f i.succ) + f 0 : nat.le_add_left _ _
+    ... = (∑(i : ℕ) in finset.range k.succ, f i)       : (finset.sum_range_succ' _ _).symm
 end
 
 --
