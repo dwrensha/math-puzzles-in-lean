@@ -57,18 +57,21 @@ def a_and_b_seqs {n : ℕ} (t : antipascal_triangle n) : ℕ → a_and_b
      then if t.f b + t.f (left_child b) = t.f (right_child b)
           then ⟨left_child b, right_child b⟩
           else ⟨right_child b, left_child b⟩
-     else ⟨a, b⟩ -- outside relevant region, can choose anything
+     else ⟨left_child b, right_child b⟩ -- outside relevant region, can choose anything
 
 
 lemma a_and_b_row_is_m {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
     (a_and_b_seqs t m).a.row = m ∧ (a_and_b_seqs t m).b.row = m :=
 begin
-  induction m with pm hpm,
-  { unfold a_and_b_seqs,
-    simp },
-  unfold a_and_b_seqs,
-  obtain ⟨hpma, hpmb⟩ := hpm,
-  sorry,
+  induction m with m' ih,
+  { simp[a_and_b_seqs] },
+  cases classical.em (m'<n) with hm' hmnot',
+  { sorry },
+  { have : a_and_b_seqs t m'.succ =
+     ⟨left_child (a_and_b_seqs t m').b, left_child (a_and_b_seqs t m').b⟩,
+    { sorry },
+    sorry,
+  },
 end
 
 lemma b_within_triangle {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (hm : m < n) :
