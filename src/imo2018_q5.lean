@@ -115,11 +115,13 @@ begin
   have hz: c * c - b * c = a * (c * N - b) := by assumption_mod_cast,
   clear this,
   have h1 : a ∣ (c * c - b * c) := dvd.intro (c * N - b) (eq.symm hz),
-  have h2 : ((a.gcd b):ℤ) ∣ c * c,
-  {
-     sorry,
-  },
+  have h1' : ((a.gcd b):ℤ) ∣ a := int.gcd_dvd_left a b,
+  have h2 : ((a.gcd b):ℤ) ∣ (c * c - b * c) := dvd_trans h1' h1,
+  have h3 : ((a.gcd b):ℤ) ∣ b := int.gcd_dvd_right a b,
+  have h4 : ((a.gcd b):ℤ) ∣ b * c := dvd_mul_of_dvd_left h3 c,
+  have h5 : ((a.gcd b):ℤ) ∣ c * c := (dvd_iff_dvd_of_dvd_sub h2).mpr h4,
 
+  rw[←int.gcd_assoc] at hgcd,
   sorry
 end
 
