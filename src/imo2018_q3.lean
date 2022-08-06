@@ -34,8 +34,12 @@ structure coords := mk ::
 def left_child (c : coords) : coords :=
 ⟨c.row.succ, c.col⟩
 
+lemma left_child_row (c : coords) : (left_child c).row = c.row.succ := rfl
+
 def right_child (c : coords) : coords :=
 ⟨c.row.succ, c.col.succ⟩
+
+lemma right_child_row (c : coords) : (right_child c).row = c.row.succ := rfl
 
 /--
 antipascal triangle with n rows
@@ -52,7 +56,7 @@ structure a_and_b := mk ::
 def a_and_b_seqs {n : ℕ} (t : antipascal_triangle n) : ℕ → a_and_b
 | 0 := ⟨⟨0,0⟩, ⟨0,0⟩⟩
 | (nat.succ m) :=
-  let ⟨a, b⟩ := a_and_b_seqs m
+  let b := (a_and_b_seqs m).b
   in if hm : m.succ < n
      then if t.f b + t.f (left_child b) = t.f (right_child b)
           then ⟨left_child b, right_child b⟩
@@ -65,12 +69,30 @@ lemma a_and_b_row_is_m {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
 begin
   induction m with m' ih,
   { simp[a_and_b_seqs] },
-  cases classical.em (m'<n) with hm' hmnot',
-  { sorry },
-  { have : a_and_b_seqs t m'.succ =
-     ⟨left_child (a_and_b_seqs t m').b, left_child (a_and_b_seqs t m').b⟩,
-    { sorry },
-    sorry,
+  cases ih with ih1 ih2,
+  cases classical.em (m'.succ<n) with hm' hmnot',
+  { simp[a_and_b_seqs, hm'],
+    cases classical.em (t.f (a_and_b_seqs t m').b +
+              t.f (left_child (a_and_b_seqs t m').b) =
+                 t.f (right_child (a_and_b_seqs t m').b)) with hc hcnot,
+    { simp[hc],
+      split,
+      {nth_rewrite 1 [← ih2], refl},
+      {nth_rewrite 1 [← ih2], refl},
+    },
+    { simp[hcnot],
+      split,
+      {nth_rewrite 1 [← ih2], refl},
+      {nth_rewrite 1 [← ih2], refl}},
+  },
+  { have hp : a_and_b_seqs t m'.succ =
+          ⟨left_child (a_and_b_seqs t m').b, right_child (a_and_b_seqs t m').b⟩,
+    { simp[a_and_b_seqs, hmnot']},
+    rw[hp],
+    dsimp,
+    split,
+    { nth_rewrite 1 [← ih2], refl},
+    { nth_rewrite 1 [← ih2], refl},
   },
 end
 
