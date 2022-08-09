@@ -65,6 +65,14 @@ def a_and_b_seqs {n : ℕ} (t : antipascal_triangle n) : ℕ → a_and_b
           else ⟨right_child b, left_child b⟩
      else ⟨left_child b, right_child b⟩ -- outside relevant region, can choose anything
 
+lemma a_and_b_invariant {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
+  (let b := (a_and_b_seqs t m).b in
+   (a_and_b_seqs t m.succ) = ⟨left_child b, right_child b⟩ ∨
+   (a_and_b_seqs t m.succ) = ⟨right_child b, left_child b⟩) :=
+begin
+  simp only [a_and_b_seqs, left_child, right_child],
+  finish,
+end
 
 lemma a_and_b_row_is_m {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
     (a_and_b_seqs t m).a.row = m ∧ (a_and_b_seqs t m).b.row = m :=
@@ -72,30 +80,9 @@ begin
   induction m with m' ih,
   { simp[a_and_b_seqs] },
   cases ih with ih1 ih2,
-  cases classical.em (m'.succ<n) with hm' hmnot',
-  { simp[a_and_b_seqs, hm'],
-    cases classical.em (t.v (a_and_b_seqs t m').b +
-              t.v (left_child (a_and_b_seqs t m').b) =
-                 t.v (right_child (a_and_b_seqs t m').b)) with hc hcnot,
-    { simp[hc],
-      split,
-      {nth_rewrite 1 [← ih2], refl},
-      {nth_rewrite 1 [← ih2], refl},
-    },
-    { simp[hcnot],
-      split,
-      {nth_rewrite 1 [← ih2], refl},
-      {nth_rewrite 1 [← ih2], refl}},
-  },
-  { have hp : a_and_b_seqs t m'.succ =
-          ⟨left_child (a_and_b_seqs t m').b, right_child (a_and_b_seqs t m').b⟩,
-    { simp[a_and_b_seqs, hmnot']},
-    rw[hp],
-    dsimp,
-    split,
-    { nth_rewrite 1 [← ih2], refl},
-    { nth_rewrite 1 [← ih2], refl},
-  },
+  cases a_and_b_invariant t m' with hl hr,
+  { simp[hl,left_child, right_child, ih2] },
+  { simp[hr,left_child, right_child, ih2] }
 end
 
 lemma a_and_b_within_triangle {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (hm : m < n) :
@@ -123,7 +110,6 @@ begin
   have har : (a_and_b_seqs t m').a.row.succ < n := (congr_arg nat.succ hra).trans_lt hm,
 --  have hbr : (a_and_b_seqs t m').a.row < n := by {rw[← hra] at hm, exact nat.lt_of_succ_lt hm},
   have :=  t.antipascal (a_and_b_seqs t m').a har haw,
-  
   sorry
 end
 
