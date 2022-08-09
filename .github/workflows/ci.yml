@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      # number of commits to check for olean cache
+      GIT_HISTORY_DEPTH: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ env.GIT_HISTORY_DEPTH }}
+
+      - name: install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+          echo "short_lean_version=$(~/.elan/bin/lean --run scripts/lean_version.lean)" >> $GITHUB_ENV
+
+      - name: install mathlibtools
+        run: python -m pip install --upgrade pip mathlibtools
+
+      - name: leanpkg configure
+        run: leanpkg configure
+
+      - name: get mathlib cache
+        run: leanproject get-mathlib-cache || true
+
+      - name: leanpkg build
+        id: build
+        run: |
+          set -o pipefail
+          echo "::set-output name=started::true"
+          echo "Starting build at $(date +'%T')"
+          leanpkg build --make
+          result_run1=$?
+          echo "Complete at $(date +'%T'); return value $result_run1"
+
+
