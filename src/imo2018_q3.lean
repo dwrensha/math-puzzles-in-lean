@@ -35,11 +35,13 @@ def left_child (c : coords) : coords :=
 ⟨c.row.succ, c.col⟩
 
 lemma left_child_row (c : coords) : (left_child c).row = c.row.succ := rfl
+lemma left_child_col (c : coords) : (left_child c).col = c.col := rfl
 
 def right_child (c : coords) : coords :=
 ⟨c.row.succ, c.col.succ⟩
 
 lemma right_child_row (c : coords) : (right_child c).row = c.row.succ := rfl
+lemma right_child_col (c : coords) : (right_child c).col = c.col.succ := rfl
 
 /--
 antipascal triangle with n rows
@@ -59,19 +61,30 @@ def a_and_b_seqs {n : ℕ} (t : antipascal_triangle n) : ℕ → a_and_b
 | 0 := ⟨⟨0,0⟩, ⟨0,0⟩⟩
 | (nat.succ m) :=
   let b := (a_and_b_seqs m).b
-  in if hm : m.succ < n
-     then if t.v b + t.v (left_child b) = t.v (right_child b)
-          then ⟨left_child b, right_child b⟩
-          else ⟨right_child b, left_child b⟩
-     else ⟨left_child b, right_child b⟩ -- outside relevant region, can choose anything
+  in if t.v b + t.v (left_child b) = t.v (right_child b)
+     then ⟨left_child b, right_child b⟩
+     else ⟨right_child b, left_child b⟩
 
 lemma a_and_b_invariant {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
   (let b := (a_and_b_seqs t m).b in
-   (a_and_b_seqs t m.succ) = ⟨left_child b, right_child b⟩ ∨
-   (a_and_b_seqs t m.succ) = ⟨right_child b, left_child b⟩) :=
+   ((a_and_b_seqs t m.succ) = ⟨left_child b, right_child b⟩ ∧
+    (b.row.succ < n → b.col ≤ b.row → t.v b + t.v (left_child b) = t.v (right_child b))) ∨
+    ((a_and_b_seqs t m.succ) = ⟨right_child b, left_child b⟩) ∧
+     (b.row.succ < n → b.col ≤ b.row → t.v b + t.v (right_child b) = t.v (left_child b))) :=
 begin
-  simp only [a_and_b_seqs, left_child, right_child],
-  finish,
+  cases classical.em (t.v (a_and_b_seqs t m).b +
+                     t.v (left_child (a_and_b_seqs t m).b) =
+                     t.v (right_child (a_and_b_seqs t m).b)) with hl hr,
+  { simp only [a_and_b_seqs, left_child, right_child],
+    finish },
+  { simp only [a_and_b_seqs, left_child, right_child, hr],
+    right,
+    split,
+    { finish },
+    { intros h1 h2,
+      have := t.antipascal (a_and_b_seqs t m).b h1 h2,
+      finish },
+  },
 end
 
 lemma a_and_b_row_is_m {n : ℕ} (t : antipascal_triangle n) (m : ℕ) :
@@ -90,11 +103,19 @@ lemma a_and_b_within_triangle {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (h
   (a_and_b_seqs t m).b.col ≤ (a_and_b_seqs t m).b.row :=
 begin
   induction m with m' ih,
-  { unfold a_and_b_seqs, sorry },
-  unfold a_and_b_seqs,
-  have h' := ih (nat.lt_of_succ_lt hm),
---  have := t.antipascal (a_and_b_seqs t pm).b _ h',
-  sorry,
+  { simp[a_and_b_seqs] },
+  { obtain ⟨iha,ihb⟩ := ih (nat.lt_of_succ_lt hm),
+    cases (a_and_b_invariant t m') with hl hr,
+    { rw[hl.1],
+      rw[left_child_col, left_child_row, right_child_col, right_child_row],
+      split,
+      { exact nat.le_succ_of_le ihb },
+      { exact nat.succ_le_succ ihb } },
+    { rw[hr.1],
+      rw[left_child_col, left_child_row, right_child_col, right_child_row],
+      split,
+      { exact nat.succ_le_succ ihb },
+      { exact nat.le_succ_of_le ihb }} }
 end
 
 lemma sum_of_a {n : ℕ} (t : antipascal_triangle n) (m : ℕ) (hm : m < n) :
@@ -103,14 +124,11 @@ begin
   induction m with m' ih,
   { simp only [nat.nat_zero_eq_zero, finset.sum_singleton, finset.range_one, a_and_b_seqs] },
   rw [finset.sum_range_succ, ih (nat.lt_of_succ_lt hm)],
-  --have hb := b_within_triangle t m' (nat.lt_of_succ_lt hm),
   obtain ⟨hra, hrb⟩ := a_and_b_row_is_m t m',
---  obtain ⟨haw, hbw⟩ := a_and_b_within_triangle t m'.succ hm,
   obtain ⟨haw, hbw⟩ := a_and_b_within_triangle t m' (nat.lt_of_succ_lt hm),
-  have har : (a_and_b_seqs t m').a.row.succ < n := (congr_arg nat.succ hra).trans_lt hm,
---  have hbr : (a_and_b_seqs t m').a.row < n := by {rw[← hra] at hm, exact nat.lt_of_succ_lt hm},
-  have :=  t.antipascal (a_and_b_seqs t m').a har haw,
-  sorry
+  cases a_and_b_invariant t m' with hl hr,
+  { finish },
+  { finish },
 end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
