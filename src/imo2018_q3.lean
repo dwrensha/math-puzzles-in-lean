@@ -133,7 +133,7 @@ end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
   (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
-    ∃ r < 2018, ∃ c < r, t.v ⟨r,c⟩ = n) :
+    ∃ r < 2018, ∃ c ≤ r, t.v ⟨r,c⟩ = n) :
   false :=
 begin
 sorry
