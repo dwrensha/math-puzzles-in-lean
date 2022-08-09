@@ -54,6 +54,36 @@ structure antipascal_triangle (n : ℕ) := mk ::
                    v x + v (left_child x) = v (right_child x) ∨
                    v x + v (right_child x) = v (left_child x))
 
+/--
+  Given an antipascal triangle and a point c in it, construct the subtriangle
+  rooted at c.
+-/
+def subtriangle
+   {n : ℕ}
+   (t : antipascal_triangle n)
+   (c : coords)
+   (hcr : c.row < n)
+   (hcc : c.col ≤ c.row) : antipascal_triangle (n - c.row) :=
+{
+  v := (λ x, t.v ⟨x.row + c.row, x.col + c.col⟩),
+  antipascal :=
+    begin
+      intros x hxr hxc,
+      have hh : x.row.succ + c.row < n := lt_tsub_iff_right.mp hxr,
+      rw [nat.succ_add] at hh,
+      have := t.antipascal ⟨x.row + c.row, x.col + c.col⟩ hh (add_le_add hxc hcc),
+      cases this with hl hr,
+      { left,
+        rw[left_child, right_child] at hl,
+        rw[left_child, nat.succ_add, right_child, nat.succ_add, nat.succ_add],
+        exact hl },
+      { right,
+        rw[left_child, right_child] at hr,
+        rw[left_child, nat.succ_add, right_child, nat.succ_add, nat.succ_add],
+        exact hr },
+    end
+}
+
 structure a_and_b := mk ::
 (a : coords) (b : coords)
 
