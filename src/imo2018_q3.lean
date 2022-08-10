@@ -161,6 +161,79 @@ begin
   { finish },
 end
 
+def has_downward_path_to (c1 c2 : coords) : Prop :=
+ ∃ (rd cd : ℕ), cd ≤ rd ∧ c2 = ⟨c1.row + rd, c1.col + cd⟩
+
+lemma downward_path_trans
+   {c1 c2 c3 : coords}
+   (h12 : has_downward_path_to c1 c2)
+   (h23 : has_downward_path_to c2 c3) :
+   has_downward_path_to c1 c3 :=
+begin
+  obtain ⟨rd1, cd1, hle1, hs1⟩ := h12,
+  obtain ⟨rd2, cd2, hle2, hs2⟩ := h23,
+  use rd1 + rd2,
+  use cd1 + cd2,
+  split,
+  { exact add_le_add hle1 hle2 },
+  { rw [hs1] at hs2,
+    rw [hs2],
+    rw[add_assoc, add_assoc] }
+end
+
+lemma downward_path_left_child (c : coords) : has_downward_path_to c (left_child c) :=
+begin
+  rw[left_child],
+  use 1,
+  use 0,
+  simp,
+end
+
+lemma downward_path_right_child (c : coords) : has_downward_path_to c (right_child c) :=
+begin
+  rw[right_child],
+  use 1,
+  use 1,
+  simp,
+end
+
+lemma a_and_b_have_path_from_origin
+            {n : ℕ}
+            (t : antipascal_triangle n)
+            (i : ℕ) :
+            has_downward_path_to ⟨0,0⟩ (a_and_b_seqs t i).a ∧
+            has_downward_path_to ⟨0,0⟩ (a_and_b_seqs t i).b :=
+begin
+  induction i with i' ih,
+  { split,
+    { use 0, use 0, simp[a_and_b_seqs] },
+    { use 0, use 0, simp[a_and_b_seqs] }},
+  { cases ih with iha ihb,
+    cases a_and_b_invariant t i' with hl hr,
+    { rw[hl.1],
+      dsimp,
+      split,
+      { exact downward_path_trans ihb (downward_path_left_child _) },
+      { exact downward_path_trans ihb (downward_path_right_child _) },},
+    { rw[hr.1],
+      dsimp,
+      split,
+      { exact downward_path_trans ihb (downward_path_right_child _) },
+      { exact downward_path_trans ihb (downward_path_left_child _) }},
+  },
+end
+
+/-
+lemma foobar {n : ℕ} (t : antipascal_triangle n) :
+     ∃ (c : coords) (hcr : c.row < n) (hcc : c.col ≤ c.row),
+        (subtriangle t c hcr hcc)
+  :=
+begin
+
+end
+-/
+
+
 theorem imo2018_q3 (t : antipascal_triangle 2018)
   (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
     ∃ r < 2018, ∃ c ≤ r, t.v ⟨r,c⟩ = n) :
