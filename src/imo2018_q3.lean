@@ -182,20 +182,10 @@ begin
 end
 
 lemma downward_path_left_child (c : coords) : has_downward_path_to c (left_child c) :=
-begin
-  rw[left_child],
-  use 1,
-  use 0,
-  simp,
-end
+ ⟨1, 0, by simp[left_child]⟩
 
 lemma downward_path_right_child (c : coords) : has_downward_path_to c (right_child c) :=
-begin
-  rw[right_child],
-  use 1,
-  use 1,
-  simp,
-end
+ ⟨1, 1, by simp[right_child]⟩
 
 lemma a_and_b_have_path_from_origin
             {n : ℕ}
