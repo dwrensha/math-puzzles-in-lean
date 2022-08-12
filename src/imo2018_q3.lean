@@ -213,16 +213,25 @@ begin
   },
 end
 
-/-
-lemma foobar {n : ℕ} (t : antipascal_triangle n) :
-     ∃ (c : coords) (hcr : c.row < n) (hcc : c.col ≤ c.row),
-        (subtriangle t c hcr hcc)
-  :=
-begin
-
-end
+/--
+ Given an antipascal triangle t with height n greater than 2, there exists a subtriangle
+ of height at least (n - 1) / 2 that contains none of the elements of `a_and_b_seqs t`.
 -/
-
+lemma exists_disjoint_subtriangle
+  {n : ℕ}
+  (t : antipascal_triangle n)
+  (hn : 2 < n) :
+  ∃ (c : coords)
+    (hcr : (n - 1) / 2 ≤ n - c.row )
+    (hcc : c.col ≤ c.row),
+    (∀ ii : ℕ, ii < n → ((¬ has_downward_path_to c (a_and_b_seqs t ii).a) ∧
+                         (¬ has_downward_path_to c (a_and_b_seqs t ii).b))) :=
+begin
+  -- look at columns of (a_and_b_seqs t (n-1))
+  -- if they are both less than ~ n/2, then choose ⟨n - (n-1)/2, 0⟩,
+  -- else choose ⟨n-(n-1)/2, n-(n-1)/2⟩.
+  sorry
+end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
   (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
