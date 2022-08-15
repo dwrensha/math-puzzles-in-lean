@@ -233,9 +233,9 @@ begin
   sorry
 end
 
-def triangle (n : ℕ) := finset.sigma (finset.range n) (λ i, finset.range i)
+def triangle (n : ℕ) := finset.sigma (finset.range n) (λ i, finset.range (i + 1))
 
-theorem triangle_card (n : ℕ) : (triangle n).card = (∑ i in finset.range n, i) :=
+lemma triangle_card (n : ℕ) : (triangle n).card = (∑ i in finset.range n, (i + 1)) :=
 begin
   rw[triangle],
   cases n,
@@ -244,7 +244,7 @@ begin
     rw [finset.card_range],
     congr,
     funext,
-    exact finset.card_range x }
+    exact finset.card_range _ }
 end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
