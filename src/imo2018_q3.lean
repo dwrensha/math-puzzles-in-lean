@@ -235,6 +235,19 @@ end
 
 def triangle (n : ℕ) := finset.sigma (finset.range n) (λ i, finset.range (i + 1))
 
+lemma mem_triangle_iff (n r c : ℕ) : sigma.mk r c ∈ triangle n ↔ r < n ∧ c ≤ r :=
+begin
+  rw [triangle, finset.mem_sigma, finset.mem_range, finset.mem_range],
+  dsimp,
+  split,
+  { intro h,
+    cases h with hl hr,
+    exact ⟨hl, nat.lt_succ_iff.mp hr⟩ },
+  { intro h,
+    cases h with hl hr,
+    exact ⟨hl, nat.lt_succ_iff.mpr hr⟩ }
+end
+
 lemma triangle_card (n : ℕ) : (triangle n).card = (∑ i in finset.range n, (i + 1)) :=
 begin
   rw[triangle],
@@ -245,6 +258,19 @@ begin
     congr,
     funext,
     exact finset.card_range _ }
+end
+
+lemma antipascal_injective
+        (n : ℕ)
+        (t : antipascal_triangle n)
+        (h_contains_all : ∀ m ≤ (∑(i:ℕ) in finset.range m, i + 1),
+         ∃ r < n, ∃ c ≤ r, t.v ⟨r,c⟩ = m) :
+        ∀ r1 c1 r2 c2 : ℕ,
+            (r1 < n ∧ r2 < n ∧ c1 ≤ r1 ∧ c2 ≤ r2
+             ∧ t.v ⟨r1, c1⟩ = t.v ⟨r2, c2⟩) → (r1 = r2 ∧ c1 = c2) :=
+begin
+  intros r1 c1 r2 c2 h,
+  sorry
 end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
