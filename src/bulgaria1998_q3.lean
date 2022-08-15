@@ -18,17 +18,15 @@ for every x,y ∈ ℝ⁺.
 open_locale big_operators
 
 lemma geom_sum_bound (n:ℕ) : ∑(i : ℕ) in finset.range n, (1:ℝ) / (2^i) < 3 :=
-begin
   calc ∑(i : ℕ) in finset.range n, (1:ℝ) / 2^i
           = ∑(i : ℕ) in finset.range n, (1 / 2)^i : by {congr; simp [div_eq_mul_inv]}
       ... ≤ 2 : sum_geometric_two_le n
-      ... < 3 : by norm_num,
-end
+      ... < 3 : by norm_num
 
 theorem bulgaria1998_q3
-  (f: ℝ → ℝ)
+  (f : ℝ → ℝ)
   (hpos : ∀ x : ℝ, 0 < x → 0 < f x)
-  (hf : (∀x y : ℝ, 0 < x → 0 < y → (f (x + y)) * (f x + y) ≤ (f x)^2)) :
+  (hf : (∀ x y : ℝ, 0 < x → 0 < y → (f (x + y)) * (f x + y) ≤ (f x)^2)) :
   false :=
 begin
   have f_decr : ∀ x y : ℝ, 0 < x → 0 < y → f (x + y) < f x,
@@ -40,7 +38,7 @@ begin
     have h5 : f x / (f x + y) < 1 := by rwa [div_lt_iff h2, one_mul],
     calc f (x + y) = f (x + y) * 1                       : (mul_one (f (x + y))).symm
                ... = f (x + y) * ((f x + y) / (f x + y)) : by rw (div_self (ne.symm (ne_of_lt h2)))
-               ... = (f (x + y) * (f x + y)) / (f x + y) : mul_div_assoc' (f (x + y)) (f x + y) (f x + y)
+               ... = (f (x + y) * (f x + y)) / (f x + y) : mul_div_assoc' _ _ _
                ... ≤ (f x)^2 / (f x + y)                 : (div_le_div_right h2).mpr h1
                ... = (f x) * (f x / (f x + y))           : by field_simp [pow_two]
                ... < f x                                 : (mul_lt_iff_lt_one_right (hpos x hx)).mpr h5,
@@ -51,7 +49,7 @@ begin
     have h0 := hpos x hx,
     have h1 := hf x (f x) hx h0,
     have h2 : 0 < f x + f x := add_pos h0 h0,
-    have h3 : 0 ≠ f x + f x := by linarith,
+    have h3 : 0 ≠ f x + f x := ne_of_lt h2,
     have h5 := ne_of_lt h0,
     have h6: 2 * f x ≠ 0 := by linarith,
     have h7 : (f x/ (2 * f x)) = 1 / 2 := by { rw [div_eq_iff h6], ring },
@@ -87,11 +85,11 @@ begin
   have f_x_seq: ∀ n:ℕ, f(x_seq n) ≤ f 1 / 2^n,
   { intro n,
     induction n with pn hpn,
-    { rw hz, simp only [div_one, pow_zero],},
+    { rw hz, simp only [div_one, pow_zero] },
 
     have hpp: x_seq pn.succ = x_seq pn + f 1 / 2^pn,
     {
-      simp [x_seq],
+      simp only [x_seq],
       have : ∑ (i : ℕ) in finset.range pn.succ, f 1 / 2 ^ i =
               f 1 / 2 ^ pn + ∑ (i : ℕ) in finset.range pn, f 1 / 2 ^ i,
       { exact finset.sum_range_succ_comm (λ (x : ℕ), f 1 / 2 ^ x) pn },
@@ -105,14 +103,11 @@ begin
      rw hpp,
      obtain heq | hlt := eq_or_lt_of_le hpn,
      { rwa heq },
-     {
-       have := le_of_lt (f_decr (x_seq pn + f (x_seq pn)) (f 1 / 2 ^ pn - f (x_seq pn))
+     { have := le_of_lt (f_decr (x_seq pn + f (x_seq pn)) (f 1 / 2 ^ pn - f (x_seq pn))
                                 (add_pos (x_seq_pos pn) (hpos (x_seq pn) (x_seq_pos pn)))
                                 (sub_pos.mpr hlt)),
-       simp at this,
-       assumption,
-     }
-    },
+       rw[add_add_sub_cancel] at this,
+       exact this } },
 
     calc f (x_seq pn.succ) ≤ f (x_seq pn + f(x_seq pn)) : h1
                        ... ≤ f (x_seq pn) / 2 : f_half (x_seq pn) (x_seq_pos pn)
@@ -138,19 +133,15 @@ begin
                      ... ≤ f 1 / 2^n : f_x_seq n,
   },
 
-  have he: ∃n:ℕ, f 1 / 2^n < f (1 + 3 * f 1),
-  {
-    obtain ⟨N, hN⟩ := pow_unbounded_of_one_lt (f 1 / f (1 + 3 * f 1)) one_lt_two,
+  have he : ∃n : ℕ, f 1 / 2^n < f (1 + 3 * f 1),
+  { obtain ⟨N, hN⟩ := pow_unbounded_of_one_lt (f 1 / f (1 + 3 * f 1)) one_lt_two,
     use N,
 
-    have hp : 0 < f (1 + 3 * f 1),
-    { have : 0 < 1 + 3 * f 1 := by linarith,
-      exact hpos (1 + 3 * f 1) this
-    },
+    have hp : 0 < f (1 + 3 * f 1) :=
+      hpos (1 + 3 * f 1) (lt_trans (x_seq_pos 0) (h1 0)),
 
     have h2N : (0:ℝ) < 2^N := pow_pos (by norm_num) N,
-    exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hN),
-  },
+    exact (div_lt_iff h2N).mpr ((div_lt_iff' hp).mp hN) },
 
   obtain ⟨N, hN⟩ := he,
   exact lt_irrefl _ (lt_trans (h3 N) hN),
