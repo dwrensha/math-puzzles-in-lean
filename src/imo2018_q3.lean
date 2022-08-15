@@ -263,7 +263,7 @@ end
 lemma antipascal_injective
         (n : ℕ)
         (t : antipascal_triangle n)
-        (h_contains_all : ∀ m ≤ (∑(i:ℕ) in finset.range m, i + 1),
+        (h_contains_all : ∀ m ≤ (∑(i:ℕ) in finset.range n, i + 1),
          ∃ r < n, ∃ c ≤ r, t.v ⟨r,c⟩ = m) :
         ∀ r1 c1 r2 c2 : ℕ,
             (r1 < n ∧ r2 < n ∧ c1 ≤ r1 ∧ c2 ≤ r2
