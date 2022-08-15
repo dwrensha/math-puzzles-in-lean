@@ -233,6 +233,20 @@ begin
   sorry
 end
 
+def triangle (n : ℕ) := finset.sigma (finset.range n) (λ i, finset.range i)
+
+theorem triangle_card (n : ℕ) : (triangle n).card = (∑ i in finset.range n, i) :=
+begin
+  rw[triangle],
+  cases n,
+  { simp },
+  { rw [finset.sum_range_succ, finset.card_sigma, finset.sum_range_succ],
+    rw [finset.card_range],
+    congr,
+    funext,
+    exact finset.card_range x }
+end
+
 theorem imo2018_q3 (t : antipascal_triangle 2018)
   (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
     ∃ r < 2018, ∃ c ≤ r, t.v ⟨r,c⟩ = n) :
