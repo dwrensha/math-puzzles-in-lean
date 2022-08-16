@@ -260,21 +260,27 @@ begin
     exact finset.card_range _ }
 end
 
+lemma triangle_fintype_card (n : ℕ) : fintype.card (triangle n) = (∑ i in finset.range n, (i + 1)) :=
+by rw [fintype.card_coe, triangle_card]
+
 lemma antipascal_injective
         (n : ℕ)
         (t : antipascal_triangle n)
-        (h_contains_all : ∀ m ≤ (∑(i:ℕ) in finset.range n, i + 1),
+        (h_contains_all : ∀ m ≤ (∑(i:ℕ) in finset.range n, (i + 1)),
          ∃ r < n, ∃ c ≤ r, t.v ⟨r,c⟩ = m) :
         ∀ r1 c1 r2 c2 : ℕ,
-            (r1 < n ∧ r2 < n ∧ c1 ≤ r1 ∧ c2 ≤ r2
+            ((r1 < n ∧ c1 ≤ r1) ∧ (r2 < n ∧ c2 ≤ r2)
              ∧ t.v ⟨r1, c1⟩ = t.v ⟨r2, c2⟩) → (r1 = r2 ∧ c1 = c2) :=
 begin
   intros r1 c1 r2 c2 h,
+  let f : ↥(triangle n) → {j // j ≤ (∑(i:ℕ) in finset.range n, (i + 1))} :=
+          (λ ⟨x, hxt⟩, let y := t.v ⟨x.1, x.2⟩ in ⟨y, sorry⟩),
+
   sorry
 end
 
 theorem imo2018_q3 (t : antipascal_triangle 2018)
-  (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, i + 1),
+  (h_contains_all : ∀ n ≤ (∑(i:ℕ) in finset.range 2018, (i + 1)),
     ∃ r < 2018, ∃ c ≤ r, t.v ⟨r,c⟩ = n) :
   false :=
 begin
