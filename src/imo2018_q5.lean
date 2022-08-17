@@ -137,8 +137,7 @@ begin
   rw [←hc'] at h6,
   rw [←hc', ←nat.cast_one] at hgcd,
   norm_cast at h6,
-  have : nat.gcd (int.gcd a b) c' = 1 := by finish,
-  exact nat.coprime.eq_one_of_dvd this h6
+  exact nat.coprime.eq_one_of_dvd hgcd h6
 end
 
 theorem imo2018_q5
