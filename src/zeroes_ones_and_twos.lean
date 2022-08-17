@@ -35,7 +35,7 @@ begin
   { intros a b,
     contrapose,
     exact hc a b, },
-  apply not_injective_infinite_fintype f hinj,
+  apply not_injective_infinite_finite f hinj,
 end
 
 lemma pigeonhole' (n : ℕ) (f : ℕ → fin n) :
