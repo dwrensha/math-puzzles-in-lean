@@ -273,8 +273,25 @@ lemma antipascal_injective
              ∧ t.v ⟨r1, c1⟩ = t.v ⟨r2, c2⟩) → (r1 = r2 ∧ c1 = c2) :=
 begin
   intros r1 c1 r2 c2 h,
-  let f : ↥(triangle n) → {j // j ≤ (∑(i:ℕ) in finset.range n, (i + 1))} :=
-          (λ ⟨x, hxt⟩, let y := t.v ⟨x.1, x.2⟩ in ⟨y, sorry⟩),
+--  let f : ↥(triangle n) → {j // j ≤ (∑(i:ℕ) in finset.range n, (i + 1))} :=
+--          (λ ⟨x, hxt⟩, let y := t.v ⟨x.1, x.2⟩ in ⟨y, sorry⟩),
+
+  let g : finset.range (∑(i:ℕ) in finset.range n, (i + 1)) → ↥(triangle n) :=
+          λ xx, by { have hca := h_contains_all xx.val (finset.mem_range_le xx.prop),
+                         let r' := classical.some hca,
+                         have rr' := classical.some_spec hca,
+                         have hr' := classical.some rr',
+                         have prc' := classical.some_spec rr',
+                         let c' := classical.some prc',
+                         have rc' := classical.some_spec prc',
+                         have hc' := classical.some rc',
+                         exact ⟨⟨r', c'⟩, (mem_triangle_iff n r' c').mpr ⟨hr', hc'⟩⟩ },
+
+  have : function.injective g,
+  { intros a1 a2 hg,
+    have : t.v ⟨(g a1).val.1, (g a1).val.2⟩ = a1,
+    { sorry, },
+    sorry },
 
   sorry
 end
