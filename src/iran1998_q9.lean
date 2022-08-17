@@ -17,12 +17,11 @@ Let x,y,z > 1 and 1/x + 1/y + 1/z = 2. Prove that
 
 lemma compute_norm (v : euclidean_space ℝ (fin 3)) : ∥v∥ = real.sqrt (∑(i : fin 3), (v i)^2) :=
 begin
-  have he := euclidean_space.norm_eq v,
   have hvi : (∀ i : fin 3, (v i) ^2 = ∥v i∥^2),
-  {intro i, finish},
+  { intro i, rw [real.norm_eq_abs], exact (sq_abs (v i)).symm },
   have := fintype.sum_congr ((λ jj, (v jj)^2): fin 3 → ℝ) (λ jj, ∥v jj∥^2) hvi,
   rw[this],
-  exact he,
+  exact euclidean_space.norm_eq v,
 end
 
 theorem iran1998_q9
