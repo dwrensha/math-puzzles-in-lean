@@ -25,23 +25,10 @@ def ones (b : ℕ) : ℕ → ℕ
 def map_mod (n : ℕ) (hn: 0 < n) (f : ℕ → ℕ) : ℕ → fin n
 | m := ⟨f m % n, nat.mod_lt (f m) hn⟩
 
-lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
-  ∃ a b : ℕ, a ≠ b ∧ f a = f b :=
-begin
-  classical,
-  by_contra hc,
-  push_neg at hc,
-  have hinj : function.injective f,
-  { intros a b,
-    contrapose,
-    exact hc a b, },
-  apply not_injective_infinite_finite f hinj,
-end
-
 lemma pigeonhole' (n : ℕ) (f : ℕ → fin n) :
   ∃ a b : ℕ, a < b ∧ f a = f b :=
 begin
-  obtain ⟨a, b, hne, hfe⟩ := pigeonhole n f,
+  obtain ⟨a, b, hne, hfe⟩ := finite.exists_ne_map_eq_of_infinite f,
   obtain (ha : a < b) | (hb : b < a) := ne.lt_or_lt hne,
   { use a, use b, exact ⟨ha, hfe⟩},
   { use b, use a, exact ⟨hb, hfe.symm⟩},
