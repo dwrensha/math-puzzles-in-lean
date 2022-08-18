@@ -25,14 +25,10 @@ def ones (b : ℕ) : ℕ → ℕ
 def map_mod (n : ℕ) (hn: 0 < n) (f : ℕ → ℕ) : ℕ → fin n
 | m := ⟨f m % n, nat.mod_lt (f m) hn⟩
 
-lemma pigeonhole' (n : ℕ) (f : ℕ → fin n) :
+lemma pigeonhole (n : ℕ) (f : ℕ → fin n) :
   ∃ a b : ℕ, a < b ∧ f a = f b :=
-begin
-  obtain ⟨a, b, hne, hfe⟩ := finite.exists_ne_map_eq_of_infinite f,
-  obtain (ha : a < b) | (hb : b < a) := ne.lt_or_lt hne,
-  { use a, use b, exact ⟨ha, hfe⟩},
-  { use b, use a, exact ⟨hb, hfe.symm⟩},
-end
+let ⟨a, b, hne, hfe⟩ := finite.exists_ne_map_eq_of_infinite f
+in hne.lt_or_lt.elim (λ h, ⟨a, b, h, hfe⟩) (λ h, ⟨b, a, h, hfe.symm⟩)
 
 def is_zero_or_one : ℕ → Prop
 | 0 := true
@@ -227,7 +223,7 @@ theorem zeroes_and_ones (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10
 begin
   obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
   { use 1, rw hn0, simp },
-  obtain ⟨a, b, hlt, hab⟩ := pigeonhole' n (λm, map_mod n hn (ones 10) m),
+  obtain ⟨a, b, hlt, hab⟩ := pigeonhole n (λm, map_mod n hn (ones 10) m),
   unfold map_mod at hab, unfold ones at hab,
   rw [subtype.mk_eq_mk] at hab,
   have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
