@@ -35,7 +35,6 @@ def is_zero_or_one : ℕ → Prop
 | 1 := true
 | _ := false
 
-@[simp]
 def all_zero_or_one (l : list ℕ) : Prop := ∀ e ∈ l, is_zero_or_one e
 
 lemma digits_lemma
@@ -58,9 +57,9 @@ lemma times_base_still_all_zero_or_one
 begin
   cases (nat.eq_zero_or_pos n) with hz hp,
   { rw hz,
-    simp [mul_zero, nat.digits_zero] },
+    simp [mul_zero, nat.digits_zero, all_zero_or_one] },
   { rw (digits_lemma base h2 n hp),
-    simpa[is_zero_or_one] }
+    simpa[is_zero_or_one, all_zero_or_one] }
 end
 
 lemma base_pow_still_all_zero_or_one
@@ -84,14 +83,14 @@ lemma times_base_plus_one_still_all_zero_or_one
   : all_zero_or_one (nat.digits base (1 + base * n)) :=
 begin
   rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
-  simpa[is_zero_or_one],
+  simpa[all_zero_or_one, is_zero_or_one],
 end
 
 lemma lemma_0 (k b : ℕ) (h2 : 2 ≤ b) :
   all_zero_or_one (b.digits (∑(i : ℕ) in finset.range k, b^i)) :=
 begin
   induction k with pk hpk,
-  { simp },
+  { simp[all_zero_or_one] },
   { have hh := calc
           ∑ (i : ℕ) in finset.range pk.succ, b ^ i
         = ∑ (i : ℕ) in finset.range pk, b ^ i.succ + b ^ 0 :
@@ -222,7 +221,7 @@ end
 theorem zeroes_and_ones (n : ℕ) : ∃ k : ℕ+, all_zero_or_one (nat.digits 10 (n * k)) :=
 begin
   obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
-  { use 1, rw hn0, simp },
+  { use 1, rw hn0, simp[all_zero_or_one] },
   obtain ⟨a, b, hlt, hab⟩ := pigeonhole n (λm, map_mod n hn (ones 10) m),
   unfold map_mod at hab, unfold ones at hab,
   rw [subtype.mk_eq_mk] at hab,
@@ -272,10 +271,8 @@ begin
   cases n,
   { exfalso, exact nat.lt_asymm hn hn },
   { rw[digits_len' n.succ (nat.succ_pos n)],
-    rw[pow_add, pow_one],
-    rw[add_comm],
-    have tenpos: 0 < 10 := by norm_num,
-    rw [nat.add_mul_div_left _ _ tenpos],
+    rw[pow_add, pow_one, add_comm],
+    rw [nat.add_mul_div_left _ _ (nat.succ_pos 9)],
     exact add_comm _ _ }
 end
 
@@ -333,9 +330,8 @@ begin
   { rw[digits_len' n.succ (nat.succ_pos n)],
     rw[pow_add, pow_one],
     rw[add_comm],
-    have tenpos: 0 < 10 := by norm_num,
     rw[←mul_left_comm],
-    rw [nat.add_mul_div_left _ _ tenpos],
+    rw [nat.add_mul_div_left _ _ (nat.succ_pos 9)],
     exact add_comm _ _ }
 end
 
