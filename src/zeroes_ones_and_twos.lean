@@ -215,6 +215,8 @@ begin
     ... = (∑(i : ℕ) in finset.range k.succ, f i)       : (finset.sum_range_succ' _ _).symm
 end
 
+lemma two_le_ten : (2 : ℕ) ≤ 10 := tsub_eq_zero_iff_le.mp rfl
+
 --
 -- Prove that n has a positive multiple whose representation contains only zeroes and ones.
 --
@@ -228,13 +230,13 @@ begin
   have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
   have ha: 0 < ∑(i : ℕ) in finset.range (b - a), 10^(i + a),
   { have hm : 0 < b - a := nat.sub_pos_of_lt hlt,
-    have hp : 0 < 10 ^ (0 + a) := pow_pos (by norm_num) _,
+    have hp : 0 < 10 ^ (0 + a) := pow_pos (nat.succ_pos _) _,
     exact lemma_4 hm (λ (i : ℕ), 10 ^ (i + a)) hp,
   },
   obtain ⟨k, hk⟩ := lemma_3 ha h',
   use k,
   rw [←hk],
-  exact lemma_1 (b - a) 10 a (by norm_num)
+  exact lemma_1 (b - a) 10 a two_le_ten
 end
 
 
@@ -254,8 +256,6 @@ begin
   { rw[prepend_one],
     norm_num },
 end
-
-lemma two_le_ten : (2 : ℕ) ≤ 10 := by norm_num
 
 lemma digits_len' (n : ℕ) (hn : 0 < n) :
       list.length (nat.digits 10 n) = 1 + list.length (nat.digits 10 (n / 10)) :=
