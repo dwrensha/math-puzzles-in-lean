@@ -84,15 +84,13 @@ end
 lemma a'_recurrence (n : ℕ) (hn : 2 ≤ n) :
   a' n = a' (n - 1) + a' (n / 2) :=
 begin
-  have har := a_recurrence n hn,
-  have hva: (a' (n - 1) + a' (n / 2)).val = ((a' (n - 1)).val + (a' (n / 2)).val) % 7 := zmod.val_add _ _,
+  ext,
   have : (a' n).val = (a' (n - 1) + a' (n / 2)).val,
-  { rw [hva],
-    simp_rw [a', har],
+  { rw [zmod.val_add],
+    simp_rw [a', a_recurrence n hn],
     rw [zmod.val],
     simp },
-  ext,
-  finish,
+  exact this,
 end
 
 lemma lemma3
