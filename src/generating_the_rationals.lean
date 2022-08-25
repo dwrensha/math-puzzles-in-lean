@@ -32,7 +32,7 @@ begin
     rw pow_zero at hmn,
     cases m,
     { simpa },
-    { simpa [nat.le_zero_iff.mp (nat.succ_le_succ_iff.mp hmn)] } },
+    { simpa [le_zero_iff.mp (nat.succ_le_succ_iff.mp hmn)] } },
   {
     intros m hmn,
     obtain ⟨t, ht : m = t + t⟩ | ⟨t, ht : m = 2 * t + 1⟩ := m.even_or_odd,
