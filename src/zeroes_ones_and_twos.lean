@@ -225,9 +225,8 @@ begin
   obtain (hn0 : n = 0 ) | (hn : n > 0) := nat.eq_zero_or_pos n,
   { use 1, rw hn0, simp[all_zero_or_one] },
   obtain ⟨a, b, hlt, hab⟩ := pigeonhole n (λm, map_mod n hn (ones 10) m),
-  unfold map_mod at hab, unfold ones at hab,
-  rw [subtype.mk_eq_mk] at hab,
-  have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 := lemma_2 n hn a b hlt hab,
+  have h' : (∑(i : ℕ) in finset.range (b - a), 10^(i + a)) % n = 0 :=
+   lemma_2 n hn a b hlt (fin.mk.inj hab),
   have ha: 0 < ∑(i : ℕ) in finset.range (b - a), 10^(i + a),
   { have hm : 0 < b - a := nat.sub_pos_of_lt hlt,
     have hp : 0 < 10 ^ (0 + a) := pow_pos (nat.succ_pos _) _,
