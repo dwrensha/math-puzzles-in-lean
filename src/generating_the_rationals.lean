@@ -165,12 +165,15 @@ begin
 
   obtain ⟨na, hna⟩ := pow_unbounded_of_one_lt (1/q) one_lt_two,
   let a : ℚ := 1 / 2^na,
-  have ha0 : 0 < a := by norm_num,
+  have ha0 : 0 < a := one_div_pos.mpr (by norm_num),
   have haq : a < q := (one_div_lt hgt0 (by norm_num)).mp hna,
 
   obtain ⟨nb, hnb⟩ := pow_unbounded_of_one_lt (1/(1-q)) one_lt_two,
   let b : ℚ := 1 - 1 / 2^nb,
-  have hb1 : b < 1 := by norm_num,
+  let b' : ℚ := 1 / 2^nb,
+  have hb' : b = 1 - b' := rfl,
+  have hb0 : (0:ℚ) < b' := one_div_pos.mpr (by norm_num),
+  have hb1 : b < 1 := by { rw[hb'], linarith },
   have haq : q < b,
   { have hbb : 0 < (1 - q) := sub_pos.mpr hlt1,
     have hbb': 1 < (1 - q) * 2 ^ nb := (div_lt_iff' hbb).mp hnb,
