@@ -1,5 +1,5 @@
 import data.nat.basic
-import data.nat.gcd
+import data.nat.gcd.basic
 import data.nat.pow
 
 import algebra.associated

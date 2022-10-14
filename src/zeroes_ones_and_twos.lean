@@ -3,7 +3,7 @@ import data.nat.basic
 import data.nat.modeq
 import data.pnat.basic
 import data.nat.digits
-import data.nat.gcd
+import data.nat.gcd.basic
 import algebra.big_operators.pi
 import algebra.big_operators.ring
 

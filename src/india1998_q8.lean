@@ -1,7 +1,7 @@
 import data.finset.basic
 import data.finset.lattice
 import data.nat.basic
-import data.nat.gcd
+import data.nat.gcd.basic
 import data.pnat.basic
 
 /-
