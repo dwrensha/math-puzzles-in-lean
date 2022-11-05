@@ -31,7 +31,7 @@ begin
    S.prod (λ (s : ℕ), f s ^ e) = S.prod (λ (s : ℕ), f s) ^ e,
   { exact this.2 },
   induction S using finset.induction with s S' hs ih,
-  { simp },
+  { exact ⟨zero_le_one, (real.one_rpow e).symm⟩ },
   { rw[finset.prod_insert hs, finset.prod_insert hs],
     have hp: ∀ s ∈ S', (0:ℝ) ≤ f s,
     { intros s hs',
