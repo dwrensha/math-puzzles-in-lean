@@ -1,4 +1,5 @@
 import data.int.basic
+import tactic.ring
 
 /-
 Bulgarian Mathematical Olympiad 1998, Problem 6
@@ -30,5 +31,6 @@ theorem bulgaria1998_q6
   (h : x^2 * y^2 = z^2 * (z^2 - x^2 - y^2)) :
   false :=
 begin
+  have : 0 = (z^2)^2 - z^2 * (x^2 + y^2) - x^2 * y^2 := by {rw[h], ring},
   sorry
 end
