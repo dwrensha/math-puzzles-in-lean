@@ -70,13 +70,14 @@ begin
       have h52 : ((2 * (az.val:ℤ) + 3 * (bz.val:ℤ))) % 7 = 0,
       { norm_cast, exact h50},
       rw [lemma1 a, lemma1 b] at h52,
-      simp at h52,
       rw [←int.mod_add_div a 7, ←int.mod_add_div b 7],
       have h53 : 2 * (a % 7 + 7 * (a / 7)) + 3 * (b % 7 + 7 * (b / 7)) =
               2 * (a % 7) + 3 * (b % 7) + 7 * (2 * (a / 7) + 3 * (b / 7)) := by ring,
       rw [h53],
       have h54 : 7 ∣ 7 * (2 * (a / 7) + 3 * (b / 7)) := dvd.intro _ rfl,
-      exact dvd_add h52 h54 },
+
+      exact dvd_add (int.dvd_of_mod_eq_zero h52) h54 },
+
     obtain ⟨m1, hm1⟩ := exists_eq_mul_right_of_dvd h13,
 
     have h15: (az + (- 2) * bz) = 0,
@@ -133,13 +134,12 @@ begin
       { norm_cast,
         exact h51},
       rw [lemma1 a, lemma1 b] at h52,
-      simp at h52,
       rw [←int.mod_add_div a 7, ←int.mod_add_div b 7],
       have h53 : 2 * (a % 7 + 7 * (a / 7)) + (-3) * (b % 7 + 7 * (b / 7)) =
                2 * (a % 7) + 4 * (b % 7) + 7 * (2 * (a / 7) + (-3) * (b / 7) - (b % 7) ) := by ring,
       rw [h53],
       have h54 : 7 ∣ 7 * (2 * (a / 7) + (-3) * (b / 7) - b % 7) := dvd.intro _ rfl,
-      exact dvd_add h52 h54 },
+      exact dvd_add (int.dvd_of_mod_eq_zero h52) h54 },
 
     have h14 : (∃ m1, 2 * a + (-3) * b = 7 * m1) := exists_eq_mul_right_of_dvd h13,
     obtain ⟨m1, hm1⟩ := h14,

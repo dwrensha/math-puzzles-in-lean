@@ -179,8 +179,7 @@ begin
     have hbb': 1 < (1 - q) * 2 ^ nb := (div_lt_iff' hbb).mp hnb,
     rw mul_comm at hbb',
     have := (div_lt_iff' (by norm_num)).mpr hbb',
-    exact lt_sub.mp this,
-  },
+    exact lt_sub_comm.mp this },
 
   -- if we could pick an element more than once,
   -- we would choose (q - a).num * (b - q).denom copies of a
