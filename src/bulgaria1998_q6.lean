@@ -12,6 +12,14 @@ has no solutions in positive integers.
 
 -/
 
+lemma lemma_0
+  (a b c x : ℤ)
+  (h : a * x^2 + b * x + c = 0) :
+  (∃ d : ℤ, d^2 = b^2 - 4 * a * c) :=
+begin
+  sorry
+end
+
 lemma lemma_1
   (s t u : ℤ)
   (hs : 0 < s)
