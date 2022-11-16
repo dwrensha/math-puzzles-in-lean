@@ -34,10 +34,19 @@ begin
   sorry,
 end
 
-lemma foo (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
+#check @real.exp_strict_mono
+--#check @real.exp_strict_anti
+
+lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
   real.exp(k * x) < real.exp(k * y) :=
 begin
-  sorry
+  finish,
+end
+
+lemma exp_strict_anti' (k x y : ℝ) (hkp: k < 0) (h : x < y) :
+  real.exp(k * y) < real.exp(k * x) :=
+begin
+  finish
 end
 
 theorem romania1998_q12 (u : ℝ → ℝ) :
@@ -64,11 +73,19 @@ begin
     { -- k ≠ 0
       let f : ℝ → ℝ := λ x, real.exp (k * x) - 1,
       have hfm : (strict_mono f ∨ strict_anti f),
-      { cases classical.em (k < 0) with hkn hkp,
-        { right,
-          sorry},
+      { cases classical.em (0 < k) with hkp hkn,
         { left,
-          sorry},
+          intros x y hxy,
+          have := exp_strict_mono' k x y hkp hxy,
+          exact sub_lt_sub_right this 1 },
+        { right,
+          intros x y hxy,
+          have hkn' : k < 0, {
+               simp only [not_lt] at *,
+               exact ne.lt_of_le hknz hkn,
+          },
+          have := exp_strict_anti' k x y hkn' hxy,
+          exact sub_lt_sub_right this 1 }
       },
       use f,
       use hfm,
