@@ -52,7 +52,29 @@ lemma romania1998_q12_mp (u : ℝ → ℝ) :
     (∃ k : ℝ, ∀ x : ℝ, u x = real.exp (k * x)) :=
 begin
   intro h,
-  obtain ⟨f, hf⟩ := h,
+  obtain ⟨f, hm, hf⟩ := h,
+  -- First, letting y = 0, we obtain f(x) = f(x)u(0) + f(0) for all x ∈ ℝ,
+  have hy0 : ∀ x : ℝ, f x = f x * u 0 + f 0,
+  { intro x, have := hf x 0, rw [ add_zero] at this, exact this },
+
+  -- thus u(0) ≠ 1 would imply f(x) = f(0) / (1 - u(0)) for all x,
+  -- so we must have u(0) = 1 and f(0) = 0.
+  have h0 : (u 0 ≠ 1) → ∀ x : ℝ, f x = f 0 / (1 - u 0),
+  { intros hu0 x,
+    have hy0x := hy0 x,
+    have hy0x1 := calc f 0
+         = f x - f x * u 0 : (sub_eq_of_eq_add' (hy0 x)).symm
+     ... = f x * (1 - u 0) : by { ring },
+    rw[hy0x1],
+    have : 1 - u 0 ≠ 0,
+    { intro hz,
+      have : u 0 = 1 := by linarith,
+      finish },
+    field_simp },
+
+  --have h0' : (u 0 ≠ 1) → ∀ x : ℝ, f x = f 0 / (1 - u 0),
+  -- which implies that f is constant, which we know is not the case
+  -- so f(x) ≠ 0 for all x ≠ 0.
   sorry,
 end
 
