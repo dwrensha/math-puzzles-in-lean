@@ -46,6 +46,11 @@ begin
   finish
 end
 
+example (p : Prop) (h : ¬ ¬ p) : p :=
+begin
+  exact not_not.mp h
+end
+
 lemma romania1998_q12_mp (u : ℝ → ℝ) :
     (∃ f : ℝ → ℝ, (strict_mono f ∨ strict_anti f)
         ∧ ∀ x y : ℝ, f (x + y) = f x * u y + f y) →
@@ -58,7 +63,6 @@ begin
   { intro x, have := hf x 0, rw [ add_zero] at this, exact this },
 
   -- thus u(0) ≠ 1 would imply f(x) = f(0) / (1 - u(0)) for all x,
-  -- so we must have u(0) = 1 and f(0) = 0.
   have h0 : (u 0 ≠ 1) → ∀ x : ℝ, f x = f 0 / (1 - u 0),
   { intros hu0 x,
     have hy0x := hy0 x,
@@ -81,6 +85,14 @@ begin
       have hu01 := hu0' 1,
       have hm0 := @hm 0 1 (by norm_num),
       linarith } },
+
+  -- so we must have u(0) = 1
+  have h00 : u 0 = 1 := not_not.mp h0',
+  clear h0 h0',
+  rw [h00] at hy0,
+
+  -- and f(0) = 0.
+  have hf0 : f 0 = 0 := by { have := hy0 0, linarith },
 
   -- so f(x) ≠ 0 for all x ≠ 0.
   sorry,
