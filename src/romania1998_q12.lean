@@ -15,16 +15,44 @@ function f : ℝ → ℝ such that
 lemma extend_function
    (f₁ : ℝ → ℝ)
    (f₂ : ℝ → ℝ)
+   (h_cont : continuous f₁)
    (h_mono : monotone f₂)
    (h : ∀ x : ℚ, f₁ x = f₂ x) :
    ∀ x : ℝ, f₁ x = f₂ x :=
 begin
-  sorry
+  -- suppose not.
+  by_contra hn,
+  push_neg at hn,
+
+  -- then there is y such that f₁ y ≠ f₂ y
+  obtain ⟨y, hy⟩ := hn,
+
+  let ε: ℝ := |f₁ y - f₂ y|,
+
+  -- then find a δ such that for all z, |z-y| < δ implies that
+  -- |f₁ z - f₁ y| < ε.
+  sorry,
 end
 
 theorem romania1998_q12 (u : ℝ → ℝ) :
-  (∃ f : ℝ → ℝ, ∀ x y : ℝ, f (x + y) = f x * u x + f y) ↔
+  (∃ f : ℝ → ℝ, ∀ x y : ℝ, f (x + y) = f x * u y + f y) ↔
   (∃ k : ℝ, k ≠ 0 ∧ ∀ x : ℝ, u x = real.exp (k * x)) :=
 begin
-  sorry
+  split,
+  { sorry, },
+  { intro h,
+    obtain ⟨k, hknz, hk⟩ := h,
+    let f : ℝ → ℝ := λ x, real.exp (k * x) - 1,
+--    use λ x, real.exp (k * x) - 1,
+    use f,
+    intros x y,
+    rw [hk y],
+    calc real.exp (k * (x + y)) - 1
+            = real.exp (k * x + k * y) - 1 : by {rw[mul_add]}
+        ... = real.exp (k * x) * real.exp (k * y) - 1 : by {rw[real.exp_add]}
+        ... = (real.exp (k * x) - 1) * real.exp (k * y) +
+                  (real.exp (k * y) - 1) : by ring,
+    },
 end
+
+#check @romania1998_q12
