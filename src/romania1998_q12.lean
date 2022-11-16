@@ -34,25 +34,53 @@ begin
   sorry,
 end
 
+lemma foo (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
+  real.exp(k * x) < real.exp(k * y) :=
+begin
+  sorry
+end
+
 theorem romania1998_q12 (u : ℝ → ℝ) :
-  (∃ f : ℝ → ℝ, ∀ x y : ℝ, f (x + y) = f x * u y + f y) ↔
-  (∃ k : ℝ, k ≠ 0 ∧ ∀ x : ℝ, u x = real.exp (k * x)) :=
+  (∃ f : ℝ → ℝ, (strict_mono f ∨ strict_anti f)
+        ∧ ∀ x y : ℝ, f (x + y) = f x * u y + f y) ↔
+  (∃ k : ℝ,  ∀ x : ℝ, u x = real.exp (k * x)) :=
 begin
   split,
-  { sorry, },
   { intro h,
-    obtain ⟨k, hknz, hk⟩ := h,
-    let f : ℝ → ℝ := λ x, real.exp (k * x) - 1,
---    use λ x, real.exp (k * x) - 1,
-    use f,
-    intros x y,
-    rw [hk y],
-    calc real.exp (k * (x + y)) - 1
-            = real.exp (k * x + k * y) - 1 : by {rw[mul_add]}
-        ... = real.exp (k * x) * real.exp (k * y) - 1 : by {rw[real.exp_add]}
-        ... = (real.exp (k * x) - 1) * real.exp (k * y) +
-                  (real.exp (k * y) - 1) : by ring,
+    obtain ⟨f, hf⟩ := h,
+    sorry,
+  },
+  { intro h,
+    obtain ⟨k, hk⟩ := h,
+    cases classical.em (k = 0) with hkz hknz,
+    { -- k = 0
+     use id,
+     split,
+     { left, exact strict_mono_id},
+     { intros x y,
+       rw [hk y, hkz, zero_mul, real.exp_zero],
+       simp },
     },
+    { -- k ≠ 0
+      let f : ℝ → ℝ := λ x, real.exp (k * x) - 1,
+      have hfm : (strict_mono f ∨ strict_anti f),
+      { cases classical.em (k < 0) with hkn hkp,
+        { right,
+          sorry},
+        { left,
+          sorry},
+      },
+      use f,
+      use hfm,
+      intros x y,
+      rw [hk y],
+      calc real.exp (k * (x + y)) - 1
+              = real.exp (k * x + k * y) - 1 : by {rw[mul_add]}
+          ... = real.exp (k * x) * real.exp (k * y) - 1 : by {rw[real.exp_add]}
+          ... = (real.exp (k * x) - 1) * real.exp (k * y) +
+                    (real.exp (k * y) - 1) : by ring
+    }
+   },
 end
 
 #check @romania1998_q12
