@@ -72,8 +72,16 @@ begin
       finish },
     field_simp },
 
-  --have h0' : (u 0 ≠ 1) → ∀ x : ℝ, f x = f 0 / (1 - u 0),
   -- which implies that f is constant, which we know is not the case
+  have h0' : (u 0 ≠ 1) → false,
+  { intros hu0,
+    have hu0' := h0 hu0,
+    cases hm;
+    { have hu00 := hu0' 0,
+      have hu01 := hu0' 1,
+      have hm0 := @hm 0 1 (by norm_num),
+      linarith } },
+
   -- so f(x) ≠ 0 for all x ≠ 0.
   sorry,
 end
