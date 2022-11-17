@@ -94,7 +94,12 @@ begin
   -- and f(0) = 0.
   have hf0 : f 0 = 0 := by { have := hy0 0, linarith },
 
-  -- so f(x) ≠ 0 for all x ≠ 0.
+  -- Then f(x) ≠ 0 for all x ≠ 0.
+  -- Next, we have
+  -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
+  -- so
+  -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
+
   sorry,
 end
 
