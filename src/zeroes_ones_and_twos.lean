@@ -1,6 +1,7 @@
 import data.int.modeq
 import data.nat.basic
 import data.nat.modeq
+import data.nat.parity
 import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd.basic

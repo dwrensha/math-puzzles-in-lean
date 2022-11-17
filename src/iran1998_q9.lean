@@ -15,11 +15,11 @@ Let x,y,z > 1 and 1/x + 1/y + 1/z = 2. Prove that
 
 -/
 
-lemma compute_norm (v : euclidean_space ℝ (fin 3)) : ∥v∥ = real.sqrt (∑(i : fin 3), (v i)^2) :=
+lemma compute_norm (v : euclidean_space ℝ (fin 3)) : ‖v‖ = real.sqrt (∑(i : fin 3), (v i)^2) :=
 begin
-  have hvi : (∀ i : fin 3, (v i) ^2 = ∥v i∥^2),
+  have hvi : (∀ i : fin 3, (v i) ^2 = ‖v i‖^2),
   { intro i, rw [real.norm_eq_abs], exact (sq_abs (v i)).symm },
-  have := fintype.sum_congr ((λ jj, (v jj)^2): fin 3 → ℝ) (λ jj, ∥v jj∥^2) hvi,
+  have := fintype.sum_congr ((λ jj, (v jj)^2): fin 3 → ℝ) (λ jj, ‖v jj‖^2) hvi,
   rw[this],
   exact euclidean_space.norm_eq v,
 end
@@ -66,7 +66,7 @@ begin
 
   have cauchy_schwarz := @abs_inner_le_norm ℝ (euclidean_space ℝ (fin 3)) _ _ v₁ v₂,
 
-  have hv₁ : ∥v₁∥ = real.sqrt (x + y + z),
+  have hv₁ : ‖v₁‖ = real.sqrt (x + y + z),
   { have hn := compute_norm v₁,
     have h1: ((∑ (i : fin 3), ((v₁ i) ^ 2)) : ℝ) = (v₁ 0)^2 + (v₁ 1)^2 + (v₁ 2)^2,
     { rw[fin.sum_univ_succ, fin.sum_univ_succ, fin.sum_univ_one],
@@ -82,7 +82,7 @@ begin
 
     rwa [hxx, hyy, hzz] at hn},
 
-  have hv₂ : ∥v₂∥ = 1,
+  have hv₂ : ‖v₂‖ = 1,
   { have hn := compute_norm v₂,
     have h2: ((∑ (i : fin 3), ((v₂ i) ^ 2)) : ℝ) = (v₂ 0)^2 + (v₂ 1)^2 + (v₂ 2)^2,
     { rw[fin.sum_univ_succ, fin.sum_univ_succ, fin.sum_univ_one],
