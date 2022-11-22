@@ -117,9 +117,7 @@ begin
     split,
     { left, exact strict_mono_id},
     { intros x y,
-      rw [hk y, hkz, zero_mul, real.exp_zero],
-      simp },
-   },
+      rw [hk y, hkz, zero_mul, real.exp_zero, mul_one, id.def, id.def, id.def] }},
    { -- k ≠ 0
      let f : ℝ → ℝ := λ x, real.exp (k * x) - 1,
      have hfm : (strict_mono f ∨ strict_anti f),
