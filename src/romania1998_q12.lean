@@ -1,6 +1,7 @@
 import data.rat.basic
 import data.real.basic
 import data.complex.exponential
+import topology.metric_space.basic
 
 /-
 Romanian Mathematical Olympiad 1998, Problem 12
@@ -11,6 +12,29 @@ function f : ℝ → ℝ such that
   ∀ x,y ∈ ℝ, f(x + y) = f(x)u(y) + f(y)
 
 -/
+
+lemma abs_pos' {x y : ℝ} (hy : x ≠ y) : 0 < |x - y| :=
+begin
+  obtain h1 | h2 | h3 := lt_trichotomy x y,
+  { -- x < y
+    simp only [abs_pos, ne.def],
+    linarith,},
+  { -- x = y,
+    rw[h2] at hy,
+    exfalso,
+    exact hy rfl },
+  { simp only [abs_pos, ne.def],
+    linarith }
+end
+
+#check filter
+
+#check nhds
+
+#check @metric.is_open_iff
+#check metric.ball
+
+#check dense
 
 lemma extend_function
    (f₁ : ℝ → ℝ)
@@ -27,11 +51,38 @@ begin
   -- then there is y such that f₁ y ≠ f₂ y
   obtain ⟨y, hy⟩ := hn,
 
-  let ε: ℝ := |f₁ y - f₂ y|,
+  let ε : ℝ := |f₁ y - f₂ y|,
 
   -- then find a δ such that for all z, |z-y| < δ implies that
   -- |f₁ z - f₁ y| < ε.
-  sorry,
+
+  have h_cont' := metric.continuous_iff'.mp h_cont y ε (abs_pos' hy),
+  have h_cont2 := filter.eventually_iff.mp h_cont',
+  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
+
+  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
+  have := hδ.trans hs,
+
+--  have : ∃δ : ℝ, ∀ z, dist z y < δ → dist (f₁ y) (f₁ y) < ε,
+--  { sorry,},
+
+  -- if f₂(y) > f₁(y), then choose such a z:ℚ that's greater than y
+  -- otherwise, choose such a z:ℚ that's less than y
+
+  obtain h1 | h2 | h3 := lt_trichotomy (f₁ y) (f₂ y),
+  {  -- pick a rational point greater than y that's in the ball s,
+    sorry
+  },
+  { exact hy h2,},
+  {  -- pick a rational point less than y that's in the ball s,
+    sorry,
+  }
+
+  -- in either case, we end up contradicting h_mono.
+
+
+  -- alternatively, f1 has a unique continuous extension on R
+
 end
 
 lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
@@ -95,12 +146,33 @@ begin
   have hf0 : f 0 = 0 := by { have := hy0 0, linarith },
 
   -- Then f(x) ≠ 0 for all x ≠ 0.
+  have hfx0 : ∀ x, x ≠ 0 → f x ≠ 0,
+  { cases hm with hm1 hm2,
+    { intros x hx,
+      obtain h1 | h2 | h3 := lt_trichotomy x 0,
+      { rw [←hf0],
+        exact ne_of_lt (hm1 h1)},
+      { exfalso, exact hx h2},
+      { have := hm1 h3,
+        rw [←hf0],
+        exact (ne_of_lt this).symm }},
+    { intros x hx,
+      obtain h1 | h2 | h3 := lt_trichotomy x 0,
+      { have := hm2 h1,
+        rw [hf0] at this,
+        exact (ne_of_lt this).symm},
+      { exfalso, exact hx h2},
+      { have := hm2 h3,
+        rw [hf0] at this,
+        exact (ne_of_lt this) }},
+  },
+
+
   -- Next, we have
   -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
   -- so
   -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
 
-  sorry,
 end
 
 lemma romania1998_q12_mpr (u : ℝ → ℝ) :
