@@ -27,15 +27,6 @@ begin
     linarith }
 end
 
-#check filter
-
-#check nhds
-
-#check @metric.is_open_iff
-#check metric.ball
-
-#check dense
-
 lemma extend_function
    (f₁ : ℝ → ℝ)
    (f₂ : ℝ → ℝ)
@@ -172,7 +163,7 @@ begin
   -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
   -- so
   -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
-
+  sorry,
 end
 
 lemma romania1998_q12_mpr (u : ℝ → ℝ) :
