@@ -114,8 +114,7 @@ begin
     rw[hy0x1],
     have : 1 - u 0 ≠ 0,
     { intro hz,
-      have : u 0 = 1 := by linarith,
-      finish },
+      exact hu0 (by linarith) },
     field_simp },
 
   -- which implies that f is constant, which we know is not the case
