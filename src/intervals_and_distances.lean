@@ -2,6 +2,7 @@ import data.finset.basic
 import data.fintype.basic
 import data.set.intervals.basic
 import data.real.basic data.nat.basic
+import algebra.big_operators.pi
 
 open_locale big_operators
 
