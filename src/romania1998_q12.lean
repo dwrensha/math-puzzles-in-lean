@@ -178,9 +178,9 @@ begin
   -- Thus u(nx) = u(x)ⁿ for all n ∈ ℤ, x ∈ ℝ.
   -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
   -- for all x, so u(x) > 0 for all x as u(0) = 1.
-  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and i(p/q) = (u(p))^(1/q) = e^(k(p/q))
+  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
   -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
-  -- Since u in monotoic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
+  -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
   -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
   sorry,
 end
