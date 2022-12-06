@@ -137,24 +137,22 @@ begin
 
   -- Then f(x) ≠ 0 for all x ≠ 0.
   have hfx0 : ∀ x, x ≠ 0 → f x ≠ 0,
-  { cases hm with hm1 hm2,
-    { intros x hx,
-      obtain h1 | h2 | h3 := lt_trichotomy x 0,
+  { intros x hx,
+    cases hm with hm1 hm2,
+    { obtain h1 | h2 | h3 := lt_trichotomy x 0,
       { rw [←hf0],
         exact ne_of_lt (hm1 h1)},
       { exfalso, exact hx h2},
       { rw [←hf0],
         exact (ne_of_lt (hm1 h3)).symm }},
-    { intros x hx,
-      obtain h1 | h2 | h3 := lt_trichotomy x 0,
+    { obtain h1 | h2 | h3 := lt_trichotomy x 0,
       { have := hm2 h1,
         rw [hf0] at this,
         exact (ne_of_lt this).symm},
       { exfalso, exact hx h2},
       { have := hm2 h3,
         rw [hf0] at this,
-        exact (ne_of_lt this) }},
-  },
+        exact (ne_of_lt this) }}},
 
   -- Next, we have
   -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
