@@ -143,9 +143,8 @@ begin
       { rw [←hf0],
         exact ne_of_lt (hm1 h1)},
       { exfalso, exact hx h2},
-      { have := hm1 h3,
-        rw [←hf0],
-        exact (ne_of_lt this).symm }},
+      { rw [←hf0],
+        exact (ne_of_lt (hm1 h3)).symm }},
     { intros x hx,
       obtain h1 | h2 | h3 := lt_trichotomy x 0,
       { have := hm2 h1,
@@ -157,11 +156,29 @@ begin
         exact (ne_of_lt this) }},
   },
 
-
   -- Next, we have
   -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
   -- so
   -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
+
+  -- Thus for any x ≠ 0, y ≠ 0, we have (u(x) - 1) / f(x) = (u(y) - 1) / f(y),
+  -- So there exists C ∈ ℝ such that (u(x) - 1) / f(x) = C for all x ≠ 0.
+  -- So u(x) = 1 + C f(x) for x ≠ 0;
+  -- since u(0) = 1, f(0) = 0, this equation also holds for x = 0.
+  -- If C = 0, then u(x) = 1 for all x and we are done.
+  -- Otherwise, observe
+  --     u(x + y) = 1 + C f(x + y)
+  --              = 1 + C f(x) u(y) + f(y)
+  --              = u(y) + C f(x) u(y)
+  --              = u(x) u(y)
+  -- for all x,y ∈ ℝ.
+  -- Thus u(nx) = u(x)ⁿ for all n ∈ ℤ, x ∈ ℝ.
+  -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
+  -- for all x, so u(x) > 0 for all x as u(0) = 1.
+  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and i(p/q) = (u(p))^(1/q) = e^(k(p/q))
+  -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
+  -- Since u in monotoic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
+  -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
   sorry,
 end
 
