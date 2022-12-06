@@ -158,6 +158,11 @@ begin
 
   -- Next, we have
   -- f(x)u(y) + f(y) = f (x + y) = f(x) + f(y)u(x)
+  have h1 : ∀ x y : ℝ, f x * u y + f y = f x + f y * u x,
+  { intros x y,
+    rw[(hf x y).symm, add_comm],
+    linarith[hf y x] },
+
   -- so
   -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
 
