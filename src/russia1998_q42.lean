@@ -1,5 +1,11 @@
 import data.real.basic
 
+import algebra.ne_zero
+import algebra.group_with_zero.basic
+import algebra.ring.defs
+import data.int.cast.defs
+
+
 /-
  Russian Mathematical Olympiad 1998, problem 42
 
@@ -8,7 +14,10 @@ import data.real.basic
 
 -/
 
-variable star : ℝ → ℝ → ℝ
+
+--variables (R : Type) [comm_ring R] [ne_zero (2:R)] [cancel_monoid_with_zero R]
+abbreviation R := int
+variable star : R → R → R
 local infixl ` ⋆ `:80 := star
 
 theorem russia1998_q42
@@ -50,7 +59,7 @@ begin
                       ... = a + a : by rw [add_zero]
                       ... = 2 * a : (two_mul a).symm,
 
-    have h3 : (2:ℝ) ≠ 0 := two_ne_zero,
+    have h3 : (2:R) ≠ 0 := two_ne_zero,
     have h4 : x = a := (mul_right_inj' h3).mp h2,
     exact h4 },
 

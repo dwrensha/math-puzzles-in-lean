@@ -161,23 +161,92 @@ begin
     rw[(hf x y).symm, add_comm],
     linarith[hf y x] },
 
-  -- so
-  -- f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
+  -- so f(x)(u(y) - 1) = f(y)(u(x) - 1) for all x,y ∈ ℝ.
+  have h2 : ∀ x y : ℝ, f x * (u y - 1) = f y * (u x - 1) := by
+  { intros x y, have := h1 x y, linarith },
 
-  -- Thus for any x ≠ 0, y ≠ 0, we have (u(x) - 1) / f(x) = (u(y) - 1) / f(y),
+  -- Thus for any x ≠ 0, y ≠ 0, we have (u(x) - 1) / f(x) = (u(y) - 1) / f(y).
+  have h3 : ∀ x y : ℝ, x ≠ 0 → y ≠ 0 → (u x - 1) / f x =  (u y - 1) / f y,
+  { intros x y hx hy,
+    have hx1 := hfx0 x hx,
+    have hy1 := hfx0 y hy,
+    have := h2 x y,
+    field_simp,
+    linarith },
+
   -- So there exists C ∈ ℝ such that (u(x) - 1) / f(x) = C for all x ≠ 0.
+  have h4: ∃ C : ℝ, ∀ x : ℝ, x ≠ 0 → (u x - 1) / f x = C,
+  { use (u 1 - 1) / f 1,
+    intros x hx,
+    exact h3 x 1 hx one_ne_zero },
+  obtain ⟨C, hC⟩ := h4,
+
   -- So u(x) = 1 + C f(x) for x ≠ 0;
+  have h5 : ∀ x : ℝ, x ≠ 0 → u x = 1 + C * f x,
+  { intros x hx,
+    have hc1 := hC x hx,
+    have hx1 := hfx0 x hx,
+    field_simp at hc1,
+    linarith },
+
   -- since u(0) = 1, f(0) = 0, this equation also holds for x = 0.
+  have h6 : ∀ x : ℝ, u x = 1 + C * f x,
+  { intro x,
+    cases em (x = 0) with hz hnz,
+    { rw [hz, hf0, h00], ring},
+    { exact h5 x hnz } },
+
   -- If C = 0, then u(x) = 1 for all x and we are done.
+  cases em (C = 0) with hCz hCnz,
+  { use 0,
+    intro x,
+    rw [zero_mul, real.exp_zero],
+    have := h6 x,
+    rwa[hCz, zero_mul, add_zero] at this},
+
   -- Otherwise, observe
   --     u(x + y) = 1 + C f(x + y)
   --              = 1 + C f(x) u(y) + f(y)
   --              = u(y) + C f(x) u(y)
   --              = u(x) u(y)
   -- for all x,y ∈ ℝ.
+  have h7 : ∀ x y : ℝ, u (x + y) = u x * u y,
+  { intros x y,
+    calc u (x + y) = 1 + C * f (x + y) : h6 (x + y)
+              ...  = 1 + C * (f x * u y  + f y) : by {rw [hf x y]}
+              ...  = u y + C * f x * u y : by { rw[h6 y], ring}
+              ...  = u y * (1 + C * f x) : by ring
+              ...  = u y * u x : by rw [h6 x]
+              ...  = u x * u y : mul_comm (u y) (u x) },
+
   -- Thus u(nx) = u(x)ⁿ for all n ∈ ℤ, x ∈ ℝ.
+  have h8 : ∀ n : ℕ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
+  { intro n,
+    induction n with pn hpn,
+    { intro x,
+      simp only [algebra_map.coe_zero, zero_mul, pow_zero],
+      exact h00, },
+    { intro x,
+      have hp1: ↑(pn.succ) * x = ↑pn * x + x,
+      { have : ↑pn * x + x = (↑pn + 1) * x := by ring,
+        rw[this, nat.cast_succ] },
+      rw[hp1],
+      rw[h7 (↑pn * x) x],
+      rw[hpn x],
+      rw[pow_succ, mul_comm] } },
+
+  have h9 : ∀ n : ℤ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
+  { intros n x,
+    cases n,
+    { simp only [int.of_nat_eq_coe, int.cast_coe_nat, zpow_coe_nat],
+      exact h8 n x,},
+    { sorry },
+  },
+
+
   -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
   -- for all x, so u(x) > 0 for all x as u(0) = 1.
+
   -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
   -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
   -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
