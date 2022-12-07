@@ -76,6 +76,48 @@ begin
 
 end
 
+lemma exp_characterization
+    (u : ℝ → ℝ)
+    (hu : ∀ x y : ℝ, u (x + y) = u x * u y)
+    (hu0 : u 0 = 1)
+    (hm : strict_mono u ∨ strict_anti u) :
+    (∃ k : ℝ, ∀ x : ℝ, u x = real.exp (k * x)) :=
+begin
+  -- Thus u(nx) = u(x)ⁿ for all n ∈ ℤ, x ∈ ℝ.
+  have h8 : ∀ n : ℕ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
+  { intro n,
+    induction n with pn hpn,
+    { intro x,
+      simp only [algebra_map.coe_zero, zero_mul, pow_zero],
+      exact hu0, },
+    { intro x,
+      have hp1: ↑(pn.succ) * x = ↑pn * x + x,
+      { have : ↑pn * x + x = (↑pn + 1) * x := by ring,
+        rw[this, nat.cast_succ] },
+      rw[hp1],
+      rw[hu (↑pn * x) x],
+      rw[hpn x],
+      rw[pow_succ, mul_comm] } },
+
+  have h9 : ∀ n : ℤ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
+  { intros n x,
+    cases n,
+    { simp only [int.of_nat_eq_coe, int.cast_coe_nat, zpow_coe_nat],
+      exact h8 n x,},
+    { sorry },
+  },
+
+
+  -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
+  -- for all x, so u(x) > 0 for all x as u(0) = 1.
+
+  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
+  -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
+  -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
+  -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
+  sorry,
+end
+
 lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
   real.exp(k * x) < real.exp(k * y) :=
 begin
@@ -219,39 +261,18 @@ begin
               ...  = u y * u x : by rw [h6 x]
               ...  = u x * u y : mul_comm (u y) (u x) },
 
-  -- Thus u(nx) = u(x)ⁿ for all n ∈ ℤ, x ∈ ℝ.
-  have h8 : ∀ n : ℕ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
-  { intro n,
-    induction n with pn hpn,
-    { intro x,
-      simp only [algebra_map.coe_zero, zero_mul, pow_zero],
-      exact h00, },
-    { intro x,
-      have hp1: ↑(pn.succ) * x = ↑pn * x + x,
-      { have : ↑pn * x + x = (↑pn + 1) * x := by ring,
-        rw[this, nat.cast_succ] },
-      rw[hp1],
-      rw[h7 (↑pn * x) x],
-      rw[hpn x],
-      rw[pow_succ, mul_comm] } },
+  have hum : (strict_mono u ∨ strict_anti u),
+  { cases hm,
+    { obtain h1 | h2 | h3 := lt_trichotomy C 0,
+      { right, intros x y hxy, nlinarith[hm hxy, h6 x, h6 y] },
+      { rw[h2] at hCnz, exfalso, apply hCnz, refl},
+      { left, intros x y hxy, nlinarith[hm hxy, h6 x, h6 y] }},
+    { obtain h1 | h2 | h3 := lt_trichotomy C 0,
+      { left, intros x y hxy, nlinarith[hm hxy, h6 x, h6 y] },
+      { rw[h2] at hCnz, exfalso, apply hCnz, refl},
+      { right, intros x y hxy, nlinarith[hm hxy, h6 x, h6 y] }}},
 
-  have h9 : ∀ n : ℤ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
-  { intros n x,
-    cases n,
-    { simp only [int.of_nat_eq_coe, int.cast_coe_nat, zpow_coe_nat],
-      exact h8 n x,},
-    { sorry },
-  },
-
-
-  -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
-  -- for all x, so u(x) > 0 for all x as u(0) = 1.
-
-  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
-  -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
-  -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
-  -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
-  sorry,
+  exact exp_characterization u h7 h00 hum
 end
 
 lemma romania1998_q12_mpr (u : ℝ → ℝ) :
