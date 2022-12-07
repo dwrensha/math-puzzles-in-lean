@@ -1,6 +1,7 @@
 import data.rat.basic
 import data.real.basic
 import data.complex.exponential
+import analysis.special_functions.pow
 import topology.metric_space.basic
 
 /-
@@ -104,15 +105,56 @@ begin
     cases n,
     { simp only [int.of_nat_eq_coe, int.cast_coe_nat, zpow_coe_nat],
       exact h8 n x,},
-    { sorry },
-  },
+    { simp only [int.cast_neg_succ_of_nat, nat.cast_add, algebra_map.coe_one,
+                 neg_add_rev, zpow_neg_succ_of_nat],
+      have h10 := h8 (n + 1) (-x),
+      have h11 : (-1 + -↑n) * x = x * (1 + ↑n ) * (-1) := by ring,
 
+      --have := calc u ((-1 + -↑n) * x) = u (x * (1 + ↑n ) * (-1)) : by rw[h11]
+      --                    ... = (u (x * (1 + ↑n ))) ^(-1) : sorry
+      --                    ... = (u x ^ (n + 1))⁻¹ : sorry,
+      sorry }},
 
-  -- Since u(x) = 1 + C f(x) for all x, u is strictly monotonic, and u(-x) = 1 / u(x)
-  -- for all x, so u(x) > 0 for all x as u(0) = 1.
+  have hunz : ∀ x, 0 < u x,
+  { intro x,
+    by_contra H, push_neg at H,
+    have H1 := one_div_nonpos.mpr H,
+    obtain h1 | h2 | h3 := lt_trichotomy x 0,
+    { have h10 := h9 (-1) x,
+      rw[int.cast_neg, algebra_map.coe_one, neg_mul, one_mul,
+         zpow_neg, zpow_one, inv_eq_one_div] at h10,
+      rw [← h10] at H1,
+      have hx0 : 0 < -x := by linarith,
+      cases hm; linarith [hm hx0, hm h1]},
+    { rw [h2,hu0] at H, linarith},
+    { have h10 := h9 (-1) x,
+      rw[int.cast_neg, algebra_map.coe_one, neg_mul, one_mul,
+         zpow_neg, zpow_one] at h10,
+      rw[inv_eq_one_div] at h10,
+      rw [← h10] at H1,
+      have hx0 : -x < 0 := by linarith,
+      cases hm; linarith [hm hx0, hm h3]}},
 
-  -- Let eᵏ = u(1); then u(n) = eᵏⁿ for all n ∈ ℕ and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
+  -- Let eᵏ = u(1);
+  have hek : ∃ k, real.exp k = u 1,
+  { use real.log (u 1), exact real.exp_log (hunz 1)},
+  obtain ⟨k,hk⟩ := hek,
+
+  -- then u(n) = eᵏⁿ for all n ∈ ℕ
+  have hnexp : ∀ n : ℕ, u n = real.exp (k * n),
+  { intro n,
+    have h10 := h9 n 1,
+    rw[←hk, mul_one] at h10,
+    norm_cast at h10,
+    rw[h10, mul_comm],
+    exact (real.exp_nat_mul _ _).symm },
+
+  -- and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
   -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
+
+  have hp : ∀ p : ℕ, ∀ x : ℝ, u (x / p) = (u x) ^ (1 / (p:ℝ)),
+  { sorry},
+
   -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
   -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
   sorry,
