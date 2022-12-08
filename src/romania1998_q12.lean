@@ -40,20 +40,20 @@ begin
   by_contra hn,
   push_neg at hn,
 
-  -- then there is y such that f₁ y ≠ f₂ y
+  -- then there is y such that u y ≠ f y
   obtain ⟨y, hy⟩ := hn,
 
---  let ε : ℝ := |f₁ y - f₂ y|,
+  let ε : ℝ := |u y - f y|,
 
   -- then find a δ such that for all z, |z-y| < δ implies that
-  -- |f₁ z - f₁ y| < ε.
+  -- |f z - f y| < ε.
 
---  have h_cont' := metric.continuous_iff'.mp h_cont y ε (abs_pos' hy),
---  have h_cont2 := filter.eventually_iff.mp h_cont',
---  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
+   have h_cont' := metric.continuous_iff'.mp f_cont y ε (abs_pos' hy),
+   have h_cont2 := filter.eventually_iff.mp h_cont',
+   obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
 
---  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
---  have := hδ.trans hs,
+   obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
+   have := hδ.trans hs,
 
 --  have : ∃δ : ℝ, ∀ z, dist z y < δ → dist (f₁ y) (f₁ y) < ε,
 --  { sorry,},
