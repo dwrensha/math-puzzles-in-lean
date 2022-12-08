@@ -29,12 +29,12 @@ begin
 end
 
 lemma extend_function
-   (f₁ : ℝ → ℝ)
-   (f₂ : ℝ → ℝ)
-   (h_cont : continuous f₁)
-   (h_mono : monotone f₂)
-   (h : ∀ x : ℚ, f₁ x = f₂ x) :
-   ∀ x : ℝ, f₁ x = f₂ x :=
+   (u : ℝ → ℝ)
+   (f : ℝ → ℝ)
+   (u_mono : monotone u)
+   (f_cont : continuous f)
+   (h : ∀ x : ℚ, u x = f x) :
+   ∀ x : ℝ, u x = f x :=
 begin
   -- suppose not.
   by_contra hn,
@@ -43,17 +43,17 @@ begin
   -- then there is y such that f₁ y ≠ f₂ y
   obtain ⟨y, hy⟩ := hn,
 
-  let ε : ℝ := |f₁ y - f₂ y|,
+--  let ε : ℝ := |f₁ y - f₂ y|,
 
   -- then find a δ such that for all z, |z-y| < δ implies that
   -- |f₁ z - f₁ y| < ε.
 
-  have h_cont' := metric.continuous_iff'.mp h_cont y ε (abs_pos' hy),
-  have h_cont2 := filter.eventually_iff.mp h_cont',
-  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
+--  have h_cont' := metric.continuous_iff'.mp h_cont y ε (abs_pos' hy),
+--  have h_cont2 := filter.eventually_iff.mp h_cont',
+--  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
 
-  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
-  have := hδ.trans hs,
+--  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
+--  have := hδ.trans hs,
 
 --  have : ∃δ : ℝ, ∀ z, dist z y < δ → dist (f₁ y) (f₁ y) < ε,
 --  { sorry,},
@@ -61,19 +61,18 @@ begin
   -- if f₂(y) > f₁(y), then choose such a z:ℚ that's greater than y
   -- otherwise, choose such a z:ℚ that's less than y
 
-  obtain h1 | h2 | h3 := lt_trichotomy (f₁ y) (f₂ y),
-  {  -- pick a rational point greater than y that's in the ball s,
-    sorry
-  },
-  { exact hy h2,},
-  {  -- pick a rational point less than y that's in the ball s,
-    sorry,
-  }
+--  obtain h1 | h2 | h3 := lt_trichotomy (f₁ y) (f₂ y),
+--  {  -- pick a rational point greater than y that's in the ball s,
+--    sorry
+--  },
+--  { exact hy h2,},
+--  {  -- pick a rational point less than y that's in the ball s,
+--    sorry,
+--  }
 
   -- in either case, we end up contradicting h_mono.
 
-
-  -- alternatively, f1 has a unique continuous extension on R
+  sorry,
 end
 
 lemma int_dichotomy (z : ℤ) : ∃ n : ℕ, (n:ℤ) = z ∨ -(n:ℤ) = z :=
@@ -217,10 +216,21 @@ begin
     ring_nf},
 
   use k,
-  
+
   -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
   -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
-  sorry,
+  let f := λ x, real.exp (k * x),
+  have hf : ∀ q : ℚ, u q = f q,
+  { intro q, exact hq q },
+
+  have h20 : continuous (real.exp) := real.continuous_exp,
+  have h21 : continuous (λ x : ℝ, k * x) := continuous_mul_left k,
+  have hfm : continuous f := continuous.comp h20 h21,
+
+  cases hm,
+  { have hmu : monotone u := strict_mono.monotone hm,
+    exact extend_function u f hmu hfm hf },
+  {sorry}
 end
 
 lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
