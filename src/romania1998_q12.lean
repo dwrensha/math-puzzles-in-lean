@@ -74,7 +74,13 @@ begin
 
 
   -- alternatively, f1 has a unique continuous extension on R
+end
 
+lemma int_dichotomy (z : ℤ) : ∃ n : ℕ, (n:ℤ) = z ∨ -(n:ℤ) = z :=
+begin
+  cases z,
+  { use z, left, simp only [int.of_nat_eq_coe]},
+  { use z + 1, right, refl },
 end
 
 lemma exp_characterization
@@ -100,40 +106,49 @@ begin
       rw[hpn x],
       rw[pow_succ, mul_comm] } },
 
-  have h9 : ∀ n : ℤ, ∀ x : ℝ, u (n * x) = (u x) ^ n,
-  { intros n x,
-    cases n,
-    { simp only [int.of_nat_eq_coe, int.cast_coe_nat, zpow_coe_nat],
-      exact h8 n x,},
-    { simp only [int.cast_neg_succ_of_nat, nat.cast_add, algebra_map.coe_one,
-                 neg_add_rev, zpow_neg_succ_of_nat],
-      have h10 := h8 (n + 1) (-x),
-      have h11 : (-1 + -↑n) * x = x * (1 + ↑n ) * (-1) := by ring,
-
-      --have := calc u ((-1 + -↑n) * x) = u (x * (1 + ↑n ) * (-1)) : by rw[h11]
-      --                    ... = (u (x * (1 + ↑n ))) ^(-1) : sorry
-      --                    ... = (u x ^ (n + 1))⁻¹ : sorry,
-      sorry }},
+  have h8'' : ∀ x, (u x) * u (-x) = 1,
+  { intro x,
+    have := hu x (-x),
+    rw[add_right_neg] at this,
+    rw[← this],
+    exact hu0 },
 
   have hunz : ∀ x, 0 < u x,
   { intro x,
     by_contra H, push_neg at H,
     have H1 := one_div_nonpos.mpr H,
     obtain h1 | h2 | h3 := lt_trichotomy x 0,
-    { have h10 := h9 (-1) x,
-      rw[int.cast_neg, algebra_map.coe_one, neg_mul, one_mul,
-         zpow_neg, zpow_one, inv_eq_one_div] at h10,
-      rw [← h10] at H1,
+    { have h10 := h8'' x,
       have hx0 : 0 < -x := by linarith,
-      cases hm; linarith [hm hx0, hm h1]},
+      cases hm; nlinarith [hm hx0, hm h1]},
     { rw [h2,hu0] at H, linarith},
-    { have h10 := h9 (-1) x,
-      rw[int.cast_neg, algebra_map.coe_one, neg_mul, one_mul,
-         zpow_neg, zpow_one] at h10,
-      rw[inv_eq_one_div] at h10,
-      rw [← h10] at H1,
+    { have h10 := h8'' x,
       have hx0 : -x < 0 := by linarith,
-      cases hm; linarith [hm hx0, hm h3]}},
+      cases hm; nlinarith [hm hx0, hm h3]}},
+
+  have h8' : ∀ x, u (-x) = 1 / (u x),
+  { intro x,
+    have := (ne_of_lt (hunz x)).symm,
+    field_simp,
+    rw[mul_comm],
+    exact h8'' x },
+
+  have h9 : ∀ z : ℤ, ∀ x : ℝ, u (z * x) = (u x) ^ z,
+  { intros z x,
+    obtain ⟨n, hn⟩ := int_dichotomy z,
+    cases hn,
+    { rw[←hn],
+      norm_cast,
+      exact h8 _ _ },
+    { have h10:= h8 n x,
+      rw[←hn],
+      have h11: ↑-((↑n):ℤ) * x = - (n * x) := by norm_num,
+      rw[h11, h8' _],
+      have := hunz (↑n * x),
+      have : u (↑ n * x) ≠ (0:ℝ) := by linarith,
+      field_simp,
+      rw[←h10],
+      field_simp}},
 
   -- Let eᵏ = u(1);
   have hek : ∃ k, real.exp k = u 1,
@@ -152,9 +167,57 @@ begin
   -- and u(p/q) = (u(p))^(1/q) = e^(k(p/q))
   -- for all p ∈ ℤ, q ∈ ℕ, so u(x) = e^(kx) for all x ∈ ℚ.
 
-  have hp : ∀ p : ℕ, ∀ x : ℝ, u (x / p) = (u x) ^ (1 / (p:ℝ)),
-  { sorry},
+  have hzexp : ∀ z : ℤ, u z = real.exp (k * z),
+  { intro z,
+    obtain ⟨n, hn⟩ := int_dichotomy z,
+    cases hn,
+    { rw[←hn],
+      norm_cast,
+      exact hnexp n},
+    { rw[←hn],
+      have := h9 (-↑n) 1,
+      rw[mul_one] at this,
+      rw[this, ←hk],
+      rw [real.exp_mul],
+      norm_cast }},
 
+  have hp : ∀ p : ℕ, 0 < p → ∀ x : ℝ, u (x / p) = (u x) ^ (1 / (p:ℝ)),
+  { intros p hp x,
+    cases p,
+    { exfalso, exact nat.lt_asymm hp hp},
+    have h12: ∀ n : ℕ, (u (x / p.succ))^n = u (x * n / p.succ),
+    { intro n,
+      induction n with pn hpn,
+      { simp[hu0.symm] },
+      { have h10: x * ↑(pn.succ) / ↑(p.succ) = x * ↑pn / ↑(p.succ) + x / ↑(p.succ),
+        { field_simp, ring },
+        rw[h10],
+        have h11 := hu (x * ↑pn / ↑(p.succ)) (x / ↑(p.succ)),
+        rw[h11, ← hpn],
+        exact pow_succ' _ _}},
+        replace h12 := h12 p.succ,
+        have h13 : x * ↑(p.succ) / ↑(p.succ) = x,
+        { have : (p.succ : ℝ) ≠ 0 := ne_zero.ne _,
+          exact (div_eq_iff this).mpr rfl },
+        rw[h13] at h12,
+        rw[← h12],
+        have h14: u (x / ↑(p.succ)) ^ p.succ = u (x / ↑(p.succ)) ^ (p.succ:ℝ) := by norm_cast,
+        rw[h14],
+        have h15 := le_of_lt (hunz (x / ↑(p.succ))),
+        rw[←real.rpow_mul h15 _],
+        have : ((p:ℝ) + 1) ≠ 0 := by { norm_cast, exact ne_of_gt hp },
+        field_simp},
+
+  have hq : ∀ q : ℚ, u q = real.exp (k * q),
+  { intro q,
+    rw[rat.cast_def q],
+    rw[hp q.denom q.pos q.num],
+    rw[hzexp q.num],
+    rw[←real.exp_mul],
+    ring_nf},
+
+  use k,
+  
   -- Since u in monotonic and the rationals are dense in ℝ, we have u(x) = e^(kx) for all x ∈ ℝ.
   -- Therefore all solutions of the form u(x) = e^(kx), k ∈ ℝ.
   sorry,
