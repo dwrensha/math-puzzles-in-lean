@@ -1,5 +1,6 @@
 import data.int.basic
 import data.int.modeq
+import data.nat.prime_norm_num
 import data.zmod.basic
 
 import tactic.linarith

@@ -1,5 +1,6 @@
 import data.nat.basic
 import data.nat.modeq
+import data.nat.prime_norm_num
 import data.zmod.basic
 import data.int.basic
 
