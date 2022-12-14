@@ -28,6 +28,26 @@ begin
     linarith }
 end
 
+lemma rationals_dense_in_reals : dense {r : ℝ | ∃ q:ℚ, (q:ℝ) = r} :=
+begin
+  intro x,
+  exact rat.dense_range_cast _
+end
+
+example (y δ : ℝ) (hδ : 0 < δ) :
+     ∃ (z : ℚ), (z:ℝ) ∈ metric.ball y δ :=
+begin
+  have hd := dense_iff_inter_open.mp rationals_dense_in_reals,
+  -- consider the interval (y, y + δ)
+  let i := set.Ioo y (y + δ),
+  have : is_open i,
+  { intro,
+    sorry,
+  },
+  have := hd i,
+  sorry,
+end
+
 lemma extend_function
    (u : ℝ → ℝ)
    (f : ℝ → ℝ)
@@ -60,7 +80,9 @@ begin
   { exact hy h2 },
   { -- pick a rational point z greater than y that's in the ball s,
     -- how to do that? Use the denseness of ℚ, I suppose.
-    have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ := by { sorry },
+    have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ,
+    { sorry,},
+
     obtain ⟨z, h_y_lt_z, hyz⟩ := this,
     -- then dist (f z) (f y) < ε.
     have hzb : (↑z) ∈ metric.ball y δ := metric.mem_ball.mpr hyz,
