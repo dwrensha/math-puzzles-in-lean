@@ -37,42 +37,51 @@ lemma extend_function
    ∀ x : ℝ, u x = f x :=
 begin
   -- suppose not.
-  by_contra hn,
-  push_neg at hn,
+  by_contra hn, push_neg at hn,
 
   -- then there is y such that u y ≠ f y
   obtain ⟨y, hy⟩ := hn,
-
   let ε : ℝ := |u y - f y|,
+  have hε : 0 < ε := abs_pos' hy,
 
   -- then find a δ such that for all z, |z-y| < δ implies that
   -- |f z - f y| < ε.
+  have h_cont' := metric.continuous_iff'.mp f_cont y ε hε,
+  have h_cont2 := filter.eventually_iff.mp h_cont',
+  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
 
-   have h_cont' := metric.continuous_iff'.mp f_cont y ε (abs_pos' hy),
-   have h_cont2 := filter.eventually_iff.mp h_cont',
-   obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
+  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
+  have hb := hδ.trans hs,
 
-   obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
-   have := hδ.trans hs,
+  obtain h1 | h2 | h3 := lt_trichotomy (u y) (f y),
+  {  -- pick a rational point less than y that's in the ball s,
+    sorry
+  },
+  { exact hy h2 },
+  { -- pick a rational point z greater than y that's in the ball s,
+    -- how to do that? Use the denseness of ℚ, I suppose.
+    have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ := by { sorry },
+    obtain ⟨z, h_y_lt_z, hyz⟩ := this,
+    -- then dist (f z) (f y) < ε.
+    have hzb : (↑z) ∈ metric.ball y δ := metric.mem_ball.mpr hyz,
+    have hbzb := hb hzb,
+    rw[set.mem_set_of_eq, ← h z] at hbzb,
+    have huzuy : u z < u y,
+    { have hufp : 0 < u y - f y := by linarith,
+      have hua : ε = u y - f y := abs_of_pos hufp,
+      rw [hua, real.dist_eq] at hbzb,
+      cases em (f y < u z),
+      { have : 0 ≤ u z - f y := by linarith,
+        rw[abs_eq_self.mpr this] at hbzb,
+        linarith,},
+      { linarith,}},
+    -- so u(z) < u(y), contradicting u_mono.
+    have h_y_le_z := le_of_lt  h_y_lt_z,
+    have := u_mono h_y_le_z,
+    linarith,
+  },
 
---  have : ∃δ : ℝ, ∀ z, dist z y < δ → dist (f₁ y) (f₁ y) < ε,
---  { sorry,},
-
-  -- if f₂(y) > f₁(y), then choose such a z:ℚ that's greater than y
-  -- otherwise, choose such a z:ℚ that's less than y
-
---  obtain h1 | h2 | h3 := lt_trichotomy (f₁ y) (f₂ y),
---  {  -- pick a rational point greater than y that's in the ball s,
---    sorry
---  },
---  { exact hy h2,},
---  {  -- pick a rational point less than y that's in the ball s,
---    sorry,
---  }
-
-  -- in either case, we end up contradicting h_mono.
-
-  sorry,
+  -- in either case, we end up contradicting u_mono.
 end
 
 lemma int_dichotomy (z : ℤ) : ∃ n : ℕ, (n:ℤ) = z ∨ -(n:ℤ) = z :=
