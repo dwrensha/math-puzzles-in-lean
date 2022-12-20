@@ -34,17 +34,19 @@ begin
   exact rat.dense_range_cast _
 end
 
-example (y δ : ℝ) (hδ : 0 < δ) :
-     ∃ (z : ℚ), (z:ℝ) ∈ metric.ball y δ :=
+lemma find_rational_in_ball_right (y δ : ℝ) (hδ : 0 < δ) :
+     ∃ (z : ℚ), (y < z) ∧ (z : ℝ) ∈ metric.ball y δ :=
 begin
   have hd := dense_iff_inter_open.mp rationals_dense_in_reals,
-  -- consider the interval (y, y + δ)
-  let i := set.Ioo y (y + δ),
-  have : is_open i,
-  { intro,
-    sorry,
-  },
-  have := hd i,
+  let i := metric.ball ((y + δ) / 2) (δ/2),
+  have io : is_open i := @metric.is_open_ball ℝ _ _ _,
+  have ine : i.nonempty,
+  { use ((y + δ) / 2),
+    norm_num,
+    sorry},
+  obtain ⟨y', hy1, hy2⟩ := hd i io ine,
+  obtain ⟨yy, hyy⟩ :=  hy2,
+  use yy,
   sorry,
 end
 
@@ -81,7 +83,11 @@ begin
   { -- pick a rational point z greater than y that's in the ball s,
     -- how to do that? Use the denseness of ℚ, I suppose.
     have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ,
-    { sorry,},
+    { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_right y δ hδ0,
+      use z,
+      constructor,
+      { exact hz1, },
+      {exact metric.mem_ball.mp hz2,}},
 
     obtain ⟨z, h_y_lt_z, hyz⟩ := this,
     -- then dist (f z) (f y) < ε.
