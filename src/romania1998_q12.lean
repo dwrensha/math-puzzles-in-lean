@@ -104,7 +104,7 @@ begin
       linarith}}
 end
 
-lemma extend_function
+lemma extend_function_mono
    (u : ℝ → ℝ)
    (f : ℝ → ℝ)
    (u_mono : monotone u)
@@ -133,10 +133,7 @@ begin
   {  -- pick a rational point less than y that's in the ball s,
     have : ∃ z : ℚ, (z:ℝ) < y ∧ dist (z:ℝ) y < δ,
     { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_left y δ hδ0,
-      use z,
-      constructor,
-      { exact hz1, },
-      {exact metric.mem_ball.mp hz2,}},
+      exact ⟨z, hz1, metric.mem_ball.mp hz2⟩ },
 
     obtain ⟨z, h_z_lt_y, hyz⟩ := this,
     -- then dist (f z) (f y) < ε.
@@ -185,8 +182,86 @@ begin
     have := u_mono h_y_le_z,
     linarith,
   },
+end
 
-  -- in either case, we end up contradicting u_mono.
+lemma extend_function_anti
+   (u : ℝ → ℝ)
+   (f : ℝ → ℝ)
+   (u_anti : antitone u)
+   (f_cont : continuous f)
+   (h : ∀ x : ℚ, u x = f x) :
+   ∀ x : ℝ, u x = f x :=
+begin
+  -- suppose not.
+  by_contra hn, push_neg at hn,
+
+  -- then there is y such that u y ≠ f y
+  obtain ⟨y, hy⟩ := hn,
+  let ε : ℝ := |u y - f y|,
+  have hε : 0 < ε := abs_pos' hy,
+
+  -- then find a δ such that for all z, |z-y| < δ implies that
+  -- |f z - f y| < ε.
+  have h_cont' := metric.continuous_iff'.mp f_cont y ε hε,
+  have h_cont2 := filter.eventually_iff.mp h_cont',
+  obtain ⟨s, hs, hs', hs''⟩ := mem_nhds_iff.mp h_cont2,
+
+  obtain ⟨δ, hδ0, hδ⟩ := metric.is_open_iff.mp hs' y hs'',
+  have hb := hδ.trans hs,
+
+  obtain h1 | h2 | h3 := lt_trichotomy (u y) (f y),
+  { -- pick a rational point z greater than y that's in the ball s,
+    have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ,
+    { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_right y δ hδ0,
+      exact ⟨z, hz1, metric.mem_ball.mp hz2⟩},
+
+    obtain ⟨z, h_y_lt_z, hyz⟩ := this,
+    -- then dist (f z) (f y) < ε.
+    have hzb : (↑z) ∈ metric.ball y δ := metric.mem_ball.mpr hyz,
+    have hbzb := hb hzb,
+    rw[set.mem_set_of_eq, ← h z] at hbzb,
+    have huzuy : u y < u z,
+    { have hufp : u y - f y < 0  := by linarith,
+      have hua : ε = -(u y - f y) := abs_of_neg hufp,
+      rw [hua, real.dist_eq] at hbzb,
+      cases em (f y < u z),
+      { have : 0 ≤ u z - f y := by linarith,
+        linarith,},
+      { have : u z - f y ≤ 0 := by linarith,
+        rw[abs_eq_neg_self.mpr this] at hbzb,
+        linarith }},
+    have h_y_le_z := le_of_lt h_y_lt_z,
+    have := u_anti h_y_le_z,
+    linarith},
+  { exact hy h2 },
+  {  -- pick a rational point less than y that's in the ball s,
+    have : ∃ z : ℚ, (z:ℝ) < y ∧ dist (z:ℝ) y < δ,
+    { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_left y δ hδ0,
+      use z,
+      constructor,
+      { exact hz1, },
+      {exact metric.mem_ball.mp hz2,}},
+
+    obtain ⟨z, h_z_lt_y, hyz⟩ := this,
+    -- then dist (f z) (f y) < ε.
+    have hzb : (↑z) ∈ metric.ball y δ := metric.mem_ball.mpr hyz,
+    have hbzb := hb hzb,
+    rw[set.mem_set_of_eq, ← h z] at hbzb,
+    have huzuy : u z < u y,
+    { have hufp : 0 < u y - f y := by linarith,
+      have hua : ε = u y - f y := abs_of_pos hufp,
+      rw [hua, real.dist_eq] at hbzb,
+      obtain h5 | h6 := em (f y < u z),
+      { have : 0 ≤ u z - f y := by linarith,
+        rw[abs_eq_self.mpr this] at hbzb,
+        linarith },
+      { have : u z - f y ≤ 0 := by linarith,
+        rw[abs_eq_neg_self.mpr this] at hbzb,
+        linarith }},
+    have h_z_le_y := le_of_lt h_z_lt_y,
+    have := u_anti h_z_le_y,
+    linarith },
+  -- in either case, we end up contradicting u_anti.
 end
 
 lemma int_dichotomy (z : ℤ) : ∃ n : ℕ, (n:ℤ) = z ∨ -(n:ℤ) = z :=
@@ -343,8 +418,9 @@ begin
 
   cases hm,
   { have hmu : monotone u := strict_mono.monotone hm,
-    exact extend_function u f hmu hfm hf },
-  {sorry}
+    exact extend_function_mono u f hmu hfm hf },
+  { have hau : antitone u := strict_anti.antitone hm,
+    exact extend_function_anti u f hau hfm hf }
 end
 
 lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
