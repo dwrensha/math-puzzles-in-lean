@@ -421,11 +421,6 @@ begin
   finish
 end
 
-example (p : Prop) (h : ¬ ¬ p) : p :=
-begin
-  exact not_not.mp h
-end
-
 lemma romania1998_q12_mp (u : ℝ → ℝ) :
     (∃ f : ℝ → ℝ, (strict_mono f ∨ strict_anti f)
         ∧ ∀ x y : ℝ, f (x + y) = f x * u y + f y) →
