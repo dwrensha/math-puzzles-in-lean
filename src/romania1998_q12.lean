@@ -69,6 +69,41 @@ begin
       linarith}}
 end
 
+lemma find_rational_in_ball_left (y δ : ℝ) (hδ : 0 < δ) :
+     ∃ (z : ℚ), ((z:ℝ) < y) ∧ (z : ℝ) ∈ metric.ball y δ :=
+begin
+  have hd := dense_iff_inter_open.mp rationals_dense_in_reals,
+  let i := metric.ball (y - δ / 2) (δ/2),
+  have io : is_open i := @metric.is_open_ball ℝ _ _ _,
+  have ine : i.nonempty,
+  { use (y - δ / 2),
+    have hδ' : 0 < δ / 2 := by nlinarith,
+    norm_num[hδ']},
+  obtain ⟨y', hy1, hy2⟩ := hd i io ine,
+  obtain ⟨yy, hyy⟩ := hy2,
+  use yy,
+  rw [hyy], clear hyy,
+  have hy3 := metric.mem_ball.mp hy1,
+  rw[real.dist_eq] at hy3,
+  have hyy' : y' < y,
+  { obtain ⟨ha, ha'⟩ | ⟨hb,hb'⟩ := abs_cases (y' - (y - δ / 2)),
+    { rw[ha] at hy3,
+      linarith},
+    { rw[hb] at hy3,
+      linarith }},
+  constructor,
+  { exact hyy' },
+  { apply metric.mem_ball.mpr,
+    rw[real.dist_eq],
+    have hy4 : y' - y ≤ 0 := by linarith,
+    rw[abs_eq_neg_self.mpr hy4],
+    obtain ⟨ha, ha'⟩ | ⟨hb,hb'⟩ := abs_cases (y' - (y - δ / 2)),
+    { rw[ha] at hy3,
+      linarith},
+    { rw[hb] at hy3,
+      linarith}}
+end
+
 lemma extend_function
    (u : ℝ → ℝ)
    (f : ℝ → ℝ)
@@ -96,11 +131,34 @@ begin
 
   obtain h1 | h2 | h3 := lt_trichotomy (u y) (f y),
   {  -- pick a rational point less than y that's in the ball s,
-    sorry
-  },
+    have : ∃ z : ℚ, (z:ℝ) < y ∧ dist (z:ℝ) y < δ,
+    { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_left y δ hδ0,
+      use z,
+      constructor,
+      { exact hz1, },
+      {exact metric.mem_ball.mp hz2,}},
+
+    obtain ⟨z, h_z_lt_y, hyz⟩ := this,
+    -- then dist (f z) (f y) < ε.
+    have hzb : (↑z) ∈ metric.ball y δ := metric.mem_ball.mpr hyz,
+    have hbzb := hb hzb,
+    rw[set.mem_set_of_eq, ← h z] at hbzb,
+    have huzuy : u y < u z,
+    { have hufp : u y - f y < 0 := by linarith,
+      have hua : ε = -(u y - f y) := abs_of_neg hufp,
+      rw [hua, real.dist_eq] at hbzb,
+      obtain h5 | h6 := em (f y < u z),
+      { have : 0 ≤ u z - f y := by linarith,
+        linarith },
+      { have : u z - f y ≤ 0 := by linarith,
+        rw[abs_eq_neg_self.mpr this] at hbzb,
+        linarith }},
+    -- so u(z) < u(y), contradicting u_mono.
+    have h_y_le_z := le_of_lt  h_z_lt_y,
+    have := u_mono h_y_le_z,
+    linarith },
   { exact hy h2 },
   { -- pick a rational point z greater than y that's in the ball s,
-    -- how to do that? Use the denseness of ℚ, I suppose.
     have : ∃ z : ℚ, y < z ∧ dist (z:ℝ) y < δ,
     { obtain ⟨z, hz1, hz2⟩ := find_rational_in_ball_right y δ hδ0,
       use z,
