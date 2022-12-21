@@ -15,18 +15,7 @@ function f : ℝ → ℝ such that
 -/
 
 lemma abs_pos' {x y : ℝ} (hy : x ≠ y) : 0 < |x - y| :=
-begin
-  obtain h1 | h2 | h3 := lt_trichotomy x y,
-  { -- x < y
-    simp only [abs_pos, ne.def],
-    linarith,},
-  { -- x = y,
-    rw[h2] at hy,
-    exfalso,
-    exact hy rfl },
-  { simp only [abs_pos, ne.def],
-    linarith }
-end
+  abs_pos.mpr (sub_ne_zero.mpr hy)
 
 lemma rationals_dense_in_reals : dense {r : ℝ | ∃ q:ℚ, (q:ℝ) = r} :=
 begin
