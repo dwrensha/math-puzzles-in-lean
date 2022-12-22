@@ -4,9 +4,7 @@ import data.nat.prime_norm_num
 import data.zmod.basic
 import data.int.basic
 
-
 import tactic.linarith
-import tactic.field_simp
 import tactic.norm_num
 import tactic.interval_cases
 
@@ -107,9 +105,8 @@ begin
   split,
   { exact zmod.val_lt ii },
   { have := hN ii.val (zmod.val_lt ii),
-    rw [this],
-    field_simp,
-    ring },
+    rw [this, zmod.nat_cast_val, zmod.cast_id', id.def, mul_div_cancel' _ hk],
+    exact add_neg_self (a' N0) }
 end
 
 lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
