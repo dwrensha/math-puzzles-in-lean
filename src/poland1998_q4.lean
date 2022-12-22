@@ -44,10 +44,10 @@ lemma a_recurrence (n : ℕ) (hn : 2 ≤ n) :
   a n = a (n - 1) + a (n / 2) :=
 begin
   cases n,
-  { linarith },
+  { exact (nat.not_succ_le_zero _ hn).elim },
   cases n,
-  { linarith },
-  simp [a],
+  { exact (nat.not_succ_le_self _ hn).elim },
+  simp only [a, nat.succ_sub_succ_eq_sub, tsub_zero],
 end
 
 lemma lemma1 (n : ℕ) (npos : 0 < n) : 2 * (n - 1) + 1 = 2 * n - 1 :=
