@@ -114,8 +114,9 @@ end
 
 lemma lemma6 (n : ℕ) : (4 * (n - 1) + 1 + 3) / 2 = (2 * (n - 1) + 1 + 1) :=
 begin
-  have : (4 * (n - 1) + 1 + 3) = 2 * (2 * (n - 1) + 1 + 1) := by linarith,
-  finish
+  have : (4 * (n - 1) + 1 + 3) = 2 * (2 * (n - 1) + 1 + 1) := by ring,
+  rw [this,nat.mul_div_right],
+  exact two_pos,
 end
 
 lemma lemma6' (n : ℕ) : (4 * (n - 1) + 1 + 4) / 2 = (2 * (n - 1) + 1 + 1) :=
@@ -127,13 +128,13 @@ end
 
 lemma lemma7 (n : ℕ) : (4 * (n - 1) + 1 + 5) / 2 = (2 * (n - 1) + 1 + 2) :=
 begin
-  have : (4 * (n - 1) + 1 + 5) = 2 * (2 * (n - 1) + 1 + 2) := by linarith,
+  have : (4 * (n - 1) + 1 + 5) = 2 * (2 * (n - 1) + 1 + 2) := by ring,
   finish
 end
 
 lemma lemma7' (n : ℕ) : (4 * (n - 1) + 1 + 6) / 2 = (2 * (n - 1) + 1 + 2) :=
 begin
-  have h1 : (4 * (n - 1) + 1 + 6) = 2 * (2 * (n - 1) + 1 + 2) + 1 := by linarith,
+  have h1 : (4 * (n - 1) + 1 + 6) = 2 * (2 * (n - 1) + 1 + 2) + 1 := by ring,
   rw [h1],
   exact lemma2 (2 * (n - 1) + 1 + 2),
 end
@@ -330,7 +331,7 @@ begin
     { have heq : m = pn + 1,
       { have h1 : pn < m := hm,
         have h2 : m ≤ pn + 1 := hlte,
-        have h3 : m = pn + 1 := by linarith,
+        have h3 : m = pn + 1 := le_antisymm hlte hm,
         exact h3 },
       rw [heq] at hmp,
       exact h (pn.succ) hmp } }
