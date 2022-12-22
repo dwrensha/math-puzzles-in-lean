@@ -51,7 +51,7 @@ begin
     have h2 : 0 < f x + f x := add_pos h0 h0,
     have h3 : 0 ≠ f x + f x := ne_of_lt h2,
     have h5 := ne_of_lt h0,
-    have h6: 2 * f x ≠ 0 := by linarith,
+    have h6: 2 * f x ≠ 0 := by positivity,
     have h7 : (f x/ (2 * f x)) = 1 / 2 := by { rw [div_eq_iff h6], ring },
 
     calc f (x + f x) = f (x + f x) * 1                   : (mul_one _).symm
