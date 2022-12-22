@@ -30,9 +30,7 @@ begin
   let i := metric.ball (y + δ / 2) (δ/2),
   have io : is_open i := @metric.is_open_ball ℝ _ _ _,
   have ine : i.nonempty,
-  { use (y + δ / 2),
-    have hδ' : 0 < δ / 2 := by nlinarith,
-    norm_num[hδ']},
+  { use (y + δ / 2), norm_num[half_pos hδ] },
   obtain ⟨y', hy1, hy2⟩ := hd i io ine,
   obtain ⟨yy, hyy⟩ := hy2,
   use yy,
@@ -65,9 +63,7 @@ begin
   let i := metric.ball (y - δ / 2) (δ/2),
   have io : is_open i := @metric.is_open_ball ℝ _ _ _,
   have ine : i.nonempty,
-  { use (y - δ / 2),
-    have hδ' : 0 < δ / 2 := by nlinarith,
-    norm_num[hδ']},
+  { use (y - δ / 2), norm_num[half_pos hδ] },
   obtain ⟨y', hy1, hy2⟩ := hd i io ine,
   obtain ⟨yy, hyy⟩ := hy2,
   use yy,
@@ -210,7 +206,7 @@ begin
     have hbzb := hb hzb,
     rw[set.mem_set_of_eq, ← h z] at hbzb,
     have huzuy : u y < u z,
-    { have hufp : u y - f y < 0  := by linarith,
+    { have hufp : u y - f y < 0 := by linarith,
       have hua : ε = -(u y - f y) := abs_of_neg hufp,
       rw [hua, real.dist_eq] at hbzb,
       cases em (f y < u z),
@@ -293,11 +289,11 @@ begin
     have H1 := one_div_nonpos.mpr H,
     obtain hlt | heq | hgt := lt_trichotomy x 0,
     { have h10 := h2 x,
-      have hx0 : 0 < -x := by linarith,
+      have hx0 : 0 < -x := neg_pos.mpr hlt,
       cases hm; nlinarith [hm hx0, hm hlt]},
     { rw [heq, hu0] at H, linarith},
     { have h10 := h2 x,
-      have hx0 : -x < 0 := by linarith,
+      have hx0 : -x < 0 := neg_lt_zero.mpr hgt,
       cases hm; nlinarith [hm hx0, hm hgt]}},
 
   have h3 : ∀ x, u (-x) = 1 / (u x),
@@ -410,16 +406,12 @@ begin
 end
 
 lemma exp_strict_mono' (k x y : ℝ) (hkp: 0 < k) (h : x < y) :
-  real.exp(k * x) < real.exp(k * y) :=
-begin
-  finish,
-end
+    real.exp(k * x) < real.exp(k * y) :=
+  real.exp_lt_exp.mpr ((mul_lt_mul_left hkp).mpr h)
 
 lemma exp_strict_anti' (k x y : ℝ) (hkp: k < 0) (h : x < y) :
-  real.exp(k * y) < real.exp(k * x) :=
-begin
-  finish
-end
+    real.exp(k * y) < real.exp(k * x) :=
+  real.exp_lt_exp.mpr (mul_lt_mul_of_neg_left h hkp)
 
 lemma romania1998_q12_mp (u : ℝ → ℝ) :
     (∃ f : ℝ → ℝ, (strict_mono f ∨ strict_anti f)
