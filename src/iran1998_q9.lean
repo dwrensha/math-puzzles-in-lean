@@ -40,13 +40,13 @@ begin
   --
   -- The desired result follows.
 
-  have hxz : x ≠ 0 := by linarith,
-  have hyz : y ≠ 0 := by linarith,
-  have hzz : z ≠ 0 := by linarith,
+  have hxz : x ≠ 0 := by positivity,
+  have hyz : y ≠ 0 := by positivity,
+  have hzz : z ≠ 0 := by positivity,
 
-  have hx0 : 0 ≤ x := by linarith,
-  have hy0 : 0 ≤ y := by linarith,
-  have hz0 : 0 ≤ z := by linarith,
+  have hx0 : 0 ≤ x := by positivity,
+  have hy0 : 0 ≤ y := by positivity,
+  have hz0 : 0 ≤ z := by positivity,
 
   have hx1 : 0 ≤ x - 1 := by linarith,
   have hy1 : 0 ≤ y - 1 := by linarith,
@@ -104,7 +104,7 @@ begin
     rw[hxx', hyy', hzz'] at hn,
     have hfs: (x - 1) / x + (y - 1) / y + (z - 1) / z = 3 - (1/x + 1/y + 1/z) := by {field_simp, ring},
     rw[hfs, h] at hn,
-    have ha: (3: ℝ) - 2 = 1 := by linarith,
+    have ha: (3: ℝ) - 2 = 1 := by norm_num,
     rw[hn, ha],
     exact real.sqrt_one},
 
