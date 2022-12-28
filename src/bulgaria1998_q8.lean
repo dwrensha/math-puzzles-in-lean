@@ -19,11 +19,25 @@ def P : ℕ → R → R → R
 | 0 _ _ := 1
 | (n+1) x y := (x + y - 1) * (y + 1) * P n x (y + 2) + (y - y^2) * P n x y
 
--- helper function
-/- Sₙ₋₁(x,y) = [(x + y)² - 1](y + 1)(x + 1)Pₙ₋₁(y+2, x+2).
+/- helper function
+   Sₙ₋₁(x,y) = [(x + y)² - 1](y + 1)(x + 1)Pₙ₋₁(y+2, x+2).
 -/
 def S : ℕ → R → R → R
 | n x y := ((x + y)^2 - 1) * (y + 1) * (x + 1) * P n (y + 2) (x + 2)
+
+/- helper function
+   Tₙ₋₁(x,y) = (y - y²)(x - x²)Pₙ₋₁(y, x).
+-/
+def T : ℕ → R → R → R
+| n x y := (y - y^2) * (x - x^2) * P n y x
+
+/- helper function
+   Uₙ₋₁(x,y) = (x + y - 1) [(y + 1)(x - x²)Pₙ₋₁(y + 2, x)
+                           + (x + 1)(y - y²) Pₙ₋₁(y, x + 2)]
+-/
+def U : ℕ → R → R → R
+| n x y := (x + y - 1) *((y + 1)*(x - x^2) * P n (y + 2) x
+                           + (x + 1) * (y - y^2) * P n y (x + 2))
 
 theorem bulgaria1998_q8 (n : ℕ) (x y : R) : P n x y = P n y x :=
 begin
@@ -57,37 +71,34 @@ begin
                    (y - y^2) * (P n.succ y x) : by {rw[ih1 x y,ih1 x (y+2)]},
     },
 
-    have h1' : ∀ x y : R, P n.succ x y =
-               (x + y - 1) * (y + 1) * (P n (y + 2) x) +
-                   (y - y^2) * (P n y x),
-    { intros x y,
-      calc P (n.succ) x y
-               = (x + y - 1) * (y + 1) * (P n x (y + 2)) +
-                   (y - y^2) * (P n x y) : rfl
-           ... = (x + y - 1) * (y + 1) * (P n (y + 2) x) +
-                   (y - y^2) * (P n y x) : sorry
-/-by {rw[ih1 x y,ih1 x (y+2)]}-/,
-    },
-
-    /- Note that
-      (x + y - 1)(y + 1)Pₙ(y + 2, x)
-        = Sₙ₋₁(x,y) + (x + y - 1)(y + 1)(x - x²)Pₙ₋₁(y+2,x),
-      where Sₙ₋₁(x,y) = [(x + y)² - 1](y + 1)(x + 1)Pₙ₋₁(y+2,x+2).
-    -/
     have h2 : ∀ x y : R, (x + y - 1) * (y + 1) * P n.succ (y + 2) x
         = S n x y + (x + y - 1)* (y + 1) * (x - x^2)* P n (y+2) x,
-    {intros x y,
-     unfold S,
-     unfold P,
-     ring},
+    {intros x y, unfold S P, ring},
 
-    have h2' : ∀ x y : R, (x + y - 1) * (y + 1) * P n.succ.succ (y + 2) x
-        = S n.succ x y + (x + y - 1)* (y + 1) * (x - x^2)* P n.succ (y+2) x,
-    {intros x y,
-     unfold S,
-     unfold P,
-     ring},
+    have h_s_symm : ∀ m : ℕ, m < n.succ.succ → ∀ x y : R, S m x y = S m y x,
+    { intros m hm x y, unfold S, rw[ih m hm (x + 2) (y + 2)], ring },
 
-    sorry,
+    have h4 : ∀ x y : R, (y - y^2) * P n.succ y x =
+              (y - y^2) * (x + y -1) * (x + 1) * P n y (x + 2) + T n x y,
+    { intros x y, unfold T P, ring },
+
+    have h_t_symm : ∀ m : ℕ, m < n.succ.succ → ∀ x y : R, T m x y = T m y x,
+    { intros m hm x y, unfold T, rw[ih m hm x y], ring },
+
+    have h_u_symm : ∀ m : ℕ, m < n.succ.succ → ∀ x y : R, U m x y = U m y x,
+    { intros m hm x y, unfold U, rw[ih m hm (y+2) x, ih m hm (x+2) y], ring },
+
+    have h7 : forall x y : R, P n.succ.succ x y = S n x y + T n x y + U n x y,
+    { intros x y, rw[h1 x y, h2 x y, h4 x y], unfold U, ring,},
+
+    have h8 : n < n.succ := lt_add_one n,
+    have h9 : n < n.succ.succ := nat.lt.step h8,
+
+    intros x y,
+    calc P n.succ.succ x y = S n x y + T n x y + U n x y : h7 x y
+                       ... = S n y x + T n x y + U n x y : by rw[h_s_symm n h9 x y]
+                       ... = S n y x + T n y x + U n x y : by rw[h_t_symm n h9 x y]
+                       ... = S n y x + T n y x + U n y x : by rw[h_u_symm n h9 x y]
+                       ... = P n.succ.succ y x : (h7 y x).symm
   },
 end
