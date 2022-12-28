@@ -78,28 +78,15 @@ begin
         = S n x y + (x + y - 1)* (y + 1) * (x - x^2)* P n (y+2) x,
     {intros x y,
      unfold S,
-     rw[ih1 (y+2) x],
-     have h3 := h1' x (y + 2),
-     rw[h3],
-     sorry},
+     unfold P,
+     ring},
 
     have h2' : ∀ x y : R, (x + y - 1) * (y + 1) * P n.succ.succ (y + 2) x
         = S n.succ x y + (x + y - 1)* (y + 1) * (x - x^2)* P n.succ (y+2) x,
     {intros x y,
      unfold S,
-     have h3 := h1 (y + 2) x,
-     rw[h3],
-     rw[ih1 x (y+2)],
-     ring_nf,
-     sorry},
-
-/-
- [(x + y)² - 1](y + 1)(x + 1)Pₙ₋₁(y + 2, x) +
- (x + y - 1)(y + 1)(x - x²)Pₙ₋₁(y + 2, x)
-
- [x² + y² + 2xy - 1](y + 1)(x + 1)Pₙ₋₁(y + 2, x) +
- (x + y - 1)(y + 1)x(1 - x)Pₙ₋₁(y + 2, x)
--/
+     unfold P,
+     ring},
 
     sorry,
   },
