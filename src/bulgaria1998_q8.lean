@@ -87,7 +87,7 @@ begin
   have h_u_symm : ∀ m : ℕ, m < n.succ.succ → ∀ x y : R, U m x y = U m y x,
   { intros m hm x y, unfold U, rw[ih m hm (y+2) x, ih m hm (x+2) y], ring },
 
-  have h7 : forall x y : R, P n.succ.succ x y = S n x y + T n x y + U n x y,
+  have h7 : ∀ x y : R, P n.succ.succ x y = S n x y + T n x y + U n x y,
   { intros x y, rw[h1 x y, h2 x y, h4 x y], unfold U, ring,},
 
   have h9 : n < n.succ.succ := nat.lt.step (lt_add_one n),
