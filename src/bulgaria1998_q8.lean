@@ -90,8 +90,7 @@ begin
   have h7 : forall x y : R, P n.succ.succ x y = S n x y + T n x y + U n x y,
   { intros x y, rw[h1 x y, h2 x y, h4 x y], unfold U, ring,},
 
-  have h8 : n < n.succ := lt_add_one n,
-  have h9 : n < n.succ.succ := nat.lt.step h8,
+  have h9 : n < n.succ.succ := nat.lt.step (lt_add_one n),
 
   intros x y,
   calc P n.succ.succ x y = S n x y + T n x y + U n x y : h7 x y
