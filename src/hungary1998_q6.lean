@@ -25,5 +25,8 @@ begin
  -- which implies that 3∣y. Since z ≥ 2, 3²∣y^z, but 3² does not divide
  -- 33(3x² + 300x + 50 ⬝ 199), contradiction.
 
+
+ -- (note that mathlib has finset.sum_range_id)
+
  sorry
 end
