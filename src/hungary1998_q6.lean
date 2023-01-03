@@ -11,7 +11,7 @@ Let x, y, z be integers with z > 1. Show that
 
 open_locale big_operators
 
-theorem hungary1998_q6 (x y) (z : ℕ) (hz : 1 < z) :
+theorem hungary1998_q6 (x y : ℤ) (z : ℕ) (hz : 1 < z) :
     ∑(i : ℕ) in finset.range 99, (x + i + 1)^2 ≠ y^z :=
 begin
  -- Suppose (x + 1)² + (x + 2)² + ... + (x + 99)² ≠ y^z.
