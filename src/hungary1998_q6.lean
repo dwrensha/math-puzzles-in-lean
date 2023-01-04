@@ -107,7 +107,6 @@ begin
   have h12 : k * (3 * k * (3 * k) ^ z) = (11 * (3 * x ^ 2 + 300 * x + 50 * 199)),
   { exact (mul_right_inj' h11).mp h7 },
 
-
   have h14 : (k * (3 * k * (3 * k) ^ z)) = (3 * (k * k * (3 * k) ^ z)) :=
     by ring,
   have h15 : (3 * x ^ 2 + 300 * x + 50 * 199) =
