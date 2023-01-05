@@ -52,10 +52,6 @@ begin
   --     = 99x² + 2[(99 ⬝ 100)/2]x + (99 ⬝ 100 ⬝ 199)/6
   --     = 33(3x² + 300x + 50 ⬝ 199).
 
-  have h1 : ∀ i : ℕ, i ∈ finset.range 99 →
-    (x + i + 1)^2 = x^2 + 2 * x * (i + 1) + (i + 1)^2,
-  { intros i _, ring},
-
   have h2 : ∑(i : ℕ) in finset.range 99, (x^2) = 99 * x^2 := by norm_num,
 
   have h3 : ∑(i : ℕ) in finset.range 99, (2 * x * (i + 1)) =
@@ -74,7 +70,7 @@ begin
   have h7 := calc y^z
       = ∑(i : ℕ) in finset.range 99, ((x + i) + 1)^2 : he.symm
   ... = ∑(i : ℕ) in finset.range 99,
-          (x^2 + 2 * x * (i + 1) + (i + 1)^2) : finset.sum_congr rfl h1
+          (x^2 + 2 * x * (i + 1) + (i + 1)^2) : by {congr, funext, ring}
   ... = ∑(i : ℕ) in finset.range 99, (x^2 + 2 * x * (i + 1)) +
          ∑(i : ℕ) in finset.range 99, ((i + 1)^2) : finset.sum_add_distrib
   ... = ∑(i : ℕ) in finset.range 99, (x^2) +
