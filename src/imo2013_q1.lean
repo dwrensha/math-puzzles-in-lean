@@ -21,8 +21,6 @@ We prove a slightly more general version where k does not need to be strictly po
 
 open_locale big_operators
 
-lemma arith_lemma (k n : ℕ) : 0 < 2 * n + 2^k.succ := by positivity
-
 lemma prod_lemma (m : ℕ → ℕ+) (k : ℕ) (nm : ℕ+):
       ∏ (i : ℕ) in finset.range k, ((1 : ℚ) + 1 / ↑(if i < k then m i else nm)) =
       ∏ (i : ℕ) in finset.range k, (1 + 1 / m i) :=
@@ -50,14 +48,13 @@ begin
     -- Now we have ht : ↑n = 2 * (t + 1).
     let t_succ : ℕ+ := ⟨t + 1, t.succ_pos⟩,
     obtain ⟨pm, hpm⟩ := hpk t_succ,
-    let m := λi, if i < pk then pm i else ⟨2 * t + 2^pk.succ, arith_lemma pk t⟩,
+    let m := λi, if i < pk then pm i else ⟨2 * t + 2^pk.succ, by positivity⟩,
     use m,
 
     have hmpk : (m pk : ℚ) = 2 * t + 2^pk.succ,
     { have : m pk = ⟨2 * t + 2^pk.succ, _⟩ := if_neg (irrefl pk), simp [this] },
 
-    have denom_ne_zero : (2 * (t:ℚ) + 2^pk.succ) ≠ 0,
-    { norm_cast, exact (ne_of_gt $ arith_lemma pk t) },
+    have denom_ne_zero : (2 * (t:ℚ) + 2^pk.succ) ≠ 0 := by positivity,
 
     calc (1 : ℚ) + (2 ^ pk.succ - 1) / ↑n
         = 1 + (2 * 2 ^ pk - 1) / (2 * (t + 1) : ℕ)    : by rw [coe_coe n, ht, pow_succ]
@@ -79,7 +76,7 @@ begin
     have hmpk : (m pk : ℚ) = 2 * t + 1,
     { have : m pk = ⟨2 * t + 1, _⟩ := if_neg (irrefl pk), simp [this] },
 
-    have denom_ne_zero : (2 * (t : ℚ) + 1) ≠ 0 := by { norm_cast, apply (2 * t).succ_ne_zero },
+    have denom_ne_zero : (2 * (t : ℚ) + 1) ≠ 0 := by positivity,
 
     calc (1 : ℚ) + (2 ^ pk.succ - 1) / ↑n
         = 1 + (2 * 2^pk - 1) / (2 * t + 1 : ℕ)        : by rw [coe_coe n, ht, pow_succ]
