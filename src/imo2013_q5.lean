@@ -100,12 +100,11 @@ begin
 
   have num_pos : 0 < q.num := rat.num_pos_iff_pos.mpr hq,
   have hqna : (q.num.nat_abs : ℤ) = q.num := int.nat_abs_of_nonneg num_pos.le,
-  have hqfn' :=
-    calc (q.num : ℝ)
+  have hqfn' := calc (q.num : ℝ)
             = ((q.num.nat_abs : ℤ) : ℝ) : congr_arg coe (eq.symm hqna)
         ... ≤ f q.num.nat_abs           : H4 q.num.nat_abs
                                             (int.nat_abs_pos_of_ne_zero (ne_of_gt num_pos))
-        ... = f q.num                   : by exact_mod_cast congr_arg f (congr_arg coe hqna),
+        ... = f q.num                   : by rw [nat.cast_nat_abs, abs_of_nonneg num_pos.le],
 
   have f_num_pos := calc (0 : ℝ) < q.num   : int.cast_pos.mpr num_pos
                              ... ≤ f q.num : hqfn',
