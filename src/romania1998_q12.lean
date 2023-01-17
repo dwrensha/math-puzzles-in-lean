@@ -1,8 +1,6 @@
 import data.rat.basic
 import data.real.basic
-import data.complex.exponential
 import analysis.special_functions.pow
-import topology.metric_space.basic
 
 /-
 Romanian Mathematical Olympiad 1998, Problem 12
