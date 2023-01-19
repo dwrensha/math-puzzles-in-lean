@@ -1,5 +1,4 @@
 import algebra.big_operators.intervals
-import algebra.big_operators.pi
 import algebra.big_operators.ring
 import data.nat.prime
 import algebra.associated
