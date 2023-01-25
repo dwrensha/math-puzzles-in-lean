@@ -44,7 +44,8 @@ lemma digits_lemma
   (hn: 0 < n)
   : (nat.digits base (base * n)) = 0 :: (nat.digits base n) :=
 begin
-  have := nat.digits_add base h2 0 n (nat.lt_of_succ_lt (nat.succ_le_iff.mp h2)) (or.inr hn),
+  have := nat.digits_add base h2 0 n (nat.lt_of_succ_lt (nat.succ_le_iff.mp h2))
+                              (or.inr (ne_of_gt hn)),
   rwa (zero_add (base * n)) at this,
 end
 
@@ -82,7 +83,7 @@ lemma times_base_plus_one_still_all_zero_or_one
   (hazoo : all_zero_or_one (nat.digits base n))
   : all_zero_or_one (nat.digits base (1 + base * n)) :=
 begin
-  rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_pos)),
+  rw (nat.digits_add base h2 1 n (nat.succ_le_iff.mp h2) (or.inl nat.one_ne_zero)),
   simpa[all_zero_or_one, is_zero_or_one],
 end
 
@@ -278,7 +279,7 @@ end
 lemma prepend_one_mod (n : ℕ) (hn : 0 < n) : prepend_one n % 10 = n % 10 :=
 begin
   rw[prepend_one],
-  rw[nat.digits_len _ _ two_le_ten hn],
+  rw[nat.digits_len _ _ two_le_ten (ne_of_gt hn)],
   rw[pow_add, pow_one],
   exact nat.mul_add_mod _ 10 n
 end
@@ -337,7 +338,7 @@ end
 lemma prepend_two_mod (n : ℕ) (hn : 0 < n) : prepend_two n % 10 = n % 10 :=
 begin
   rw[prepend_two],
-  rw[nat.digits_len _ _ two_le_ten hn],
+  rw[nat.digits_len _ _ two_le_ten (ne_of_gt hn)],
   rw[pow_add, pow_one, ←mul_assoc],
   exact nat.mul_add_mod _ 10 n
 end
