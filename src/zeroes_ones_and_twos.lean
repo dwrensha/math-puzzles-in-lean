@@ -5,7 +5,6 @@ import data.nat.parity
 import data.pnat.basic
 import data.nat.digits
 import data.nat.gcd.basic
-import algebra.big_operators.pi
 import algebra.big_operators.ring
 
 import tactic.ring_exp

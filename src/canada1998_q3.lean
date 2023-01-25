@@ -1,4 +1,4 @@
-import algebra.big_operators.pi
+import algebra.big_operators.basic
 import data.real.basic
 
 /-

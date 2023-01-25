@@ -1,6 +1,6 @@
 import algebra.order.archimedean
 import data.real.basic
-import algebra.big_operators.pi
+import algebra.big_operators.basic
 import analysis.specific_limits.basic
 
 /-
