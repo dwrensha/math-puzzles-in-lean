@@ -1,9 +1,10 @@
 import data.stream.defs
 import data.stream.init
 
-import algebra.big_operators
+import algebra.big_operators.basic
 
 import tactic.basic
+import tactic.ring
 
 /-
 

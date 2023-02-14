@@ -1,7 +1,8 @@
 import data.finset.basic
+import data.fintype.card
 import data.nat.basic
 
-import algebra.big_operators
+import algebra.big_operators.basic
 
 open_locale big_operators
 
