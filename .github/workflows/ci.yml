@@ -14,7 +14,7 @@ jobs:
       # number of commits to check for olean cache
       GIT_HISTORY_DEPTH: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: ${{ env.GIT_HISTORY_DEPTH }}
 
@@ -39,7 +39,6 @@ jobs:
         id: build
         run: |
           set -o pipefail
-          echo "::set-output name=started::true"
           echo "Starting build at $(date +'%T')"
           leanpkg build --make
           result_run1=$?
