@@ -6,4 +6,4 @@ plus various olympiads.
 
 
 Please see the Lean 4 version of this repo here:
-https://github.com/dwrensha/math-puzzles-in-lean4
+https://github.com/dwrensha/compfiles
